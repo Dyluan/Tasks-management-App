@@ -9,7 +9,7 @@ function ColumnListComponent({columns}) {
         <ul className={styles.list}>
           {columns.map((elem, index) => (
             <li className={styles.elem} key={index}>
-              <ColumnComponent title={elem}/>
+              <ColumnComponent title={elem} />
             </li>
           ))}
         </ul> 

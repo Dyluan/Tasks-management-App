@@ -17,6 +17,20 @@
     justify-content: space-between;
     margin-bottom: 12px;
 }
+.titleInput {
+    padding: 8px 8px 8px 0;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+.titleInput:focus {
+    outline: none;
+}
+.title:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0,0,0,0.2);
+    cursor: pointer;
+}
 .title {
     font-size: 16px;
     line-height: 22px;

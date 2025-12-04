@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 
 function ColumnComponent({title}) {
 
+  // should transform items to objects with a unique ID to be able to move them/ delete them
   const [items, setItems] = useState(["Card Text", "Another text", "Third one"]);
   const [columnTitle, setColumnTitle] = useState(title);
   const [editingTitle, setEditingTitle] = useState(false);
