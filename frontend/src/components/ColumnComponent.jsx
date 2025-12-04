@@ -5,7 +5,7 @@ import featuredLogo from '../assets/featured_play_list.png';
 import CardListComponent from './CardListComponent';
 import { useState } from 'react';
 
-function ColumnComponent() {
+function ColumnComponent({title}) {
 
   const [items, setItems] = useState(["Card Text", "Another text", "Third one"]);
 
@@ -17,7 +17,7 @@ function ColumnComponent() {
     <div className={styles.main} >
       <div className={styles.titleContainer}>
         <div className={styles.title}>
-          Title
+          {title}
         </div>
         <div className="titleImg">
           <img src={moreHoriz} alt="dot image" />
@@ -28,10 +28,12 @@ function ColumnComponent() {
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
-          <div className={styles.leftLogo}>
-            <img src={add} alt="add image" />
-          </div>
-          <div className={styles.leftText}>Add a card</div>
+          <button onClick={addItems} className={styles.leftButton}>
+            <div className={styles.leftLogo}>
+              <img src={add} alt="add image" />
+            </div>
+            <div className={styles.leftText}>Add a card</div>
+          </button>
         </div>
         <div className={styles.right}>
           <div className={styles.rightLogo}>

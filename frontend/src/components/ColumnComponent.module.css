@@ -8,10 +8,9 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     width: fit-content;
-    margin: 24px;
     min-width: 300px;
+    height: fit-content;
 }
 .titleContainer {
     display: flex;
@@ -34,6 +33,19 @@
     justify-content: center;
     align-items: center;
 }
+.leftButton {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    border: 1px transparent;
+    border-radius: 5px;
+}
 .leftLogo {
     display: flex;
     align-items: center;
@@ -41,7 +53,7 @@
 }
 .leftText {
     font-size: 14px;
-    margin-left: 8px;
+    margin-left: 4px;
 }
 .right {
     display: flex;
