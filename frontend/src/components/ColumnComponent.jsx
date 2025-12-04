@@ -2,9 +2,17 @@ import styles from './ColumnComponent.module.css';
 import moreHoriz from '../assets/more_horiz.png';
 import add from '../assets/add.png';
 import featuredLogo from '../assets/featured_play_list.png';
-import CardComponent from './CardComponent';
+import CardListComponent from './CardListComponent';
+import { useState } from 'react';
 
 function ColumnComponent() {
+
+  const [items, setItems] = useState(["Card Text", "Another text", "Third one"]);
+
+  const addItems = () => {
+    setItems(prev => [...prev, "New Card"])
+  }
+
   return (
     <div className={styles.main} >
       <div className={styles.titleContainer}>
@@ -15,7 +23,9 @@ function ColumnComponent() {
           <img src={moreHoriz} alt="dot image" />
         </div>
       </div>
-      <CardComponent cardText='Card Text' />
+      <div className={styles.cardsList}>
+        <CardListComponent cards={items}/>
+      </div>
       <div className={styles.footer}>
         <div className={styles.left}>
           <div className={styles.leftLogo}>

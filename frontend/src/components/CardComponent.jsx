@@ -4,7 +4,7 @@ function CardComponent({cardText = "Add some things"}) {
   return (
     <>
       <div className={styles.main}>
-        <p>cardText</p>
+        <p>{cardText}</p>
       </div>
     </>
   )
