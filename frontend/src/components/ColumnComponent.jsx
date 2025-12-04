@@ -3,7 +3,7 @@ import moreHoriz from '../assets/more_horiz.png';
 import add from '../assets/add.png';
 import featuredLogo from '../assets/featured_play_list.png';
 import CardListComponent from './CardListComponent';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 function ColumnComponent({title}) {
 
@@ -12,6 +12,10 @@ function ColumnComponent({title}) {
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
+
+  useEffect(() => {
+    if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
+  }, [editingTitle]);
 
   const addItems = () => {
     setItems(prev => [...prev, "New Card"])
