@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 function ColumnComponent({title}) {
 
-  // should transform items to objects with a unique ID to be able to move them/ delete them
   const [items, setItems] = useState([
     {cardName: "Card Text", id: uuidv4()}, 
     {cardName: "Another text", id: uuidv4()}, 

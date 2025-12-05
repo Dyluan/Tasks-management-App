@@ -1,20 +1,74 @@
 import styles from './CardComponent.module.css';
 import trashIcon from '../assets/trash_icon.svg';
+import editIcon from '../assets/edit_icon.svg';
+import { useState, useRef, useEffect } from 'react';
 
 function CardComponent({card, deleteFunction}) {
 
+  const [cardTitle, setCardTitle] = useState(card.cardName);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const titleInputRef = useRef(null);
+  const prevTitleRef = useRef(cardTitle);
+
+  useEffect(() => {
+    if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
+  }, [editingTitle]);
+
   const handleTrashClick = () => {
     deleteFunction(card.id);
+  }
+
+  function startEdit() {
+    prevTitleRef.current = cardTitle;
+    setEditingTitle(true);
+  }
+
+  function saveTitle(newTitle) {
+    const trimmed = String(newTitle).trim();
+    if (trimmed.length === 0) {
+      setCardTitle(prevTitleRef.current);
+    } else {
+      setCardTitle(trimmed);
+    }
+    setEditingTitle(false);
+  }
+
+  function cancelEdit() {
+    setCardTitle(prevTitleRef.current);
+    setEditingTitle(false);
+  }
+
+  function onTitleKeyDown(e) {
+    if (e.key === 'Enter') saveTitle(e.target.value);
+    if (e.key === 'Escape') cancelEdit();
   }
 
   return (
     <>
       <div className={styles.main}>
         <div className={styles.left}>
-          <p>{card.cardName}</p>
+          {editingTitle ? (
+          <input 
+            ref={titleInputRef}
+            className={styles.titleInput}
+            defaultValue={cardTitle}
+            onBlur={(e) => saveTitle(e.target.value)}
+            onKeyDown={onTitleKeyDown}
+            aria-label='Edit card title'
+          />
+        ) : (
+          <div className={styles.title}>
+            {cardTitle}
+          </div>
+        )}
         </div>
         <div className={styles.right}>
-          <img src={trashIcon} alt="bin" onClick={handleTrashClick}/>
+          <div className={styles.editIcon}>
+            <img src={editIcon} alt="edit" onClick={startEdit} />
+          </div>
+          <div className={styles.trashIcon}>
+            <img src={trashIcon} alt="bin" onClick={handleTrashClick}/>
+          </div>
         </div>
       </div>
     </>

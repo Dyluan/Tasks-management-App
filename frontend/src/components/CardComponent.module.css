@@ -23,4 +23,30 @@
 .right {
     opacity: 0;
     transition: opacity 150ms ease;
+    display: flex;
+}
+.editIcon {
+    margin-right: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 150ms ease;
+    margin: -4px -4px -4px 0;
+}
+.trashIcon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 150ms ease;
+    margin: -4px -4px -4px 0;
+}
+.trashIcon:hover,
+.editIcon:hover {
+    background-color: #b8b8b8;
 }
