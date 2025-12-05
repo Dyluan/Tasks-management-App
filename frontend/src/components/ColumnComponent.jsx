@@ -4,11 +4,16 @@ import add from '../assets/add.png';
 import featuredLogo from '../assets/featured_play_list.png';
 import CardListComponent from './CardListComponent';
 import { useState, useRef, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 function ColumnComponent({title}) {
 
   // should transform items to objects with a unique ID to be able to move them/ delete them
-  const [items, setItems] = useState(["Card Text", "Another text", "Third one"]);
+  const [items, setItems] = useState([
+    {cardName: "Card Text", id: uuidv4()}, 
+    {cardName: "Another text", id: uuidv4()}, 
+    {cardName: "Third one", id: uuidv4()}
+  ]);
   const [columnTitle, setColumnTitle] = useState(title);
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
@@ -19,7 +24,7 @@ function ColumnComponent({title}) {
   }, [editingTitle]);
 
   const addItems = () => {
-    setItems(prev => [...prev, "New Card"])
+    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4()}])
   }
 
   function startEdit() {
@@ -70,7 +75,7 @@ function ColumnComponent({title}) {
           </div>
         )}
         <div className="titleImg">
-          <img src={moreHoriz} alt="dot image" />
+          <img src={moreHoriz} alt="dot" />
         </div>
       </div>
       <div className={styles.cardsList}>
@@ -80,7 +85,7 @@ function ColumnComponent({title}) {
         <div className={styles.left}>
           <button onClick={addItems} className={styles.leftButton}>
             <div className={styles.leftLogo}>
-              <img src={add} alt="add image" />
+              <img src={add} alt="add" />
             </div>
             <div className={styles.leftText}>Add a card</div>
           </button>

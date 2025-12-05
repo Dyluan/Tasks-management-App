@@ -10,17 +10,12 @@ function CardListComponent({cards}) {
     setCardList(cards);
   }, [cards]);
 
-  // doesnt work yet as I have to rework the items
-  const deleteItems = (index) => {
-    setCardList(prev => prev.filter())
-  }
-
   return (
     <div className={styles.main}>
       <ul className={styles.cardList}>
-        {cardList.map((elem, index) => (
-          <li className={styles.cardElem} key={index}>
-            <CardComponent cardText={elem} index={index}/>
+        {cardList.map((elem) => (
+          <li className={styles.cardElem} key={elem.id}>
+            <CardComponent card={elem}/>
           </li>
         ))}
       </ul>

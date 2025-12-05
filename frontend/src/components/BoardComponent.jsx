@@ -20,7 +20,7 @@ function BoardComponent() {
         <ColumnListComponent columns={columns} />
         <p>
           <button className={styles.addButton} onClick={addColumn}>
-            <div className={styles.buttonImg}><img src={add} alt="add image" /></div>
+            <div className={styles.buttonImg}><img src={add} alt="add" /></div>
             <div className={styles.buttonText}>Add another list</div>
           </button>
         </p>

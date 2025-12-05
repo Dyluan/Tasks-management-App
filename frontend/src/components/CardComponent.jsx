@@ -1,19 +1,20 @@
 import styles from './CardComponent.module.css';
 import trashIcon from '../assets/trash_icon.svg';
 
-function CardComponent({cardText = "Add some things", index}) {
+function CardComponent({card}) {
 
   const handleTrashClick = () => {
-    console.log('Trash called!', index);
+    console.log('Trash called!', card);
   }
+  
   return (
     <>
       <div className={styles.main}>
         <div className={styles.left}>
-          <p>{cardText}</p>
+          <p>{card.cardName}</p>
         </div>
         <div className={styles.right}>
-          <img src={trashIcon} alt="bin image" onClick={handleTrashClick}/>
+          <img src={trashIcon} alt="bin" onClick={handleTrashClick}/>
         </div>
       </div>
     </>
