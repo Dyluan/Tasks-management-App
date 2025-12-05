@@ -26,6 +26,9 @@ function ColumnComponent({title}) {
   const addItems = () => {
     setItems(prev => [...prev, {cardName: "New Card", id: uuidv4()}])
   }
+  const deleteItems = (idToRemove) => {
+    setItems(prev => prev.filter(item => item.id !== idToRemove));
+  };
 
   function startEdit() {
     prevTitleRef.current = columnTitle;
@@ -79,7 +82,7 @@ function ColumnComponent({title}) {
         </div>
       </div>
       <div className={styles.cardsList}>
-        <CardListComponent cards={items}/>
+        <CardListComponent cards={items} deleteFunction={deleteItems} />
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>

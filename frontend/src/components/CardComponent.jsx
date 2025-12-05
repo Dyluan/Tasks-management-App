@@ -1,12 +1,12 @@
 import styles from './CardComponent.module.css';
 import trashIcon from '../assets/trash_icon.svg';
 
-function CardComponent({card}) {
+function CardComponent({card, deleteFunction}) {
 
   const handleTrashClick = () => {
-    console.log('Trash called!', card);
+    deleteFunction(card.id);
   }
-  
+
   return (
     <>
       <div className={styles.main}>
