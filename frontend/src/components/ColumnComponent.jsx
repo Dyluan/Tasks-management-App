@@ -88,6 +88,7 @@ function ColumnComponent({column}) {
   )
 
   return (
+    // <div className={styles.main} ref={setNodeRef} {...attributes} {...(!editingTitle && listeners)} style={style} >
     <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
       <div className={styles.titleContainer}>
         {editingTitle ? (
@@ -97,6 +98,7 @@ function ColumnComponent({column}) {
             defaultValue={columnTitle}
             onBlur={(e) => saveTitle(e.target.value)}
             onKeyDown={onTitleKeyDown}
+            onPointerDown={(e) => e.stopPropagation()}
             aria-label='Edit column title'
           />
         ) : (
