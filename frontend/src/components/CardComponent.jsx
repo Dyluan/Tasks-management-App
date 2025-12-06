@@ -64,10 +64,10 @@ function CardComponent({card, deleteFunction}) {
         </div>
         <div className={styles.right}>
           <div className={styles.editIcon}>
-            <img src={editIcon} alt="edit" onClick={startEdit} />
+            <img src={editIcon} alt="edit" onClick={startEdit} onPointerDown={(e) => e.stopPropagation()} />
           </div>
           <div className={styles.trashIcon}>
-            <img src={trashIcon} alt="bin" onClick={handleTrashClick}/>
+            <img src={trashIcon} alt="bin" onClick={handleTrashClick} onPointerDown={(e) => e.stopPropagation()} />
           </div>
         </div>
       </div>

@@ -2,13 +2,33 @@ import ColumnListComponent from "./ColumnListComponent";
 import { useState } from "react";
 import styles from "./Board.module.css";
 import add from '../assets/add_white.png';
+import { v4 as uuidv4 } from 'uuid';
+import { closestCorners, DndContext } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 
 function BoardComponent() {
 
-  const [columns, setColumns] = useState(["Done", "To Do"]);
+  const [columns, setColumns] = useState([
+    {id: uuidv4(), title: "Done"}, 
+    {id: uuidv4(), title: "To Do"}
+    ]);
 
   const addColumn = () => {
-    setColumns(prev => [...prev, "New column"]);
+    setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
+  }
+
+  const getColumPosition = (id) => columns.findIndex(column => column.id === id);
+
+  const handleDragEnd = (event) => {
+    const {active, over} = event;
+    if (active.id === over.id) return;
+
+    setColumns((colums) => {
+      const originalPos = getColumPosition(active.id);
+      const newPos = getColumPosition(over.id);
+
+      return arrayMove(columns, originalPos, newPos);
+    })
   }
 
   return (
@@ -17,7 +37,9 @@ function BoardComponent() {
         <p>My Board</p>
       </div>
       <div className={styles.main}>
-        <ColumnListComponent columns={columns} />
+        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+          <ColumnListComponent columns={columns} />
+        </DndContext>
         <p>
           <button className={styles.addButton} onClick={addColumn}>
             <div className={styles.buttonImg}><img src={add} alt="add" /></div>

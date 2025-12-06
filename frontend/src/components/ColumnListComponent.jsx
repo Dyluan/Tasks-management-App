@@ -1,5 +1,6 @@
 import ColumnComponent from "./ColumnComponent";
 import styles from './ColumnListComponent.module.css';
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
 function ColumnListComponent({columns}) {
 
@@ -7,11 +8,14 @@ function ColumnListComponent({columns}) {
     <>
       <div className={styles.main}>
         <ul className={styles.list}>
-          {columns.map((elem, index) => (
-            <li className={styles.elem} key={index}>
-              <ColumnComponent title={elem} />
-            </li>
-          ))}
+          <SortableContext items={columns} strategy={horizontalListSortingStrategy}>
+            {columns.map((elem) => (
+              <li className={styles.elem} key={elem.id}>
+                <ColumnComponent column={elem} key={elem.id} />
+              </li>
+            ))}
+          </SortableContext>
+          
         </ul> 
       </div>
     </>

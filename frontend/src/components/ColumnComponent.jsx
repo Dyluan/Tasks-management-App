@@ -5,18 +5,22 @@ import featuredLogo from '../assets/featured_play_list.png';
 import CardListComponent from './CardListComponent';
 import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-function ColumnComponent({title}) {
+function ColumnComponent({column}) {
 
   const [items, setItems] = useState([
     {cardName: "Card Text", id: uuidv4()}, 
     {cardName: "Another text", id: uuidv4()}, 
     {cardName: "Third one", id: uuidv4()}
   ]);
-  const [columnTitle, setColumnTitle] = useState(title);
+  const [columnTitle, setColumnTitle] = useState(column.title);
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
+
+  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 
   useEffect(() => {
     if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
@@ -28,6 +32,10 @@ function ColumnComponent({title}) {
   const deleteItems = (idToRemove) => {
     setItems(prev => prev.filter(item => item.id !== idToRemove));
   };
+
+  const style = {
+    transition, transform: CSS.Transform.toString(transform),
+  }
 
   function startEdit() {
     prevTitleRef.current = columnTitle;
@@ -55,7 +63,7 @@ function ColumnComponent({title}) {
   }
 
   return (
-    <div className={styles.main} >
+    <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
       <div className={styles.titleContainer}>
         {editingTitle ? (
           <input 
@@ -85,7 +93,7 @@ function ColumnComponent({title}) {
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
-          <button onClick={addItems} className={styles.leftButton}>
+          <button onClick={addItems} className={styles.leftButton} onPointerDown={(e) => e.stopPropagation()}>
             <div className={styles.leftLogo}>
               <img src={add} alt="add" />
             </div>
