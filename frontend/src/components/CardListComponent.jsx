@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import CardComponent from "./CardComponent";
 import styles from "./CardList.module.css";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 function CardListComponent({cards, deleteFunction}) {
 
@@ -13,11 +14,13 @@ function CardListComponent({cards, deleteFunction}) {
   return (
     <div className={styles.main}>
       <ul className={styles.cardList}>
-        {cardList.map((elem) => (
-          <li className={styles.cardElem} key={elem.id}>
-            <CardComponent card={elem} deleteFunction={deleteFunction} />
-          </li>
-        ))}
+        <SortableContext items={cards} strategy={verticalListSortingStrategy}>
+          {cardList.map((elem) => (
+            <li className={styles.cardElem} key={elem.id}>
+              <CardComponent card={elem} deleteFunction={deleteFunction} key={elem.id} />
+            </li>
+          ))}
+        </SortableContext>
       </ul>
     </div>
   )

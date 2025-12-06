@@ -2,6 +2,8 @@ import styles from './CardComponent.module.css';
 import trashIcon from '../assets/trash_icon.svg';
 import editIcon from '../assets/edit_icon.svg';
 import { useState, useRef, useEffect } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 function CardComponent({card, deleteFunction}) {
 
@@ -10,12 +12,18 @@ function CardComponent({card, deleteFunction}) {
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(cardTitle);
 
+  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
+
   useEffect(() => {
     if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
   }, [editingTitle]);
 
   const handleTrashClick = () => {
     deleteFunction(card.id);
+  }
+
+  const style = {
+    transition, transform: CSS.Translate.toString(transform),
   }
 
   function startEdit() {
@@ -44,8 +52,7 @@ function CardComponent({card, deleteFunction}) {
   }
 
   return (
-    <>
-      <div className={styles.main}>
+      <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
         <div className={styles.left}>
           {editingTitle ? (
           <input 
@@ -71,7 +78,6 @@ function CardComponent({card, deleteFunction}) {
           </div>
         </div>
       </div>
-    </>
   )
 }
 

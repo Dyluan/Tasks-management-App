@@ -7,6 +7,8 @@ import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 function ColumnComponent({column}) {
 
@@ -34,7 +36,7 @@ function ColumnComponent({column}) {
   };
 
   const style = {
-    transition, transform: CSS.Transform.toString(transform),
+    transition, transform: CSS.Translate.toString(transform),
   }
 
   function startEdit() {
@@ -61,6 +63,29 @@ function ColumnComponent({column}) {
     if (e.key === 'Enter') saveTitle(e.target.value);
     if (e.key === 'Escape') cancelEdit();
   }
+
+  // this part of the code is relative to the dnd-kit library
+  const getCardPosition = (id) => items.findIndex(item => item.id === id);
+
+  const handleDragEnd = (event) => {
+    const {active, over} = event;
+    if (active.id === over.id) return;
+
+    setItems((items) => {
+      const originalPos = getCardPosition(active.id);
+      const newPos = getCardPosition(over.id);
+
+      return arrayMove(items, originalPos, newPos);
+    })
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
 
   return (
     <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
@@ -89,7 +114,9 @@ function ColumnComponent({column}) {
         </div>
       </div>
       <div className={styles.cardsList}>
-        <CardListComponent cards={items} deleteFunction={deleteItems} />
+        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners} sensors={sensors}>
+          <CardListComponent cards={items} deleteFunction={deleteItems} />
+        </DndContext>
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
