@@ -80,3 +80,16 @@
     align-items: center;
     justify-content: center;
 }
+.titleImgContainer:hover {
+    transform: translateY(-1px);
+}
+.titleImg {
+    cursor: pointer;
+}
+.boxInModal {
+    background-color: white;
+    font-family: inherit;
+    color: black;
+    display: flex;
+    
+}

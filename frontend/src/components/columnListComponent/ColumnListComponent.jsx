@@ -1,4 +1,4 @@
-import ColumnComponent from "./ColumnComponent";
+import ColumnComponent from "../columnComponent/ColumnComponent";
 import styles from './ColumnListComponent.module.css';
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 

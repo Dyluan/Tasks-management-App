@@ -1,14 +1,16 @@
 import styles from './ColumnComponent.module.css';
-import moreHoriz from '../assets/more_horiz.png';
-import add from '../assets/add.png';
-import featuredLogo from '../assets/featured_play_list.png';
-import CardListComponent from './CardListComponent';
+import moreHoriz from '../../assets/more_horiz.png';
+import add from '../../assets/add.png';
+import featuredLogo from '../../assets/featured_play_list.png';
+import CardListComponent from '../cardListComponent/CardListComponent';
 import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 
 function ColumnComponent({column}) {
 
@@ -21,8 +23,12 @@ function ColumnComponent({column}) {
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
+
+  const handleModalOpen = () => setIsModalOpen(true);
+  const handleModalClose = () => setIsModalOpen(false);
 
   useEffect(() => {
     if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
@@ -111,8 +117,16 @@ function ColumnComponent({column}) {
             {columnTitle}
           </div>
         )}
-        <div className="titleImg">
-          <img src={moreHoriz} alt="dot" />
+        <div className={styles.titleImgContainer}>
+          <img src={moreHoriz} alt="dot" className={styles.titleImg} onClick={handleModalOpen} onPointerDown={(e) => e.stopPropagation()}/>
+          <Modal
+            open={isModalOpen}
+            onClose={handleModalClose}
+          >
+            <Box className={styles.boxInModal}>
+              <p>Bonjour, je suis un modal!</p>
+            </Box>
+          </Modal>
         </div>
       </div>
       <div className={styles.cardsList}>
@@ -122,7 +136,7 @@ function ColumnComponent({column}) {
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
-          <button onClick={addItems} className={styles.leftButton} onPointerDown={(e) => e.stopPropagation()}>
+          <button onClick={addItems} className={styles.leftButton} onPointerDown={(e) => e.stopPropagation()} >
             <div className={styles.leftLogo}>
               <img src={add} alt="add" />
             </div>

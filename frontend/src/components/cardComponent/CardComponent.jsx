@@ -1,6 +1,6 @@
 import styles from './CardComponent.module.css';
-import trashIcon from '../assets/trash_icon.svg';
-import editIcon from '../assets/edit_icon.svg';
+import trashIcon from '../../assets/trash_icon.svg';
+import editIcon from '../../assets/edit_icon.svg';
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';

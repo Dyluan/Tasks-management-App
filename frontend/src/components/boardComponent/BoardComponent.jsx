@@ -1,7 +1,7 @@
-import ColumnListComponent from "./ColumnListComponent";
+import ColumnListComponent from "../columnListComponent/ColumnListComponent";
 import { useState } from "react";
 import styles from "./Board.module.css";
-import add from '../assets/add_white.png';
+import add from '../../assets/add_white.png';
 import { v4 as uuidv4 } from 'uuid';
 import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";

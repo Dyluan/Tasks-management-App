@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import CardComponent from "./CardComponent";
+import CardComponent from "../cardComponent/CardComponent";
 import styles from "./CardList.module.css";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
