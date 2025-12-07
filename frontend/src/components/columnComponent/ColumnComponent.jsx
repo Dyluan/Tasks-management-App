@@ -2,6 +2,7 @@ import styles from './ColumnComponent.module.css';
 import moreHoriz from '../../assets/more_horiz.png';
 import add from '../../assets/add.png';
 import featuredLogo from '../../assets/featured_play_list.png';
+import closeIcon from '../../assets/close_icon.png';
 import CardListComponent from '../cardListComponent/CardListComponent';
 import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -124,7 +125,29 @@ function ColumnComponent({column}) {
             onClose={handleModalClose}
           >
             <Box className={styles.boxInModal}>
-              <p>Bonjour, je suis un modal!</p>
+              <div className={styles.modalContainer}>
+                <div className={styles.modalHeader}>
+                  <div className={styles.modalTitle}>
+                    <p>Liste des actions</p>  
+                  </div>
+                  <button className={styles.modalCloseButton} onClick={handleModalClose}><img src={closeIcon} alt="close" /></button>
+                </div>
+                <div className={styles.underline}></div>
+                <div className={styles.modalContent}>
+                  <div className={styles.modalCards}>
+                    <ul>
+                      <li><button>New card</button></li>
+                      <li><button>Rename column</button></li>
+                      <li><button>Delete column</button></li>
+                      <li><button>Copy column</button></li>
+                    </ul>
+                  </div>
+                  <div className={styles.underline}></div>
+                  <div className={styles.modalColors}>
+
+                  </div>
+                </div>
+              </div>
             </Box>
           </Modal>
         </div>
