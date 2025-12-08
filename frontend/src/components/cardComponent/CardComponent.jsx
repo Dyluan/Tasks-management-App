@@ -53,7 +53,7 @@ function CardComponent({card, deleteFunction}) {
 
   return (
       // <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
-      <div className={styles.main} ref={setNodeRef} {...attributes} {...(!editingTitle && listeners)} style={style} >
+      <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
         <div className={styles.left}>
           {editingTitle ? (
           <input 
@@ -62,7 +62,6 @@ function CardComponent({card, deleteFunction}) {
             defaultValue={cardTitle}
             onBlur={(e) => saveTitle(e.target.value)}
             onKeyDown={onTitleKeyDown}
-            onPointerDown={(e) => e.stopPropagation()}
             aria-label='Edit card title'
           />
         ) : (

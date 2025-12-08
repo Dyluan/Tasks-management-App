@@ -21,10 +21,12 @@ function ColumnComponent({column}) {
     {cardName: "Third one", id: uuidv4()}
   ]);
   const [columnTitle, setColumnTitle] = useState(column.title);
+  const [columnColor, setcolumnColor] = useState('#F5F5F5');
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const colorList = ['#4bce97', '#eed12b', '#fca700', '#f87168', '#c97cf4', '#669df1', '#6cc3e0', '#F5F5F5'];
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 
@@ -44,6 +46,11 @@ function ColumnComponent({column}) {
 
   const style = {
     transition, transform: CSS.Translate.toString(transform),
+    background: columnColor
+  }
+
+  const handleColorChange = (newColor) => {
+    setcolumnColor(newColor);
   }
 
   function startEdit() {
@@ -144,7 +151,21 @@ function ColumnComponent({column}) {
                   </div>
                   <div className={styles.underline}></div>
                   <div className={styles.modalColors}>
-
+                    <div className={styles.modalColorsTitle}>
+                      Edit list color
+                    </div>
+                    <ul className={styles.modalColorsList}>
+                      {colorList.map((elem, index) => (
+                        <li className={styles.modalColorsElem} key={index}>
+                          <button 
+                            className={styles.modalColorButton} 
+                            style={{backgroundColor: elem}}
+                            onClick={() => handleColorChange(elem)}
+                          >
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
