@@ -10,8 +10,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import Popover from '@mui/material/Popover';
 
 function ColumnComponent({column, deleteColumn}) {
 
@@ -25,13 +25,12 @@ function ColumnComponent({column, deleteColumn}) {
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const colorList = ['#4bce97', '#eed12b', '#fca700', '#f87168', '#c97cf4', '#669df1', '#6cc3e0', '#F5F5F5'];
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 
-  const handleModalOpen = () => setIsModalOpen(true);
-  const handleModalClose = () => setIsModalOpen(false);
+  const handlePopoverClose = () => setAnchorEl(null);
 
   useEffect(() => {
     if (editingTitle && titleInputRef.current) {
@@ -129,10 +128,25 @@ function ColumnComponent({column, deleteColumn}) {
           </div>
         )}
         <div className={styles.titleImgContainer}>
-          <img src={moreHoriz} alt="dot" className={styles.titleImg} onClick={handleModalOpen} onPointerDown={(e) => e.stopPropagation()}/>
-          <Modal
-            open={isModalOpen}
-            onClose={handleModalClose}
+          <img 
+            src={moreHoriz} 
+            alt="dot" 
+            className={styles.titleImg} 
+            onClick={(e) => setAnchorEl(e.currentTarget)} 
+            onPointerDown={(e) => e.stopPropagation()}
+          />
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handlePopoverClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
           >
             <Box className={styles.boxInModal}>
               <div className={styles.modalContainer}>
@@ -140,7 +154,7 @@ function ColumnComponent({column, deleteColumn}) {
                   <div className={styles.modalTitle}>
                     Actions
                   </div>
-                  <button className={styles.modalCloseButton} onClick={handleModalClose}><img src={closeIcon} alt="close" /></button>
+                  <button className={styles.modalCloseButton} onClick={handlePopoverClose}><img src={closeIcon} alt="close" /></button>
                 </div>
                 <div className={styles.underline}></div>
                 <div className={styles.modalContent}>
@@ -148,7 +162,7 @@ function ColumnComponent({column, deleteColumn}) {
                     <ul>
                       <li><button>New card</button></li>
                       <li><button onClick={() => {
-                        handleModalClose();
+                        handlePopoverClose();
                         startEdit();
                       }}>Rename column</button></li>
                       <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
@@ -176,7 +190,7 @@ function ColumnComponent({column, deleteColumn}) {
                 </div>
               </div>
             </Box>
-          </Modal>
+          </Popover>
         </div>
       </div>
       <div className={styles.cardsList}>
