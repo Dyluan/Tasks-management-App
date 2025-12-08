@@ -63,29 +63,29 @@ function CardComponent({card, deleteFunction}) {
   return (
       <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style}>
         <Modal 
-              open={isModalOpen}
-              onClose={handleModalClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Box sx={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '24px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                maxWidth: '600px',
-                width: '90%',
-                maxHeight: '90vh',
-                overflow: 'auto'
-              }}>
-                Card Modal!
-              </Box>
-            </Modal>
+          open={isModalOpen}
+          onClose={handleModalClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box sx={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            Card Modal!
+          </Box>
+        </Modal>
         <div className={styles.left}>
           {editingTitle ? (
           <input 
@@ -99,7 +99,6 @@ function CardComponent({card, deleteFunction}) {
         ) : (
           <div className={styles.title} onClick={startEdit}>
             {cardTitle}
-            
           </div>
         )}
         </div>

@@ -51,6 +51,10 @@ function ColumnComponent({column, deleteColumn}) {
     background: columnColor
   }
 
+  const addButtonStyle = {
+    backgroundColor: columnColor
+  }
+
   const handleColorChange = (newColor) => {
     setcolumnColor(newColor);
   }
@@ -145,7 +149,7 @@ function ColumnComponent({column, deleteColumn}) {
             }}
             transformOrigin={{
               vertical: 'top',
-              horizontal: 'right',
+              horizontal: 'left',
             }}
           >
             <Box className={styles.boxInModal}>
@@ -195,12 +199,17 @@ function ColumnComponent({column, deleteColumn}) {
       </div>
       <div className={styles.cardsList}>
         <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners} sensors={sensors}>
-          <CardListComponent cards={items} deleteFunction={deleteItems} />
+          <CardListComponent cards={items} deleteFunction={deleteItems} columnColor={columnColor} />
         </DndContext>
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
-          <button onClick={addItems} className={styles.leftButton} onPointerDown={(e) => e.stopPropagation()} >
+          <button 
+            onClick={addItems} 
+            className={styles.leftButton} 
+            onPointerDown={(e) => e.stopPropagation()} 
+            style={addButtonStyle}
+          >
             <div className={styles.leftLogo}>
               <img src={add} alt="add" />
             </div>
