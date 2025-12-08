@@ -102,7 +102,6 @@ function ColumnComponent({column, deleteColumn}) {
   )
 
   return (
-    // <div className={styles.main} ref={setNodeRef} {...attributes} {...(!editingTitle && listeners)} style={style} >
     <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
       <div className={styles.titleContainer}>
         {editingTitle ? (
@@ -112,7 +111,6 @@ function ColumnComponent({column, deleteColumn}) {
             defaultValue={columnTitle}
             onBlur={(e) => saveTitle(e.target.value)}
             onKeyDown={onTitleKeyDown}
-            onPointerDown={(e) => e.stopPropagation()}
             aria-label='Edit column title'
           />
         ) : (
@@ -135,7 +133,7 @@ function ColumnComponent({column, deleteColumn}) {
               <div className={styles.modalContainer}>
                 <div className={styles.modalHeader}>
                   <div className={styles.modalTitle}>
-                    <p>Liste des actions</p>  
+                    Actions
                   </div>
                   <button className={styles.modalCloseButton} onClick={handleModalClose}><img src={closeIcon} alt="close" /></button>
                 </div>
