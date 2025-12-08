@@ -17,6 +17,10 @@ function BoardComponent() {
     setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
   }
 
+  const deleteColumn = (idToRemove) => {
+    setColumns(prev => prev.filter(column => column.id !== idToRemove));
+  }
+
   // this part of the code is relative to the dnd-kit library
   const getColumPosition = (id) => columns.findIndex(column => column.id === id);
 
@@ -51,7 +55,7 @@ function BoardComponent() {
       </div>
       <div className={styles.main}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-          <ColumnListComponent columns={columns} />
+          <ColumnListComponent columns={columns} deleteColumn={deleteColumn} />
         </DndContext>
         <p>
           <button className={styles.addButton} onClick={addColumn}>

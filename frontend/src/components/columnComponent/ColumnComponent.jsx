@@ -13,7 +13,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 
-function ColumnComponent({column}) {
+function ColumnComponent({column, deleteColumn}) {
 
   const [items, setItems] = useState([
     {cardName: "Card Text", id: uuidv4()}, 
@@ -145,7 +145,7 @@ function ColumnComponent({column}) {
                     <ul>
                       <li><button>New card</button></li>
                       <li><button>Rename column</button></li>
-                      <li><button>Delete column</button></li>
+                      <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
                       <li><button>Copy column</button></li>
                     </ul>
                   </div>

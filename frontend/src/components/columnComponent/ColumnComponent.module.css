@@ -2,8 +2,6 @@
 
 .main {
     font-family: 'Noto Sans';
-    /* background-color: #F5F5F5; */
-    border: 1px solid #D9D9D9;
     border-radius: 10px;
     padding: 16px;
     display: flex;

@@ -14,7 +14,7 @@ function CardListComponent({cards, deleteFunction}) {
   return (
     <div className={styles.main}>
       <ul className={styles.cardList}>
-        <SortableContext items={cards} strategy={verticalListSortingStrategy}>
+        <SortableContext items={cards.map(card => card.id)} strategy={verticalListSortingStrategy}>
           {cardList.map((elem) => (
             <li className={styles.cardElem} key={elem.id}>
               <CardComponent card={elem} deleteFunction={deleteFunction} key={elem.id} />
