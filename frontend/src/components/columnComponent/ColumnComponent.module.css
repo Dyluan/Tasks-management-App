@@ -6,9 +6,8 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    /* width: fit-content; */
     min-width: 300px;
-    /* height: auto; */
+    width: 300px;
     height: fit-content;
 }
 .titleContainer {

@@ -4,6 +4,8 @@ import editIcon from '../../assets/edit_icon.svg';
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 
 function CardComponent({card, deleteFunction}) {
 
@@ -11,11 +13,18 @@ function CardComponent({card, deleteFunction}) {
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(cardTitle);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const handleModalOpen = () => setIsModalOpen(true);
+  const handleModalClose = () => setIsModalOpen(false);
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
 
   useEffect(() => {
-    if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
+    if (editingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
   }, [editingTitle]);
 
   const handleTrashClick = () => {
@@ -52,7 +61,31 @@ function CardComponent({card, deleteFunction}) {
   }
 
   return (
-      <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
+      <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style}>
+        <Modal 
+              open={isModalOpen}
+              onClose={handleModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box sx={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                padding: '24px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                maxWidth: '600px',
+                width: '90%',
+                maxHeight: '90vh',
+                overflow: 'auto'
+              }}>
+                Card Modal!
+              </Box>
+            </Modal>
         <div className={styles.left}>
           {editingTitle ? (
           <input 
@@ -64,14 +97,15 @@ function CardComponent({card, deleteFunction}) {
             aria-label='Edit card title'
           />
         ) : (
-          <div className={styles.title}>
+          <div className={styles.title} onClick={startEdit}>
             {cardTitle}
+            
           </div>
         )}
         </div>
         <div className={styles.right}>
           <div className={styles.editIcon}>
-            <img src={editIcon} alt="edit" onClick={startEdit} onPointerDown={(e) => e.stopPropagation()} />
+            <img src={editIcon} alt="edit" onClick={handleModalOpen} onPointerDown={(e) => e.stopPropagation()} />
           </div>
           <div className={styles.trashIcon}>
             <img src={trashIcon} alt="bin" onClick={handleTrashClick} onPointerDown={(e) => e.stopPropagation()} />

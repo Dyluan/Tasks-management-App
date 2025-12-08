@@ -3,8 +3,8 @@ import { useState } from "react";
 import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
 import { v4 as uuidv4 } from 'uuid';
-import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 
 function BoardComponent() {
 
@@ -36,6 +36,7 @@ function BoardComponent() {
     })
   }
 
+  // got rid of KeyboardSensor as it interferes with input writing (was not allowing space key to work properly)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -43,9 +44,6 @@ function BoardComponent() {
       }
     }),
     useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
   );
 
   return (

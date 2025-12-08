@@ -12,6 +12,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 .main:hover {
     transform: translateY(-1px);

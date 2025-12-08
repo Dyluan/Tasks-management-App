@@ -8,8 +8,8 @@ import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { closestCorners, DndContext, KeyboardSensor, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 
@@ -34,7 +34,10 @@ function ColumnComponent({column, deleteColumn}) {
   const handleModalClose = () => setIsModalOpen(false);
 
   useEffect(() => {
-    if (editingTitle && titleInputRef.current) titleInputRef.current.focus();
+    if (editingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
   }, [editingTitle]);
 
   const addItems = () => {
@@ -93,13 +96,15 @@ function ColumnComponent({column, deleteColumn}) {
     })
   }
 
+  // got rid of KeyboardSensor as it interferes with input writing (was not allowing space key to work properly)
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      }
+    }),
     useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
-  )
+  );
 
   return (
     <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
@@ -142,7 +147,10 @@ function ColumnComponent({column, deleteColumn}) {
                   <div className={styles.modalCards}>
                     <ul>
                       <li><button>New card</button></li>
-                      <li><button>Rename column</button></li>
+                      <li><button onClick={() => {
+                        handleModalClose();
+                        startEdit();
+                      }}>Rename column</button></li>
                       <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
                       <li><button>Copy column</button></li>
                     </ul>
