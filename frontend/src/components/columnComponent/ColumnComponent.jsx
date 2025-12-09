@@ -26,7 +26,7 @@ function ColumnComponent({column, deleteColumn}) {
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
   const [anchorEl, setAnchorEl] = useState(null);
-  const colorList = ['#4bce97', '#eed12b', '#fca700', '#f87168', '#c97cf4', '#669df1', '#6cc3e0', '#F5F5F5'];
+  const colorList = ['#baf3db', '#f5e989', '#fce4a6', '#ffd5d2', '#eed7fc', '#cfe1fd', '#c6edfb', '#F5F5F5'];
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 

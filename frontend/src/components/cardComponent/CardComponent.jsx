@@ -78,8 +78,8 @@ function CardComponent({card, deleteFunction}) {
             borderRadius: '8px',
             padding: '24px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            maxWidth: '600px',
-            width: '90%',
+            maxWidth: '400px',
+            width: 'fit-content',
             maxHeight: '90vh',
             overflow: 'auto'
           }}>

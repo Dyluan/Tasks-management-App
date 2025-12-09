@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 .main {
-    /* background-color: #D9D9D9; */
-    background-color: #F7F7F7;
+    background-color: #FDFDFB;
     font-size: 12px;
     font-family: "Noto Sans";
     color: black;
@@ -50,5 +49,5 @@
 }
 .trashIcon:hover,
 .editIcon:hover {
-    background-color: #b8b8b8;
+    background-color: #e9e9ed;
 }

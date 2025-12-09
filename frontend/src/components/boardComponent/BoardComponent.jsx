@@ -48,8 +48,10 @@ function BoardComponent() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>
-        <p>My Board</p>
+      <div className={styles.header}>
+        <div className={styles.title}>
+          <p>My Board</p>
+        </div>
       </div>
       <div className={styles.main}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
