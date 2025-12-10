@@ -1,22 +1,28 @@
 import styles from './CardComponent.module.css';
 import trashIcon from '../../assets/trash_icon.svg';
 import editIcon from '../../assets/edit_icon.svg';
+import closeIcon from '../../assets/close_icon.png';
+import labelIcon from '../../assets/label_icon.svg';
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 
-function CardComponent({card, deleteFunction}) {
+function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
 
   const [cardTitle, setCardTitle] = useState(card.cardName);
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(cardTitle);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [commentList, setCommentList] = useState([]);
   
   const handleModalOpen = () => setIsModalOpen(true);
-  const handleModalClose = () => setIsModalOpen(false);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
 
@@ -76,14 +82,62 @@ function CardComponent({card, deleteFunction}) {
           <Box sx={{
             backgroundColor: 'white',
             borderRadius: '8px',
-            padding: '24px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            maxWidth: '400px',
             width: 'fit-content',
             maxHeight: '90vh',
             overflow: 'auto'
           }}>
-            Card Modal!
+            <div className={styles.modalContainer}>
+              <div className={styles.modalHeader}>
+                <div className={styles.modalLeft} style={{backgroundColor: columnColor}}>
+                  {columnTitle}
+                </div>
+                <div className={styles.modalRight}>
+                  <button className={styles.modalCloseButton} onClick={handleModalClose}>
+                    <img src={closeIcon} alt="close button" />
+                  </button>
+                </div>
+              </div>
+              <div className={styles.modalLine}></div>
+              <div className={styles.modalMain}>
+                <div className={styles.modalLeftMain}>
+                  <div className={styles.modalCardInputContainer}>
+                    <input 
+                      className={styles.modalCardInput} 
+                      type="text" 
+                      value={cardTitle} 
+                      onChange={(e) => setCardTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <button className={styles.labelButton}>
+                      <img src={labelIcon} className={styles.modalLabelIcon} alt="label" />
+                      Label
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.modalRightMain}>
+                  <div className={styles.modalRightTitle}>
+                    <b>Comments</b>
+                  </div>
+                  <div className={styles.cardCommentInput}>
+                    <TextField 
+                      id="commentInput" 
+                      label="write a comment" 
+                      variant="outlined" 
+
+                    />
+                  </div>
+                  <div className={styles.cardCommentList}>
+                    <ul>
+                      {commentList.map((elem, index) => (
+                        <li className={styles.comment} key={index}>{elem}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </Box>
         </Modal>
         <div className={styles.left}>

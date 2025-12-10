@@ -51,3 +51,79 @@
 .editIcon:hover {
     background-color: #e9e9ed;
 }
+.modalContainer {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+}
+.modalHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+}
+.modalLeft {
+    padding: 0 4px 0 4px;
+    border: transparent;
+    border-radius: 4px;
+}
+.modalCloseButton {
+    border: transparent;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    background-color: inherit;
+}
+.modalCloseButton:hover {
+    cursor: pointer;
+    background-color: #e9e9ed;
+}
+.modalMain {
+    display: flex;
+    flex-direction: row;
+}
+.modalLine {
+    height: 1px;
+    background-color: #e9e9ed;
+}
+.modalLeftMain {
+    width: 50%;
+    padding: 12px;
+}
+.modalCardInput {
+    border: none;
+    background-color: inherit;
+    font-size: 20px;
+    font-weight: bold;
+    box-sizing: border-box;
+    max-width: 100%;
+    color: #a3a3a3;
+    padding-bottom: 16px;
+}
+.labelButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background-color: inherit;
+    border: 1px solid #a3a3a3;
+    color: #a3a3a3;
+    border-radius: 4px;
+}
+.labelButton:hover {
+    filter: brightness(0.92);
+    cursor: pointer;
+}
+.modalLabelIcon {
+    height: 16px;
+    width: 16px;
+    color: black;
+}
+.modalRightMain {
+    width: 50%;
+    background-color: #f8f8f8;
+}
+.modalRightTitle, .cardCommentInput{
+    padding: 12px;
+}

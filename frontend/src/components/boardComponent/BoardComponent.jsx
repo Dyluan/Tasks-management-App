@@ -39,6 +39,16 @@ function BoardComponent() {
     setEditingTitle(false);
   }
 
+  function cancelEdit() {
+    setBoardName(prevBoardNameRef.current);
+    setEditingTitle(false);
+  }
+
+  function onTitleKeyDown(e) {
+    if (e.key === 'Enter') saveTitle(e.target.value);
+    if (e.key === 'Escape') cancelEdit();
+  }
+
   const addColumn = () => {
     setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
   }
@@ -81,6 +91,7 @@ function BoardComponent() {
               ref={titleInputRef}
               className={styles.titleInput}
               defaultValue={boardName}
+              onKeyDown={onTitleKeyDown}
               onBlur={(e) => saveTitle(e.target.value)}
               aria-label='Edit board title'
             />

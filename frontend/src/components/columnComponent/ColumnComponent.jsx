@@ -199,7 +199,7 @@ function ColumnComponent({column, deleteColumn}) {
       </div>
       <div className={styles.cardsList}>
         <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners} sensors={sensors}>
-          <CardListComponent cards={items} deleteFunction={deleteItems} columnColor={columnColor} />
+          <CardListComponent cards={items} deleteFunction={deleteItems} columnColor={columnColor} columnTitle={columnTitle} />
         </DndContext>
       </div>
       <div className={styles.footer}>
