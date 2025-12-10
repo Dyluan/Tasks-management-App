@@ -11,9 +11,21 @@
     font-weight: bold;
     font-family: inherit;
     font-size: 24px;
-    padding: 8px;
+    padding: 16px;
     margin-left: 64px;
     color: #FDFDFB;
+}
+.titleText {
+    width: fit-content;
+    border: 1px transparent;
+    border-radius: 6px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+.titleText:hover {
+    filter: brightness(0.90);
+    cursor: pointer;
+    transform: translateY(-1px);
 }
 .main {
     margin-top: 30px;
@@ -22,10 +34,12 @@
 }
 .addButton {
     min-width: 300px;
-    background-color: #00C2E0;
+    /* background-color: #00C2E0; */
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(2px); 
     color: white;
     border: transparent;
-    font-size: 12px;
+    font-size: 16px;
     font-family: inherit;
     cursor: pointer;
     line-height: 16px;
@@ -34,9 +48,10 @@
     align-items: center;
     justify-content: center;
     border-radius: 6px;
+    height: fit-content;
 }
 .addButton:hover {
-    filter: brightness(0.92);
+    filter: brightness(0.95);
     transform: translateY(-1px);
 }
 .buttonImg {

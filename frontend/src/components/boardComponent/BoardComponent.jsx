@@ -1,5 +1,5 @@
 import ColumnListComponent from "../columnListComponent/ColumnListComponent";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +11,33 @@ function BoardComponent() {
   const [columns, setColumns] = useState([
     {id: uuidv4(), title: "Done"}, 
     {id: uuidv4(), title: "To Do"}
-    ]);
+  ]);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [boardName, setBoardName] = useState('My Board');
+  const prevBoardNameRef = useRef(boardName);
+  const titleInputRef = useRef(null);
+  
+  useEffect(() => {
+    if (editingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [editingTitle]);
+
+  const startEdit = () => {
+    prevBoardNameRef.current = boardName;
+    setEditingTitle(true);
+  }
+
+  function saveTitle(newTitle) {
+    const trimmed = String(newTitle).trim();
+    if (trimmed.length === 0) {
+      setBoardName(prevBoardNameRef.current);
+    } else {
+      setBoardName(trimmed);
+    }
+    setEditingTitle(false);
+  }
 
   const addColumn = () => {
     setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
@@ -50,19 +76,33 @@ function BoardComponent() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <p>My Board</p>
+          {editingTitle ? (
+            <input 
+              ref={titleInputRef}
+              className={styles.titleInput}
+              defaultValue={boardName}
+              onBlur={(e) => saveTitle(e.target.value)}
+              aria-label='Edit board title'
+            />
+          ) : (
+            <div className={styles.titleText} 
+              onClick={startEdit}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEdit(); }}
+            >
+              {boardName}
+            </div>
+          )}
+          
         </div>
       </div>
       <div className={styles.main}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
           <ColumnListComponent columns={columns} deleteColumn={deleteColumn} />
         </DndContext>
-        <p>
           <button className={styles.addButton} onClick={addColumn}>
             <div className={styles.buttonImg}><img src={add} alt="add" /></div>
             <div className={styles.buttonText}>Add another list</div>
           </button>
-        </p>
       </div>
     </div>
   )
