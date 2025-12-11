@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Popover from '@mui/material/Popover';
 
-function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
+function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard}) {
 
   const [cardTitle, setCardTitle] = useState(card.cardName);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -53,9 +53,14 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
     if (trimmed.length === 0) {
       setCardTitle(prevTitleRef.current);
     } else {
-      setCardTitle(trimmed);
+      saveCardTitle(trimmed);
     }
     setEditingTitle(false);
+  }
+
+  function saveCardTitle(newTitle) {
+    updateCard(card.id, {...card, cardName: newTitle});
+    setCardTitle(newTitle);
   }
 
   function cancelEdit() {
@@ -108,7 +113,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
                       className={styles.modalCardInput} 
                       type="text" 
                       value={cardTitle} 
-                      onChange={(e) => setCardTitle(e.target.value)}
+                      onChange={(e) => saveCardTitle(e.target.value)}
                     />
                   </div>
                   <div className="">

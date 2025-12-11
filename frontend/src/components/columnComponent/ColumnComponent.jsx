@@ -25,7 +25,6 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
     if (column.items && column.items.length > 0) {
       return column.items;
     }
-
     // Otherwise use fallback defaults
     return [
       { cardName: "Card Text", id: uuidv4() },
@@ -95,6 +94,14 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   function onTitleKeyDown(e) {
     if (e.key === 'Enter') saveTitle(e.target.value);
     if (e.key === 'Escape') cancelEdit();
+  }
+
+  function updateCard(cardId, updatedCard) {
+    setItems(prev =>
+      prev.map(card => 
+        card.id === cardId ? updatedCard : card
+      )
+    );
   }
 
   // this part of the code is relative to the dnd-kit library
@@ -212,7 +219,13 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
       </div>
       <div className={styles.cardsList}>
         <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners} sensors={sensors}>
-          <CardListComponent cards={items} deleteFunction={deleteItems} columnColor={columnColor} columnTitle={columnTitle} />
+          <CardListComponent 
+            cards={items} 
+            deleteFunction={deleteItems} 
+            columnColor={columnColor} 
+            columnTitle={columnTitle} 
+            updateCard={updateCard}
+          />
         </DndContext>
       </div>
       <div className={styles.footer}>
