@@ -13,15 +13,28 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 
-function ColumnComponent({column, deleteColumn}) {
+function ColumnComponent({column, deleteColumn, copyColumn}) {
 
-  const [items, setItems] = useState([
-    {cardName: "Card Text", id: uuidv4()}, 
-    {cardName: "Another text", id: uuidv4()}, 
-    {cardName: "Third one", id: uuidv4()}
-  ]);
+  // const [items, setItems] = useState([
+  //   {cardName: "Card Text", id: uuidv4()}, 
+  //   {cardName: "Another text", id: uuidv4()}, 
+  //   {cardName: "Third one", id: uuidv4()}
+  // ]);
+  const [items, setItems] = useState(() => {
+  // If the column already has items, use them
+    if (column.items && column.items.length > 0) {
+      return column.items;
+    }
+
+    // Otherwise use fallback defaults
+    return [
+      { cardName: "Card Text", id: uuidv4() },
+      { cardName: "Another text", id: uuidv4() },
+      { cardName: "Third one", id: uuidv4() }
+    ];
+  });
   const [columnTitle, setColumnTitle] = useState(column.title);
-  const [columnColor, setcolumnColor] = useState('#F5F5F5');
+  const [columnColor, setcolumnColor] = useState(column.columnColor);
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
@@ -170,7 +183,7 @@ function ColumnComponent({column, deleteColumn}) {
                         startEdit();
                       }}>Rename column</button></li>
                       <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
-                      <li><button>Copy column</button></li>
+                      <li><button onClick={() => copyColumn(columnTitle, items, columnColor)}>Copy column</button></li>
                     </ul>
                   </div>
                   <div className={styles.underline}></div>

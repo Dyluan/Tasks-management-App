@@ -9,8 +9,8 @@ import { arrayMove } from "@dnd-kit/sortable";
 function BoardComponent() {
 
   const [columns, setColumns] = useState([
-    {id: uuidv4(), title: "Done"}, 
-    {id: uuidv4(), title: "To Do"}
+    {id: uuidv4(), title: "Done", columnColor: '#f5f5f5', items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}, 
+    {id: uuidv4(), title: "To Do", columnColor: '#f5f5f5', items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}
   ]);
   const [editingTitle, setEditingTitle] = useState(false);
   const [boardName, setBoardName] = useState('My Board');
@@ -51,6 +51,16 @@ function BoardComponent() {
 
   const addColumn = () => {
     setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
+  }
+
+  const copyColumn = (newTitle, newCardList, newColor) => {
+    console.log(`Here's the list I received : ${JSON.stringify(newCardList)}`);
+    setColumns(prev => [...prev, {
+      title: newTitle, 
+      items: newCardList,
+      columnColor: newColor,
+      id: uuidv4()
+    }]);
   }
 
   const deleteColumn = (idToRemove) => {
@@ -108,7 +118,7 @@ function BoardComponent() {
       </div>
       <div className={styles.main}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-          <ColumnListComponent columns={columns} deleteColumn={deleteColumn} />
+          <ColumnListComponent columns={columns} deleteColumn={deleteColumn} copyColumn={copyColumn} />
         </DndContext>
           <button className={styles.addButton} onClick={addColumn}>
             <div className={styles.buttonImg}><img src={add} alt="add" /></div>

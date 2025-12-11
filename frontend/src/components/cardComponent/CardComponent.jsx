@@ -9,6 +9,7 @@ import { CSS } from '@dnd-kit/utilities';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Popover from '@mui/material/Popover';
 
 function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
 
@@ -18,6 +19,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
   const prevTitleRef = useRef(cardTitle);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentList, setCommentList] = useState([]);
+  const [cardComment, setCardComment] = useState('');
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -125,7 +127,8 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle}) {
                       id="commentInput" 
                       label="write a comment" 
                       variant="outlined" 
-
+                      onChange={(e) => setCardComment(e.target.value)}
+                      
                     />
                   </div>
                   <div className={styles.cardCommentList}>
