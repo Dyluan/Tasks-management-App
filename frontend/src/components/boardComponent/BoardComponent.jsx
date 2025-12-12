@@ -50,11 +50,10 @@ function BoardComponent() {
   }
 
   const addColumn = () => {
-    setColumns(prev => [...prev, {title: "New column", id: uuidv4()}]);
+    setColumns(prev => [...prev, {title: "New column", columnColor: '#f5f5f5', id: uuidv4(), items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}]);
   }
 
   const copyColumn = (newTitle, newCardList, newColor) => {
-    console.log(`Here's the list I received : ${JSON.stringify(newCardList)}`);
     setColumns(prev => [...prev, {
       title: newTitle, 
       items: newCardList,

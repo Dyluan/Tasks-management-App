@@ -88,7 +88,7 @@
     background-color: #e9e9ed;
 }
 .modalLeftMain {
-    width: 50%;
+    width: 500px;
     padding: 12px;
 }
 .modalCardInput {
@@ -121,9 +121,30 @@
     color: black;
 }
 .modalRightMain {
-    width: 50%;
+    width: 460px;
     background-color: #f8f8f8;
 }
 .modalRightTitle, .cardCommentInput{
     padding: 12px;
+}
+.commentInput input{
+    min-width: 300px;
+}
+.saveCommentContainer {
+    padding-left: 12px;
+}
+.saveCommentContainer button {
+    font-size: 12px;
+    padding: 4px;
+}
+.cardCommentList {
+    padding-left: 30px;
+    margin-top: 12px;
+}
+.cardCommentList ul, .cardCommentList li {
+    list-style: none;
+    padding: 0;
+}
+.comment {
+    margin-bottom: 12px;
 }

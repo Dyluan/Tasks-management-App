@@ -27,9 +27,9 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
     }
     // Otherwise use fallback defaults
     return [
-      { cardName: "Card Text", id: uuidv4() },
-      { cardName: "Another text", id: uuidv4() },
-      { cardName: "Third one", id: uuidv4() }
+      { cardName: "Card Text", id: uuidv4(), comments: [] },
+      { cardName: "Another text", id: uuidv4(), comments: [] },
+      { cardName: "Third one", id: uuidv4(), comments: [] }
     ];
   });
   const [columnTitle, setColumnTitle] = useState(column.title);
@@ -52,7 +52,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   }, [editingTitle]);
 
   const addItems = () => {
-    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4()}])
+    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4(), comments: []}])
   }
   const deleteItems = (idToRemove) => {
     setItems(prev => prev.filter(item => item.id !== idToRemove));

@@ -3,6 +3,7 @@ import trashIcon from '../../assets/trash_icon.svg';
 import editIcon from '../../assets/edit_icon.svg';
 import closeIcon from '../../assets/close_icon.png';
 import labelIcon from '../../assets/label_icon.svg';
+import commentIcon from '../../assets/comment_logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -10,6 +11,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Popover from '@mui/material/Popover';
+import Button from '@mui/material/Button';
 
 function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard}) {
 
@@ -18,7 +20,8 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(cardTitle);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState(card.comments ?? []);
+  const [tempCardComment, setTempCardComment] = useState('');
   const [cardComment, setCardComment] = useState('');
   
   const handleModalOpen = () => setIsModalOpen(true);
@@ -63,6 +66,22 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
     setCardTitle(newTitle);
   }
 
+  function updateComments(newComment) {
+    const updatedComments = [...commentList, newComment];
+    updateCard(card.id, {
+      ...card,
+      comments: updatedComments
+    });
+    setCardComment(newComment);
+    setCommentList(updatedComments);
+    setTempCardComment('');
+  }
+
+  // updates the commentList if the parent updates
+  useEffect(() => {
+    setCommentList(card.comments ?? []);
+  }, [card.comments]);
+
   function cancelEdit() {
     setCardTitle(prevTitleRef.current);
     setEditingTitle(false);
@@ -82,8 +101,9 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
           aria-describedby="modal-modal-description"
           sx={{
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'center',
+            top: '10vh',
+            height: 'fit-content'
           }}
         >
           <Box sx={{
@@ -129,15 +149,26 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                   </div>
                   <div className={styles.cardCommentInput}>
                     <TextField 
-                      id="commentInput" 
+                      className={styles.commentInput} 
                       label="write a comment" 
                       variant="outlined" 
-                      onChange={(e) => setCardComment(e.target.value)}
-                      
+                      value={tempCardComment}
+                      onChange={(e) => setTempCardComment(e.target.value)}
                     />
                   </div>
+                  <div className={styles.saveCommentContainer}>
+                    {tempCardComment.length > 0 ? (
+                      <Button 
+                        variant="outlined" 
+                        className={styles.saveCommentButton}
+                        onClick={() => updateComments(tempCardComment)}
+                        >Save</Button>
+                    ) : (
+                      <Button variant="outlined" disabled className={styles.saveCommentButton}>Save</Button>
+                    )}
+                  </div>
                   <div className={styles.cardCommentList}>
-                    <ul>
+                    <ul className={styles.ulComment}>
                       {commentList.map((elem, index) => (
                         <li className={styles.comment} key={index}>{elem}</li>
                       ))}
@@ -160,7 +191,14 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
           />
         ) : (
           <div className={styles.title} onClick={startEdit}>
-            {cardTitle}
+            {commentList.length > 0 ? (
+              <>
+                {cardTitle}
+                <img src={commentIcon} alt="comment" /> {commentList.length}
+              </>
+            ) : (
+              <>{cardTitle}</>
+            )}
           </div>
         )}
         </div>
