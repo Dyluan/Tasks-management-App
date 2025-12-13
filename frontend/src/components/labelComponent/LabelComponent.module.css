@@ -1,0 +1,36 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.closeButton {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 3;
+    grid-row: 1;
+    cursor: pointer;
+    border: transparent;
+    border-radius: 4px;
+    background-color: inherit;
+}
+.closeButton:hover {
+    background-color: #e9e9ed;
+}
+.labelColors ul, .labelColors li{
+    list-style: none;
+}

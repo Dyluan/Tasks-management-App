@@ -141,10 +141,17 @@
     padding-left: 30px;
     margin-top: 12px;
 }
-.cardCommentList ul, .cardCommentList li {
+.cardCommentList ul {
     list-style: none;
     padding: 0;
 }
 .comment {
     margin-bottom: 12px;
+    border: 1px solid #a3a3a3;
+    border-radius: 8px;
+    padding: 6px;
+    width: 90%;
+    background-color: white;
+    font-family: "Noto Sans";
+    font-size: 14px;
 }

@@ -10,8 +10,8 @@ import { CSS } from '@dnd-kit/utilities';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Popover from '@mui/material/Popover';
 import Button from '@mui/material/Button';
+import LabelComponent from '../labelComponent/LabelComponent';
 
 function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard}) {
 
@@ -23,10 +23,15 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [commentList, setCommentList] = useState(card.comments ?? []);
   const [tempCardComment, setTempCardComment] = useState('');
   const [cardComment, setCardComment] = useState('');
+  const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
     setIsModalOpen(false);
+  }
+
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null);
   }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
@@ -137,10 +142,14 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                     />
                   </div>
                   <div className="">
-                    <button className={styles.labelButton}>
+                    <button 
+                      className={styles.labelButton}
+                      onClick={(e) => setPopoverAnchorEl(e.currentTarget)}
+                    >
                       <img src={labelIcon} className={styles.modalLabelIcon} alt="label" />
                       Label
                     </button>
+                    <LabelComponent open={Boolean(popoverAnchorEl)} anchorEl={popoverAnchorEl} onClose={handlePopoverClose} />
                   </div>
                 </div>
                 <div className={styles.modalRightMain}>
