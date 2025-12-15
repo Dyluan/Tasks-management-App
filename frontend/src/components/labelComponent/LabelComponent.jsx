@@ -2,19 +2,22 @@ import styles from './LabelComponent.module.css';
 import Popover from '@mui/material/Popover';
 import closeIcon from '../../assets/close_icon.png';
 import editIcon from'../../assets/edit_icon.svg';
+import { useState } from 'react';
 
-function LabelComponent({ open, anchorEl, onClose }) {
+function LabelComponent({ open, anchorEl, onClose, addLabel }) {
 
-  const colorList = [
-    '#d6f5e3',
-    '#f0f4b1',
-    '#fde8b8',
-    '#ffd1c1',
-    '#f0d5fa',
-    '#d6e4ff',
-    '#cdeff7',
-    '#e6e6e6'
-  ];
+  const [colorList, setColorList] = useState([
+    {id: 0, color: '#d6f5e3'},
+    {id: 1, color: '#f0f4b1'},
+    {id: 2, color: '#fde8b8'},
+    {id: 3, color: '#ffd1c1'},
+    {id: 4, color: '#f0d5fa'},
+    {id: 5, color: '#d6e4ff'},
+    {id: 6, color: '#cdeff7'},
+    {id: 7, color: '#e6e6e6'}
+  ]);
+  const [editingColorId, setEditingColorId] = useState(null);
+  const [newColor, setNewColor] = useState('');
 
   return (
     <Popover
@@ -43,11 +46,21 @@ function LabelComponent({ open, anchorEl, onClose }) {
         <div className={styles.line}></div>
         <div className={styles.labelColors}>
           <ul>
-            {colorList.map((elem, index) => (
-              <li className={styles.labelElement} key={index}>
-                <input type="checkbox" name="elem" id="elem" />
-                <button style={{backgroundColor: elem}}></button>
-                <img src={editIcon} alt="edit" />
+            {colorList.map((elem) => (
+              <li className={styles.labelElement} key={elem.id}>
+                <input type="checkbox" name="elem" id="elemInput" onClick={() => addLabel(elem.color)}/>
+                <button 
+                  style={{backgroundColor: elem.color}} 
+                  className={styles.colorButton} 
+                  onClick={() => addLabel(elem.color)}
+                ></button>
+                <div className={styles.editIconContainer}>
+                  <img 
+                    src={editIcon} 
+                    alt="edit" 
+                    className={styles.editIcon} 
+                  />
+                </div>
               </li>
             ))}
           </ul>

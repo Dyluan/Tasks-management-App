@@ -24,6 +24,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [tempCardComment, setTempCardComment] = useState('');
   const [cardComment, setCardComment] = useState('');
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const [selectedLabels, setSelectedLabels] = useState([]);
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -32,6 +33,12 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
 
   const handlePopoverClose = () => {
     setPopoverAnchorEl(null);
+  }
+
+  function addLabel(color) {
+    setSelectedLabels(prev =>
+      prev.includes(color) ? prev : [...prev, color]
+    );
   }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
@@ -141,7 +148,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       onChange={(e) => saveCardTitle(e.target.value)}
                     />
                   </div>
-                  <div className="">
+                  <div className={styles.additionalCardsContainer}>
                     <button 
                       className={styles.labelButton}
                       onClick={(e) => setPopoverAnchorEl(e.currentTarget)}
@@ -149,7 +156,29 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       <img src={labelIcon} className={styles.modalLabelIcon} alt="label" />
                       Label
                     </button>
-                    <LabelComponent open={Boolean(popoverAnchorEl)} anchorEl={popoverAnchorEl} onClose={handlePopoverClose} />
+                    <LabelComponent 
+                      open={Boolean(popoverAnchorEl)} 
+                      anchorEl={popoverAnchorEl} 
+                      onClose={handlePopoverClose} 
+                      addLabel={addLabel}
+                    />
+                  </div>
+                  <div className={styles.labelsContainer}>
+                    <div className={styles.labelsTitle}>
+                      Labels
+                    </div>
+                    <ul>
+                      {selectedLabels.map((elem, index) => (
+                        <li key={index}>
+                          <button 
+                            className={styles.labelButtons} 
+                            style={{backgroundColor: elem}}
+                            onClick={(e) => setPopoverAnchorEl(e.currentTarget)}
+                          >
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
                 <div className={styles.modalRightMain}>
