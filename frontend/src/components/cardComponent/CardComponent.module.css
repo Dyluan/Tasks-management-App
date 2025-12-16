@@ -182,3 +182,18 @@
     font-size: 14px;
     margin: 24px 0 12px 0;
 }
+.showingLabels ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.showingColor {
+    width: 20%;
+    height: 4px;
+}
+.title {
+    width: 100%;
+}

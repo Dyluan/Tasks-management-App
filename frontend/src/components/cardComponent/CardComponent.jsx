@@ -24,6 +24,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [tempCardComment, setTempCardComment] = useState('');
   const [cardComment, setCardComment] = useState('');
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const labelButtonRef = useRef(null);
   const [selectedLabels, setSelectedLabels] = useState([]);
   
   const handleModalOpen = () => setIsModalOpen(true);
@@ -35,9 +36,11 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
     setPopoverAnchorEl(null);
   }
 
-  function addLabel(color) {
-    setSelectedLabels(prev =>
-      prev.includes(color) ? prev : [...prev, color]
+  function toggleLabel(color) {
+    setSelectedLabels(prev => 
+      prev.includes(color)
+      ? prev.filter(c => c !== color)
+      : [...prev, color]
     );
   }
 
@@ -152,6 +155,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                     <button 
                       className={styles.labelButton}
                       onClick={(e) => setPopoverAnchorEl(e.currentTarget)}
+                      ref={labelButtonRef}
                     >
                       <img src={labelIcon} className={styles.modalLabelIcon} alt="label" />
                       Label
@@ -160,7 +164,8 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       open={Boolean(popoverAnchorEl)} 
                       anchorEl={popoverAnchorEl} 
                       onClose={handlePopoverClose} 
-                      addLabel={addLabel}
+                      toggleLabel={toggleLabel}
+                      selectedLabels={selectedLabels}
                     />
                   </div>
                   <div className={styles.labelsContainer}>
@@ -173,7 +178,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                           <button 
                             className={styles.labelButtons} 
                             style={{backgroundColor: elem}}
-                            onClick={(e) => setPopoverAnchorEl(e.currentTarget)}
+                            onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
                           >
                           </button>
                         </li>
@@ -229,14 +234,26 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
           />
         ) : (
           <div className={styles.title} onClick={startEdit}>
+            <div className={styles.showingLabels}>
+              <ul>
+                {selectedLabels.map((elem, index) => (
+                  <li key={index}>
+                    <span className={styles.showingColor} style={{backgroundColor: elem}}></span>
+                  </li>
+                ))}
+              </ul>      
+            </div>
             {commentList.length > 0 ? (
               <>
                 {cardTitle}
                 <img src={commentIcon} alt="comment" /> {commentList.length}
               </>
             ) : (
-              <>{cardTitle}</>
+              <>
+                {cardTitle}
+              </>
             )}
+
           </div>
         )}
         </div>

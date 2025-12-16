@@ -4,7 +4,7 @@ import closeIcon from '../../assets/close_icon.png';
 import editIcon from'../../assets/edit_icon.svg';
 import { useState } from 'react';
 
-function LabelComponent({ open, anchorEl, onClose, addLabel }) {
+function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels }) {
 
   const [colorList, setColorList] = useState([
     {id: 0, color: '#d6f5e3'},
@@ -48,11 +48,17 @@ function LabelComponent({ open, anchorEl, onClose, addLabel }) {
           <ul>
             {colorList.map((elem) => (
               <li className={styles.labelElement} key={elem.id}>
-                <input type="checkbox" name="elem" id="elemInput" onClick={() => addLabel(elem.color)}/>
+                <input 
+                  type="checkbox" 
+                  name="elem" 
+                  id="elemInput" 
+                  checked={selectedLabels.includes(elem.color)}
+                  onChange={() => toggleLabel(elem.color)}
+                />
                 <button 
                   style={{backgroundColor: elem.color}} 
                   className={styles.colorButton} 
-                  onClick={() => addLabel(elem.color)}
+                  onClick={() => toggleLabel(elem.color)}
                 ></button>
                 <div className={styles.editIconContainer}>
                   <img 
