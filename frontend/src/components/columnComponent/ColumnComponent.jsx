@@ -15,11 +15,6 @@ import Popover from '@mui/material/Popover';
 
 function ColumnComponent({column, deleteColumn, copyColumn}) {
 
-  // const [items, setItems] = useState([
-  //   {cardName: "Card Text", id: uuidv4()}, 
-  //   {cardName: "Another text", id: uuidv4()}, 
-  //   {cardName: "Third one", id: uuidv4()}
-  // ]);
   const [items, setItems] = useState(() => {
   // If the column already has items, use them
     if (column.items && column.items.length > 0) {
@@ -27,9 +22,9 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
     }
     // Otherwise use fallback defaults
     return [
-      { cardName: "Card Text", id: uuidv4(), comments: [] },
-      { cardName: "Another text", id: uuidv4(), comments: [] },
-      { cardName: "Third one", id: uuidv4(), comments: [] }
+      { cardName: "Card Text", id: uuidv4(), comments: [], labels:[] },
+      { cardName: "Another text", id: uuidv4(), comments: [], labels:[] },
+      { cardName: "Third one", id: uuidv4(), comments: [], labels:[] }
     ];
   });
   const [columnTitle, setColumnTitle] = useState(column.title);
@@ -52,7 +47,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   }, [editingTitle]);
 
   const addItems = () => {
-    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4(), comments: []}])
+    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4(), labels: [], comments: []}])
   }
   const deleteItems = (idToRemove) => {
     setItems(prev => prev.filter(item => item.id !== idToRemove));

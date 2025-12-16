@@ -25,7 +25,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [cardComment, setCardComment] = useState('');
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const labelButtonRef = useRef(null);
-  const [selectedLabels, setSelectedLabels] = useState([]);
+  const [selectedLabels, setSelectedLabels] = useState(card.labels ?? []);
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -37,11 +37,19 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   }
 
   function toggleLabel(color) {
-    setSelectedLabels(prev => 
-      prev.includes(color)
-      ? prev.filter(c => c !== color)
-      : [...prev, color]
-    );
+    setSelectedLabels(prev => {
+      const updated =
+        prev.includes(color)
+          ? prev.filter(c => c !== color)
+          : [...prev, color];
+
+      updateCard(card.id, {
+        ...card,
+        labels: updated
+      });
+
+      return updated;
+    });
   }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
@@ -96,6 +104,11 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   useEffect(() => {
     setCommentList(card.comments ?? []);
   }, [card.comments]);
+  
+  // updates the labels if the parent updates
+  useEffect(() => {
+    setSelectedLabels(card.labels ?? []);
+  }, [card.labels]);
 
   function cancelEdit() {
     setCardTitle(prevTitleRef.current);
@@ -233,24 +246,22 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
             aria-label='Edit card title'
           />
         ) : (
-          <div className={styles.title} onClick={startEdit}>
+          <div className={styles.titleContainer} onClick={startEdit}>
             <div className={styles.showingLabels}>
-              <ul>
+              <ul className={styles.labelList}>
                 {selectedLabels.map((elem, index) => (
-                  <li key={index}>
+                  <li className={styles.labelElement} key={index}>
                     <span className={styles.showingColor} style={{backgroundColor: elem}}></span>
                   </li>
                 ))}
-              </ul>      
+              </ul>
             </div>
-            {commentList.length > 0 ? (
+            <div className={styles.title}>
+              {cardTitle}
+            </div>
+            {commentList.length > 0 && (
               <>
-                {cardTitle}
                 <img src={commentIcon} alt="comment" /> {commentList.length}
-              </>
-            ) : (
-              <>
-                {cardTitle}
               </>
             )}
 

@@ -9,8 +9,24 @@ import { arrayMove } from "@dnd-kit/sortable";
 function BoardComponent() {
 
   const [columns, setColumns] = useState([
-    {id: uuidv4(), title: "Done", columnColor: '#f5f5f5', items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}, 
-    {id: uuidv4(), title: "To Do", columnColor: '#f5f5f5', items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}
+    {
+      id: uuidv4(), 
+      title: "Done", 
+      columnColor: '#f5f5f5', 
+      items: [
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[]}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[]}
+      ]
+    }, 
+    {
+      id: uuidv4(), 
+      title: "To Do", 
+      columnColor: '#f5f5f5', 
+      items: [
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[]}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[]}
+      ]
+    }
   ]);
   const [editingTitle, setEditingTitle] = useState(false);
   const [boardName, setBoardName] = useState('My Board');

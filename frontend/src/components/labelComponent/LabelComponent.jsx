@@ -16,8 +16,6 @@ function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels }
     {id: 6, color: '#cdeff7'},
     {id: 7, color: '#e6e6e6'}
   ]);
-  const [editingColorId, setEditingColorId] = useState(null);
-  const [newColor, setNewColor] = useState('');
 
   return (
     <Popover
