@@ -26,6 +26,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const labelButtonRef = useRef(null);
   const [selectedLabels, setSelectedLabels] = useState(card.labels ?? []);
+  const [description, setDescription] = useState('');
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -260,9 +261,12 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
               {cardTitle}
             </div>
             {commentList.length > 0 && (
-              <>
-                <img src={commentIcon} alt="comment" /> {commentList.length}
-              </>
+              <div className={styles.showingComments}>
+                <img src={commentIcon} alt="comment" /> 
+                <div className={styles.commentsNumber}>
+                  {commentList.length}
+                </div>
+              </div>
             )}
 
           </div>

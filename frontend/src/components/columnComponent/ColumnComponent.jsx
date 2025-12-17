@@ -179,7 +179,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
                 <div className={styles.modalContent}>
                   <div className={styles.modalCards}>
                     <ul>
-                      <li><button>New card</button></li>
+                      <li><button onClick={addItems} >New card</button></li>
                       <li><button onClick={() => {
                         handlePopoverClose();
                         startEdit();

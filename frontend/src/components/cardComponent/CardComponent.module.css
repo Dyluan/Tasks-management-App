@@ -197,8 +197,16 @@
 .left {
     width: 100%;
 }
+.titleContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 .labelList {
     gap: 2px;
+}
+.labelList li:last-child {
+    margin-bottom: 6px;
 }
 .labelElement {
     width: 25%;
@@ -212,5 +220,19 @@
     border-radius: 4px;
 }
 .title {
-    margin-top: 6px;
+    font-family: inherit;
+}
+.showingComments {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4px;
+}
+.showingComments img {
+    height: 16px;
+    width: 16px;
+    margin-right: 2px;
+}
+.commentNumber {
+    font-size: 10px;
 }
