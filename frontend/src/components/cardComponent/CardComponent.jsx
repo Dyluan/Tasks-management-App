@@ -4,6 +4,8 @@ import editIcon from '../../assets/edit_icon.svg';
 import closeIcon from '../../assets/close_icon.png';
 import labelIcon from '../../assets/label_icon.svg';
 import commentIcon from '../../assets/comment_logo.png';
+import addIcon from '../../assets/add.png';
+import descriptionIcon from '../../assets/description_icon.svg';
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -183,9 +185,11 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                     />
                   </div>
                   <div className={styles.labelsContainer}>
-                    <div className={styles.labelsTitle}>
-                      Labels
-                    </div>
+                    {selectedLabels.length > 0 && (
+                      <div className={styles.labelsTitle}>
+                        Labels
+                      </div>
+                    )}
                     <ul>
                       {selectedLabels.map((elem, index) => (
                         <li key={index}>
@@ -197,7 +201,33 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                           </button>
                         </li>
                       ))}
+                      {selectedLabels.length > 0 && (
+                        <li>
+                          <button
+                            className={styles.addLabelButton}
+                            onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
+                          >
+                            <img src={addIcon} alt="add" />
+                          </button>
+                        </li>
+                      )}
                     </ul>
+                  </div>
+                  <div className={styles.descriptionContainer}>
+                    <div className={styles.descriptionHeader}>
+                      <div className={styles.descriptionLeft}>
+                        <img src={descriptionIcon} alt="description" />
+                        Description
+                      </div>
+                      <div className={styles.descriptionRight}>
+                        <button className={styles.editDescriptionButton}>
+                          Edit
+                        </button>
+                      </div>
+                    </div>
+                    <div className={styles.descriptionMain}>
+                      <p>Some description..</p>
+                    </div>
                   </div>
                 </div>
                 <div className={styles.modalRightMain}>
@@ -209,6 +239,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       className={styles.commentInput} 
                       label="write a comment" 
                       variant="outlined" 
+                      size='small'
                       value={tempCardComment}
                       onChange={(e) => setTempCardComment(e.target.value)}
                     />

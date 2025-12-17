@@ -116,6 +116,14 @@
     filter: brightness(0.90);
     cursor: pointer;
 }
+.addLabelButton {
+    height: 30px;
+    border: transparent;
+    border-radius: 4px;
+}
+.addLabelButton:hover {
+    cursor: pointer;
+}
 .modalLabelIcon {
     height: 16px;
     width: 16px;
@@ -210,7 +218,7 @@
 }
 .labelElement {
     width: 25%;
-    height: 5px;
+    height: 8px;
 }
 .showingColor {
     display: flex;
@@ -218,6 +226,9 @@
     width: 100%;
     border: transparent;
     border-radius: 4px;
+}
+.showingColor:hover {
+    filter: brightness(0.95);
 }
 .title {
     font-family: inherit;
@@ -229,10 +240,45 @@
     margin-top: 4px;
 }
 .showingComments img {
-    height: 16px;
-    width: 16px;
+    height: 14px;
+    width: 14px;
     margin-right: 2px;
 }
 .commentNumber {
     font-size: 10px;
+}
+.descriptionContainer {
+    font-family: "Noto Sans";
+    margin-top: 40px;
+}
+.descriptionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.descriptionLeft {
+    font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.descriptionLeft img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+.descriptionRight {
+
+}
+.editDescriptionButton {
+    border: transparent;
+    border-radius: 4px;
+    padding: 6px 12px 6px 12px;
+    font-size: 14px;
+}
+.editDescriptionButton:hover {
+    cursor: pointer;
+}
+.descriptionMain {
+
 }
