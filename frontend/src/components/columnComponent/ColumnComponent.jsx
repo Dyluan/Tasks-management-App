@@ -186,6 +186,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
                       }}>Rename column</button></li>
                       <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
                       <li><button onClick={() => copyColumn(columnTitle, items, columnColor)}>Copy column</button></li>
+                      {/* <li><button onClick={() => copyColumn(column)}>Copy column</button></li> */}
                     </ul>
                   </div>
                   <div className={styles.underline}></div>

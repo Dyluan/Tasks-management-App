@@ -29,6 +29,9 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const labelButtonRef = useRef(null);
   const [selectedLabels, setSelectedLabels] = useState(card.labels ?? []);
   const [description, setDescription] = useState('');
+  const [tempDescription, setTempDescription] = useState('');
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const descriptionInputRef = useRef(null);
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -63,6 +66,16 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
       titleInputRef.current.select();
     }
   }, [editingTitle]);
+
+  // useEffect allowing to focus on description + place cursor at the end of 
+  // description text on Edit click
+  useEffect(() => {
+    if (isEditingDescription && descriptionInputRef.current) {
+      const el = descriptionInputRef.current;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }, [isEditingDescription]);
 
   const handleTrashClick = () => {
     deleteFunction(card.id);
@@ -220,14 +233,70 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                         Description
                       </div>
                       <div className={styles.descriptionRight}>
-                        <button className={styles.editDescriptionButton}>
+                        <button 
+                          className={styles.editDescriptionButton}
+                          onClick={() => {
+                            setTempDescription(description);
+                            setIsEditingDescription(true);
+                          }}
+                        >
                           Edit
                         </button>
                       </div>
                     </div>
                     <div className={styles.descriptionMain}>
-                      <p>Some description..</p>
+                      {!isEditingDescription ? (
+                        description.length > 0 ? (
+                          <div className={styles.descriptionText}>
+                            {description}
+                          </div>
+                        ) : (
+                          <div className={styles.descriptionPlaceholder}>
+                            No description yet
+                          </div>
+                        )
+                      ) : (
+                        <>
+                          <TextField 
+                            fullWidth
+                            label="Task description"
+                            multiline
+                            rows={4}
+                            value={tempDescription}
+                            onChange={(e) => setTempDescription(e.target.value)}
+                            inputRef={descriptionInputRef}
+                          />
+                          <div className={styles.descriptionFooter}>
+                            <div className={styles.footerButton}>
+                              <Button 
+                                variant="contained"
+                                size="small"
+                                onClick={() => {
+                                  setDescription(tempDescription);
+                                  setIsEditingDescription(false);
+                                }}
+                              >
+                                Save
+                              </Button>
+                            </div>
+
+                            <div className={styles.footerButton}>
+                              <Button 
+                                variant="outlined"
+                                size="small"
+                                onClick={() => {
+                                  setTempDescription('');
+                                  setIsEditingDescription(false);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
+                    
                   </div>
                 </div>
                 <div className={styles.modalRightMain}>
@@ -291,15 +360,21 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
             <div className={styles.title}>
               {cardTitle}
             </div>
-            {commentList.length > 0 && (
-              <div className={styles.showingComments}>
-                <img src={commentIcon} alt="comment" /> 
-                <div className={styles.commentsNumber}>
-                  {commentList.length}
+            <div className={styles.cardInformation}>
+              {description.length > 0 && (
+                <div className={styles.showingDescription}>
+                  <img src={descriptionIcon} alt="description" />
                 </div>
-              </div>
-            )}
-
+              )}
+              {commentList.length > 0 && (
+                <div className={styles.showingComments}>
+                  <img src={commentIcon} alt="comment" /> 
+                  <div className={styles.commentsNumber}>
+                    {commentList.length}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
         </div>

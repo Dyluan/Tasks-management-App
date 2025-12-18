@@ -237,7 +237,6 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-top: 4px;
 }
 .showingComments img {
     height: 14px;
@@ -280,5 +279,29 @@
     cursor: pointer;
 }
 .descriptionMain {
-
+    width: 100%;
+    margin-top: 14px;
+}
+.descriptionFooter {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.showingDescription {
+    display: flex;
+    align-items: center;
+}
+.showingDescription img {
+    height: 14px;
+    width: 14px;
+}
+.cardInformation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 4px;
 }

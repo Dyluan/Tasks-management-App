@@ -14,8 +14,8 @@ function BoardComponent() {
       title: "Done", 
       columnColor: '#f5f5f5', 
       items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[]}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[]}
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
       ]
     }, 
     {
@@ -23,8 +23,8 @@ function BoardComponent() {
       title: "To Do", 
       columnColor: '#f5f5f5', 
       items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[]}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[]}
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
       ]
     }
   ]);
@@ -66,7 +66,13 @@ function BoardComponent() {
   }
 
   const addColumn = () => {
-    setColumns(prev => [...prev, {title: "New column", columnColor: '#f5f5f5', id: uuidv4(), items: [{id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}]);
+    setColumns(prev => [...prev, {
+      title: "New column", 
+      columnColor: '#f5f5f5', 
+      id: uuidv4(), 
+      items: [
+        {id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}
+      ]);
   }
 
   const copyColumn = (newTitle, newCardList, newColor) => {
@@ -77,6 +83,43 @@ function BoardComponent() {
       id: uuidv4()
     }]);
   }
+
+  function duplicateColumn(column) {
+    return {
+      ...column,
+      id: uuidv4(),
+      cards: column.cards.map(card => ({
+        ...card,
+        id: uuidv4(), 
+        comments: card.comments ? [...card.comments] : [],
+        labels: card.labels ? [...card.labels] : [],
+        description: card.description ? card.description : ''
+      }))
+    };
+  }
+
+  // THAT HERE IS WHAT I SHOULD BE DOING. But it requires some code refactor. 
+  // Will do it later
+  // TODO
+  // const copyColumn = (column) => {
+  //   const copiedItems = column.items.map(card => ({
+  //     ...card,
+  //     id: uuidv4(),
+  //     comments: card.comments ? [...card.comments] : [],
+  //     labels: card.labels ? [...card.labels] : [],
+  //     description: card.description ?? ''
+  //   }));
+
+  //   setColumns(prev => [
+  //     ...prev,
+  //     {
+  //       id: uuidv4(),
+  //       title: column.title,
+  //       columnColor: column.columnColor,
+  //       items: copiedItems
+  //     }
+  //   ]);
+  // };
 
   const deleteColumn = (idToRemove) => {
     setColumns(prev => prev.filter(column => column.id !== idToRemove));
