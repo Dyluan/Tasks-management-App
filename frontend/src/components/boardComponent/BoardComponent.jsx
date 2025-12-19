@@ -75,55 +75,56 @@ function BoardComponent() {
       ]);
   }
 
-  const copyColumn = (newTitle, newCardList, newColor) => {
-    setColumns(prev => [...prev, {
-      title: newTitle, 
-      items: newCardList,
-      columnColor: newColor,
-      id: uuidv4()
-    }]);
-  }
+  const copyColumn = (column) => {
+    setColumns(prev => [
+      ...prev,
+      {
+        ...column,
+        id: uuidv4(),
+        items: column.items.map(card => ({
+          ...card,
+          id: uuidv4(),
+          comments: [...card.comments],
+          labels: [...card.labels],
+          description: card.description ?? ''
+        }))
+      }
+    ]);
+  };
 
-  function duplicateColumn(column) {
-    return {
-      ...column,
-      id: uuidv4(),
-      cards: column.cards.map(card => ({
-        ...card,
-        id: uuidv4(), 
-        comments: card.comments ? [...card.comments] : [],
-        labels: card.labels ? [...card.labels] : [],
-        description: card.description ? card.description : ''
-      }))
-    };
-  }
+  const updateColumnItems = (columnId, newItems) => {
+    setColumns(prev =>
+      prev.map(col =>
+        col.id === columnId
+          ? { ...col, items: newItems }
+          : col
+      )
+    );
+  };
 
-  // THAT HERE IS WHAT I SHOULD BE DOING. But it requires some code refactor. 
-  // Will do it later
-  // TODO
-  // const copyColumn = (column) => {
-  //   const copiedItems = column.items.map(card => ({
-  //     ...card,
-  //     id: uuidv4(),
-  //     comments: card.comments ? [...card.comments] : [],
-  //     labels: card.labels ? [...card.labels] : [],
-  //     description: card.description ?? ''
-  //   }));
+  const updateColumnColor = (columnId, newColor) => {
+    setColumns(prev => 
+      prev.map(col => 
+        col.id === columnId
+          ? {...col, columnColor: newColor}
+          : col
+      )
+    );
+  };
 
-  //   setColumns(prev => [
-  //     ...prev,
-  //     {
-  //       id: uuidv4(),
-  //       title: column.title,
-  //       columnColor: column.columnColor,
-  //       items: copiedItems
-  //     }
-  //   ]);
-  // };
+  const updateColumnTitle = (columnId, newTitle) => {
+    setColumns(prev => 
+      prev.map(col => 
+        col.id === columnId
+          ? { ...col, title: newTitle } // ✅ correct key
+          : col
+      )
+    );
+  };
 
   const deleteColumn = (idToRemove) => {
     setColumns(prev => prev.filter(column => column.id !== idToRemove));
-  }
+  };
 
   // this part of the code is relative to the dnd-kit library
   const getColumPosition = (id) => columns.findIndex(column => column.id === id);
@@ -176,7 +177,14 @@ function BoardComponent() {
       </div>
       <div className={styles.main}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-          <ColumnListComponent columns={columns} deleteColumn={deleteColumn} copyColumn={copyColumn} />
+          <ColumnListComponent 
+            columns={columns} 
+            deleteColumn={deleteColumn} 
+            copyColumn={copyColumn}
+            updateColumnItems={updateColumnItems}
+            updateColumnColor={updateColumnColor}
+            updateColumnTitle={updateColumnTitle}
+          />
         </DndContext>
           <button className={styles.addButton} onClick={addColumn}>
             <div className={styles.buttonImg}><img src={add} alt="add" /></div>

@@ -13,22 +13,11 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 
-function ColumnComponent({column, deleteColumn, copyColumn}) {
+function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, updateColumnColor, updateColumnTitle}) {
 
-  const [items, setItems] = useState(() => {
-  // If the column already has items, use them
-    if (column.items && column.items.length > 0) {
-      return column.items;
-    }
-    // Otherwise use fallback defaults
-    return [
-      { cardName: "Card Text", id: uuidv4(), comments: [], labels:[] },
-      { cardName: "Another text", id: uuidv4(), comments: [], labels:[] },
-      { cardName: "Third one", id: uuidv4(), comments: [], labels:[] }
-    ];
-  });
-  const [columnTitle, setColumnTitle] = useState(column.title);
-  const [columnColor, setcolumnColor] = useState(column.columnColor);
+  const items = column.items;
+  const columnTitle = column.title;
+  const columnColor = column.columnColor;
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
@@ -47,12 +36,25 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   }, [editingTitle]);
 
   const addItems = () => {
-    setItems(prev => [...prev, {cardName: "New Card", id: uuidv4(), labels: [], comments: []}])
-  }
-  const deleteItems = (idToRemove) => {
-    setItems(prev => prev.filter(item => item.id !== idToRemove));
+    updateColumnItems(column.id, [
+      ...items,
+      {
+        id: uuidv4(),
+        cardName: 'New Card',
+        comments: [],
+        labels: [],
+        description: ''
+      }
+    ]);
   };
 
+  const deleteItems = (idToRemove) => {
+    updateColumnItems(
+      column.id,
+      items.filter(item => item.id !== idToRemove)
+    );
+  };
+  
   const style = {
     transition, transform: CSS.Translate.toString(transform),
     background: columnColor
@@ -63,7 +65,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   }
 
   const handleColorChange = (newColor) => {
-    setcolumnColor(newColor);
+    updateColumnColor(column.id, newColor);
   }
 
   function startEdit() {
@@ -74,15 +76,15 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
   function saveTitle(newTitle) {
     const trimmed = String(newTitle).trim();
     if (trimmed.length === 0) {
-      setColumnTitle(prevTitleRef.current);
+      updateColumnTitle(column.id, prevTitleRef.current);
     } else {
-      setColumnTitle(trimmed);
+      updateColumnTitle(column.id, trimmed);
     }
     setEditingTitle(false);
   }
 
   function cancelEdit() {
-    setColumnTitle(prevTitleRef.current);
+    updateColumnTitle(column.id, prevTitleRef.current);
     setEditingTitle(false);
   }
 
@@ -91,13 +93,14 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
     if (e.key === 'Escape') cancelEdit();
   }
 
-  function updateCard(cardId, updatedCard) {
-    setItems(prev =>
-      prev.map(card => 
+  const updateCard = (cardId, updatedCard) => {
+    updateColumnItems(
+      column.id,
+      items.map(card =>
         card.id === cardId ? updatedCard : card
       )
     );
-  }
+  };
 
   // this part of the code is relative to the dnd-kit library
   const getCardPosition = (id) => items.findIndex(item => item.id === id);
@@ -106,12 +109,12 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
     const {active, over} = event;
     if (active.id === over.id) return;
 
-    setItems((items) => {
-      const originalPos = getCardPosition(active.id);
-      const newPos = getCardPosition(over.id);
+    const originalPos = getCardPosition(active.id);
+    const newPos = getCardPosition(over.id);
 
-      return arrayMove(items, originalPos, newPos);
-    })
+    const reorderedItems = arrayMove(items, originalPos, newPos);
+
+    updateColumnItems(column.id, reorderedItems);
   }
 
   // got rid of KeyboardSensor as it interferes with input writing (was not allowing space key to work properly)
@@ -185,8 +188,7 @@ function ColumnComponent({column, deleteColumn, copyColumn}) {
                         startEdit();
                       }}>Rename column</button></li>
                       <li><button onClick={() => deleteColumn(column.id)}>Delete column</button></li>
-                      <li><button onClick={() => copyColumn(columnTitle, items, columnColor)}>Copy column</button></li>
-                      {/* <li><button onClick={() => copyColumn(column)}>Copy column</button></li> */}
+                      <li><button onClick={() => copyColumn(column)}>Copy column</button></li>
                     </ul>
                   </div>
                   <div className={styles.underline}></div>

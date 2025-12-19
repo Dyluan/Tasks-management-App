@@ -77,6 +77,10 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
     }
   }, [isEditingDescription]);
 
+  useEffect(() => {
+    setDescription(card.description ?? '');
+  }, [card.description]);
+
   const handleTrashClick = () => {
     deleteFunction(card.id);
   }
@@ -273,6 +277,10 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                                 size="small"
                                 onClick={() => {
                                   setDescription(tempDescription);
+                                  updateCard(card.id, {
+                                    ...card,
+                                    description: tempDescription
+                                  });
                                   setIsEditingDescription(false);
                                 }}
                               >
