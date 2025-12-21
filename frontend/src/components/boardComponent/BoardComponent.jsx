@@ -140,8 +140,8 @@ function BoardComponent() {
         items: column.items.map(card => ({
           ...card,
           id: uuidv4(),
-          comments: [...card.comments],
-          labels: [...card.labels],
+          comments: [...(card.comments ?? [])],
+          labels: [...(card.labels ?? [])],
           description: card.description ?? ''
         }))
       }
