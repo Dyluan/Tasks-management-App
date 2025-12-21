@@ -12,19 +12,58 @@ import Popover from '@mui/material/Popover';
 function BoardComponent() {
 
   const [anchorEl, setAnchorEl] = useState(null);
-
   const handlePopoverClose = () => setAnchorEl(null);
-  const boardColors = [
-    'linear-gradient(135deg, #f6b365, #fda085)',
-    'linear-gradient(135deg, #ff6a88, #ff99ac)',
-    'linear-gradient(135deg, #f7971e, #ffd200)',
-    'linear-gradient(135deg, #ff9a9e, #fecfef)',
-    'linear-gradient(135deg, #43cea2, #185a9d)',
-    'linear-gradient(135deg, #ff512f, #dd2476)',
-    'linear-gradient(135deg, #fbb034, #ffdd00)',
-    'linear-gradient(135deg, #c471f5, #fa71cd)'
+  const boardThemes = [
+    {
+      board: 'linear-gradient(135deg, #f6b365, #fda085)',
+      header: 'linear-gradient(135deg, #f46b45, #eea849)',
+    },
+    {
+      board: 'linear-gradient(135deg, #ff6a88, #ff99ac)',
+      header: 'linear-gradient(135deg, #e94057, #f27121)',
+    },
+    {
+      board: 'linear-gradient(135deg, #f7971e, #ffd200)',
+      header: 'linear-gradient(135deg, #f12711, #f5af19)',
+    },
+    {
+      board: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
+      header: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
+    },
+    {
+      board: 'linear-gradient(135deg, #43cea2, #185a9d)',
+      header: 'linear-gradient(135deg, #1d2b64, #f8cdda)',
+    },
+    {
+      board: 'linear-gradient(135deg, #ff512f, #dd2476)',
+      header: 'linear-gradient(135deg, #cb2d3e, #ef473a)',
+    },
+    {
+      board: 'linear-gradient(135deg, #fbb034, #ffdd00)',
+      header: 'linear-gradient(135deg, #f7971e, #ffd200)',
+    },
+    {
+      board: 'linear-gradient(135deg, #56ab2f, #a8e063)',
+      header: 'linear-gradient(135deg, #134e5e, #71b280)'
+    },
+    {
+      board: 'linear-gradient(135deg, #e0eafc, #cfdef3)',
+      header: 'linear-gradient(135deg, #373b44, #4286f4)'
+    },
+    {
+      board: 'linear-gradient(135deg, #cfd9df, #e2ebf0)',
+      header: 'linear-gradient(135deg, #005c97, #363795)'
+    },
+    {
+      board: 'linear-gradient(135deg, #2c3e50, #bdc3c7)',
+      header: 'linear-gradient(135deg, #000428, #004e92)'
+    },
+    {
+      board: 'linear-gradient(135deg, #d7d2cc, #304352)',
+      header: 'linear-gradient(135deg, #232526, #414345)'
+    }
   ];
-
+  const [boardTheme, setBoardTheme] = useState(boardThemes[0]);
   const [columns, setColumns] = useState([
     {
       id: uuidv4(), 
@@ -143,6 +182,10 @@ function BoardComponent() {
     setColumns(prev => prev.filter(column => column.id !== idToRemove));
   };
 
+  const handleBoardColorChange = (newTheme) => {
+    setBoardTheme(newTheme);
+  }
+
   // this part of the code is relative to the dnd-kit library
   const getColumPosition = (id) => columns.findIndex(column => column.id === id);
 
@@ -169,8 +212,8 @@ function BoardComponent() {
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
+    <div className={styles.container} style={{ background: boardTheme.board }}>
+      <div className={styles.header} style={{ background: boardTheme.header }}>
         <div className={styles.edit}>
           <img 
             src={verticalDots} 
@@ -205,10 +248,17 @@ function BoardComponent() {
               <div className={styles.modalMain}>
                 <div className={styles.modalCards}>
                   <ul>
-                    <li><button>Rename Board</button></li>
+                    <li>
+                      <button
+                        onClick={() => {
+                          handlePopoverClose();
+                          startEdit();
+                        }}
+                      >Rename Board</button>
+                    </li>
                     <li>
                       <button>
-                        Add new Board
+                        Create new Board
                       </button>
                     </li>
                   </ul>
@@ -219,11 +269,12 @@ function BoardComponent() {
                     Edit Board color
                   </div>
                   <ul className={styles.modalColorsList}>
-                    {boardColors.map((elem, index) => (
+                    {boardThemes.map((elem, index) => (
                       <li className={styles.modalColorsElem} key={index}>
                         <button 
                           className={styles.modalColorButton} 
-                          style={{background: elem}}
+                          style={{ background: elem.board }}
+                          onClick={() => handleBoardColorChange(elem)}
                         >
                         </button>
                       </li>
