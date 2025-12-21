@@ -154,15 +154,35 @@
     list-style: none;
     padding: 0;
 }
-.comment {
+.commentContainer {
     margin-bottom: 12px;
+    gap: 4px;
+    display: flex;
+    flex-direction: column;
+}
+.comment {
     border: 1px solid #a3a3a3;
     border-radius: 8px;
     padding: 6px;
     width: 90%;
     background-color: white;
     font-family: "Noto Sans";
-    font-size: 14px;
+    font-size: 13px;
+}
+.editComment {
+    gap: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.editCommentButton img {
+    height: 24px;
+    width: 24px;
+}
+.editCommentButton img:hover {
+    cursor: pointer;
+    transform: translateY(-1px);
+    /* transform: rotate(20deg); */
 }
 .labelsContainer ul{
     list-style: none;
@@ -281,6 +301,7 @@
 .descriptionMain {
     width: 100%;
     margin-top: 14px;
+    font-size: 14px;
 }
 .descriptionFooter {
     margin-top: 10px;
@@ -304,4 +325,7 @@
     justify-content: flex-start;
     gap: 8px;
     margin-top: 4px;
+}
+.descriptionPlaceholder, .descriptionText {
+    margin-bottom: 10px;
 }

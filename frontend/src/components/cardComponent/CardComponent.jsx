@@ -14,6 +14,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import LabelComponent from '../labelComponent/LabelComponent';
+import { v4 as uuidv4 } from 'uuid';
 
 function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard}) {
 
@@ -32,6 +33,11 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [tempDescription, setTempDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const descriptionInputRef = useRef(null);
+  const [isEditingComment, setIsEditingComment] = useState(false);
+  const commentInputRef = useRef(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [tempEditComment, setTempEditComment] = useState('');
+  const editCommentInputRef = useRef(null);
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -58,6 +64,10 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
     });
   }
 
+  const deleteComment = (commentId) => {
+    setCommentList(prev => prev.filter(comment => comment.id !== commentId));
+  }
+
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
 
   useEffect(() => {
@@ -76,6 +86,17 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
       el.setSelectionRange(el.value.length, el.value.length);
     }
   }, [isEditingDescription]);
+
+  // same idea here but for the comments
+  useEffect(() => {
+    if (editingCommentId && editCommentInputRef.current) {
+      editCommentInputRef.current.focus();
+      editCommentInputRef.current.setSelectionRange(
+        editCommentInputRef.current.value.length,
+        editCommentInputRef.current.value.length
+      );
+    }
+  }, [editingCommentId]);
 
   useEffect(() => {
     setDescription(card.description ?? '');
@@ -110,7 +131,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   }
 
   function updateComments(newComment) {
-    const updatedComments = [...commentList, newComment];
+    const updatedComments = [{text: newComment, id: uuidv4()}, ...commentList];
     updateCard(card.id, {
       ...card,
       comments: updatedComments
@@ -133,6 +154,28 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   function cancelEdit() {
     setCardTitle(prevTitleRef.current);
     setEditingTitle(false);
+  }
+
+  function saveEditedComment(commentId) {
+    const updatedComments = commentList.map(comment =>
+      comment.id === commentId
+        ? { ...comment, text: tempEditComment }
+        : comment
+    );
+
+    setCommentList(updatedComments);
+    updateCard(card.id, {
+      ...card,
+      comments: updatedComments
+    });
+
+    setEditingCommentId(null);
+    setTempEditComment('');
+  }
+
+  function cancelEditComment() {
+    setEditingCommentId(null);
+    setTempEditComment('');
   }
 
   function onTitleKeyDown(e) {
@@ -334,8 +377,54 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                   </div>
                   <div className={styles.cardCommentList}>
                     <ul className={styles.ulComment}>
-                      {commentList.map((elem, index) => (
-                        <li className={styles.comment} key={index}>{elem}</li>
+                      {/* TODO: change this part of the code. Buttons are ugly right now */}
+                      {commentList.map((elem) => (
+                        <div className={styles.commentContainer} key={elem.id}>
+                          {editingCommentId === elem.id ? (
+                            <li className={styles.comment}>
+                              <TextField
+                                size="small"
+                                fullWidth
+                                value={tempEditComment}
+                                onChange={(e) => setTempEditComment(e.target.value)}
+                                inputRef={editCommentInputRef}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveEditedComment(elem.id);
+                                  if (e.key === 'Escape') cancelEditComment();
+                                }}
+                                />
+                              <div className={styles.editActions}>
+                                <Button size="small" onClick={() => saveEditedComment(elem.id)}>
+                                  Save
+                                </Button>
+                                <Button size="small" onClick={cancelEditComment}>
+                                  Cancel
+                                </Button>
+                              </div>
+                            </li>
+                          ) : (
+                            <>
+                              <li className={styles.comment} key={elem.id}>
+                                {elem.text}
+                              </li>
+                              <span className={styles.editComment}>
+                                <div className={styles.editCommentButton}>
+                                  <img 
+                                    src={editIcon} 
+                                    alt="edit" 
+                                    onClick={() => {
+                                      setEditingCommentId(elem.id);
+                                      setTempEditComment(elem.text);
+                                    }}
+                                  />
+                                </div>
+                                <div className={styles.editCommentButton}>
+                                  <img src={trashIcon} alt="trash" onClick={() => deleteComment(elem.id)}/>
+                                </div>
+                              </span>
+                            </>
+                            )}
+                        </div>
                       ))}
                     </ul>
                   </div>
@@ -368,6 +457,8 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
             <div className={styles.title}>
               {cardTitle}
             </div>
+            {/* TODO, the cardInformation holds a padding that displays 
+              even if there's no content inside */}
             <div className={styles.cardInformation}>
               {description.length > 0 && (
                 <div className={styles.showingDescription}>
