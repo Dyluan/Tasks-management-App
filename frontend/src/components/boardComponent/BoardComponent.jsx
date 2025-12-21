@@ -9,6 +9,8 @@ import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, use
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
 
+import Threads from "../Threads/Threads";
+
 function BoardComponent() {
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -24,7 +26,7 @@ function BoardComponent() {
     },
     {
       board: 'linear-gradient(135deg, #f7971e, #ffd200)',
-      header: 'linear-gradient(135deg, #f12711, #f5af19)',
+      header: 'linear-gradient(135deg, #f19011ff, #f5af19)',
     },
     {
       board: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
@@ -140,8 +142,8 @@ function BoardComponent() {
         items: column.items.map(card => ({
           ...card,
           id: uuidv4(),
-          comments: [...card.comments],
-          labels: [...card.labels],
+          comments: [...(card.comments ?? [])],
+          labels: [...(card.labels ?? [])],
           description: card.description ?? ''
         }))
       }
