@@ -65,7 +65,18 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   }
 
   const deleteComment = (commentId) => {
-    setCommentList(prev => prev.filter(comment => comment.id !== commentId));
+    // since the set function from usestate is async, I have to create a temp var at the moment
+    // to sync the component with the parent. Otherwise, last change is not taken into account
+    const updatedCommentList = commentList.filter(
+      comment => comment.id !== commentId
+    );
+
+    setCommentList(updatedCommentList);
+
+    updateCard(card.id, {
+      ...card,
+      comments: updatedCommentList
+    });
   }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
