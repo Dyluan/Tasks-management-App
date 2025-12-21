@@ -14,6 +14,7 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
+    align-items: center;
 }
 .titleInput {
     padding: 8px 8px 8px 0;
@@ -21,18 +22,22 @@
     border: none;
     font-size: 16px;
     margin: -8px -8px -8px 0;
+    width: fit-content;
+    background-color: inherit;
 }
 .titleInput:focus {
     outline: none;
 }
 .title:hover {
     transform: translateY(-1px);
-    border-color: rgba(0,0,0,0.2);
     cursor: pointer;
+    filter: brightness(1.9);
 }
 .title {
     font-size: 16px;
     line-height: 22px;
+    background-color: inherit;
+    box-sizing: border-box;
 }
 .footer {
     display: flex;

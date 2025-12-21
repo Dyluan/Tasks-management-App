@@ -92,7 +92,7 @@
     padding: 12px;
 }
 .modalCardInput {
-    border: none;
+    border: transparent;
     background-color: inherit;
     font-size: 24px;
     font-weight: bold;

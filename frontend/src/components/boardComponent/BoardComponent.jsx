@@ -2,11 +2,28 @@ import ColumnListComponent from "../columnListComponent/ColumnListComponent";
 import { useState, useRef, useEffect } from "react";
 import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
+import verticalDots from '../../assets/vertical_dots.svg';
+import closeIcon from '../../assets/close_icon.png';
 import { v4 as uuidv4 } from 'uuid';
 import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import Popover from '@mui/material/Popover';
 
 function BoardComponent() {
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handlePopoverClose = () => setAnchorEl(null);
+  const boardColors = [
+    'linear-gradient(135deg, #f6b365, #fda085)',
+    'linear-gradient(135deg, #ff6a88, #ff99ac)',
+    'linear-gradient(135deg, #f7971e, #ffd200)',
+    'linear-gradient(135deg, #ff9a9e, #fecfef)',
+    'linear-gradient(135deg, #43cea2, #185a9d)',
+    'linear-gradient(135deg, #ff512f, #dd2476)',
+    'linear-gradient(135deg, #fbb034, #ffdd00)',
+    'linear-gradient(135deg, #c471f5, #fa71cd)'
+  ];
 
   const [columns, setColumns] = useState([
     {
@@ -116,7 +133,7 @@ function BoardComponent() {
     setColumns(prev => 
       prev.map(col => 
         col.id === columnId
-          ? { ...col, title: newTitle } // ✅ correct key
+          ? { ...col, title: newTitle }
           : col
       )
     );
@@ -154,6 +171,69 @@ function BoardComponent() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+        <div className={styles.edit}>
+          <img 
+            src={verticalDots} 
+            alt="vertical dots" 
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+          />
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handlePopoverClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <div className={styles.modalContainer}>
+              <div className={styles.modalHeader}>
+                <div className={styles.modalTitle}>
+                  Actions
+                </div>
+                <button 
+                  className={styles.modalCloseButton} 
+                  onClick={handlePopoverClose}>
+                    <img src={closeIcon} alt="close" />
+                </button>
+              </div>
+              <div className={styles.modalLine}></div>
+              <div className={styles.modalMain}>
+                <div className={styles.modalCards}>
+                  <ul>
+                    <li><button>Rename Board</button></li>
+                    <li>
+                      <button>
+                        Add new Board
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <div className={styles.modalLine}></div>
+                <div className={styles.modalColors}>
+                  <div className={styles.modalColorsTitle}>
+                    Edit Board color
+                  </div>
+                  <ul className={styles.modalColorsList}>
+                    {boardColors.map((elem, index) => (
+                      <li className={styles.modalColorsElem} key={index}>
+                        <button 
+                          className={styles.modalColorButton} 
+                          style={{background: elem}}
+                        >
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </Popover>
+        </div>
         <div className={styles.title}>
           {editingTitle ? (
             <input 
@@ -172,7 +252,6 @@ function BoardComponent() {
               {boardName}
             </div>
           )}
-          
         </div>
       </div>
       <div className={styles.main}>
