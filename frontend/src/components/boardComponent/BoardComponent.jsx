@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
+import Threads from "../threadsComponent/Threads";
 
 function BoardComponent() {
 
@@ -19,12 +20,12 @@ function BoardComponent() {
       header: 'linear-gradient(135deg, #f46b45, #eea849)',
     },
     {
-      board: 'linear-gradient(135deg, #ff6a88, #ff99ac)',
-      header: 'linear-gradient(135deg, #e94057, #f27121)',
+      board: 'linear-gradient(to left, #bbd2c5, #536976, #292e49)',
+      header: 'linear-gradient(to right, #1f2337, #292e49, #3a475a',
     },
     {
-      board: 'linear-gradient(135deg, #f7971e, #ffd200)',
-      header: 'linear-gradient(135deg, #f12711, #f5af19)',
+      board: 'linear-gradient(to left, #f7f8f8, #acbb78)',
+      header: 'linear-gradient(to right, #7d8f4e, #acbb78, #cfd8b6)',
     },
     {
       board: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
@@ -39,8 +40,8 @@ function BoardComponent() {
       header: 'linear-gradient(135deg, #cb2d3e, #ef473a)',
     },
     {
-      board: 'linear-gradient(135deg, #fbb034, #ffdd00)',
-      header: 'linear-gradient(135deg, #f7971e, #ffd200)',
+      board: 'linear-gradient(to left, #ffefba, #ffffff)',
+      header: 'linear-gradient(to right, #f2d98b, #ffefba, #fff6d8)',
     },
     {
       board: 'linear-gradient(135deg, #56ab2f, #a8e063)',
