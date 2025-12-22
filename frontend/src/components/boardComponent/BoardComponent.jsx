@@ -9,6 +9,9 @@ import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, use
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
 import Threads from "../threadsComponent/Threads";
+import Balatro from "../balatroComponent/Balatro";
+import Iridescence from '../iridescenceComponent/Iridescence';
+import Beams from '../beamsComponent/Beams';
 
 function BoardComponent() {
 
@@ -16,52 +19,88 @@ function BoardComponent() {
   const handlePopoverClose = () => setAnchorEl(null);
   const boardThemes = [
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #f6b365, #fda085)',
       header: 'linear-gradient(135deg, #f46b45, #eea849)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #bbd2c5, #536976, #292e49)',
       header: 'linear-gradient(to right, #1f2337, #292e49, #3a475a',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #f7f8f8, #acbb78)',
       header: 'linear-gradient(to right, #7d8f4e, #acbb78, #cfd8b6)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
       header: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #43cea2, #185a9d)',
       header: 'linear-gradient(135deg, #1d2b64, #f8cdda)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #ff512f, #dd2476)',
       header: 'linear-gradient(135deg, #cb2d3e, #ef473a)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #ffefba, #ffffff)',
       header: 'linear-gradient(to right, #f2d98b, #ffefba, #fff6d8)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #56ab2f, #a8e063)',
       header: 'linear-gradient(135deg, #134e5e, #71b280)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #e0eafc, #cfdef3)',
       header: 'linear-gradient(135deg, #373b44, #4286f4)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #cfd9df, #e2ebf0)',
       header: 'linear-gradient(135deg, #005c97, #363795)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #2c3e50, #bdc3c7)',
       header: 'linear-gradient(135deg, #000428, #004e92)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #d7d2cc, #304352)',
       header: 'linear-gradient(135deg, #232526, #414345)'
+    },
+    {
+      type: 'component',
+      name: 'Threads',
+      board: 'threads',
+      header: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+    },
+    {
+      type: 'component',
+      name: 'Balatro',
+      board: 'balatro',
+      header: 'linear-gradient(135deg, #0a0e27, #1a1a2e)',
+    },
+    {
+      type: 'component',
+      name: 'Iridescence',
+      board: 'iridescence',
+      header: 'linear-gradient(to left, #bc4e9c, #f80759)',
+    },
+    {
+      type: 'component',
+      name: 'Beams',
+      board: 'beams',
+      header: 'linear-gradient(135deg, #0a0e27, #1a1a2e)'
     }
   ];
   const [boardTheme, setBoardTheme] = useState(boardThemes[0]);
@@ -213,7 +252,58 @@ function BoardComponent() {
   );
 
   return (
-    <div className={styles.container} style={{ background: boardTheme.board }}>
+    <div className={styles.container}>
+      {boardTheme.type === 'component' && boardTheme.board === 'threads' && (
+        <div className={styles.backgroundComponent}>
+          <Threads 
+            amplitude={3} 
+            distance={0}
+            enableMouseInteraction={false}
+          />
+        </div>
+      )}
+      {boardTheme.type === 'component' && boardTheme.board === 'balatro' && (
+        <div className={styles.backgroundComponent}>
+          <Balatro 
+            color1="#1a1a2e"
+            color2="#16213e"
+            color3="#0f3460"
+            spinRotation={-2.0}
+            spinSpeed={7.0}
+            contrast={3.5}
+            lighting={0.3}
+            mouseInteraction={false}
+          />
+        </div>
+      )}
+      {boardTheme.type === 'component' && boardTheme.board === 'iridescence' && (
+        <div className={styles.backgroundComponent}>
+          <Iridescence 
+            color={[0.7, 0.6, 0.8]}
+            mouseReact={false}
+          />
+        </div>
+      )}
+      {boardTheme.type === 'component' && boardTheme.board === 'beams' && (
+        <div className={styles.backgroundComponent}>
+          <Beams 
+            beamWidth={3}
+            beamHeight={25}
+            beamNumber={12}
+            lightColor="#ffffff"
+            speed={2}
+            noiseIntensity={1.75}
+            scale={0.2}
+            rotation={45}
+          />
+        </div>
+      )}
+      <div 
+        className={styles.containerContent}
+        style={{ 
+          background: boardTheme.type === 'gradient' ? boardTheme.board : 'transparent'
+        }}
+      >
       <div className={styles.header} style={{ background: boardTheme.header }}>
         <div className={styles.edit}>
           <img 
@@ -274,9 +364,47 @@ function BoardComponent() {
                       <li className={styles.modalColorsElem} key={index}>
                         <button 
                           className={styles.modalColorButton} 
-                          style={{ background: elem.board }}
+                          style={{ 
+                            background: elem.type === 'gradient' ? elem.board : '#1a1a2e',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
                           onClick={() => handleBoardColorChange(elem)}
                         >
+                          {elem.type === 'component' && elem.board === 'threads' && (
+                            <div style={{ position: 'absolute', inset: 0 }}>
+                              <Threads amplitude={2} distance={0} enableMouseInteraction={false} />
+                            </div>
+                          )}
+                          {elem.type === 'component' && elem.board === 'balatro' && (
+                            <div style={{ position: 'absolute', inset: 0 }}>
+                              <Balatro 
+                                color1="#1a1a2e"
+                                color2="#16213e"
+                                color3="#0f3460"
+                                mouseInteraction={false}
+                              />
+                            </div>
+                          )}
+                          {elem.type === 'component' && elem.board === 'iridescence' && (
+                            <div style={{ position: 'absolute', inset: 0 }}>
+                              <Iridescence color={[0.7, 0.6, 0.8]} mouseReact={false} />
+                            </div>
+                          )}
+                          {elem.type === 'component' && elem.board === 'beams' && (
+                            <div style={{ position: 'absolute', inset: 0 }}>
+                              <Beams 
+                                beamWidth={3}
+                                beamHeight={25}
+                                beamNumber={8}
+                                lightColor="#ffffff"
+                                speed={2}
+                                noiseIntensity={1.75}
+                                scale={0.2}
+                                rotation={45}
+                              />
+                            </div>
+                          )}
                         </button>
                       </li>
                     ))}
@@ -321,6 +449,7 @@ function BoardComponent() {
             <div className={styles.buttonImg}><img src={add} alt="add" /></div>
             <div className={styles.buttonText}>Add another list</div>
           </button>
+      </div>
       </div>
     </div>
   )
