@@ -94,7 +94,7 @@ function BoardComponent() {
       type: 'component',
       name: 'Iridescence',
       board: 'iridescence',
-      header: 'linear-gradient(to left, #bc4e9c, #f80759)',
+      header: 'linear-gradient(to left, #800080, #ffc0cb)',
     },
     {
       type: 'component',
@@ -256,7 +256,7 @@ function BoardComponent() {
       {boardTheme.type === 'component' && boardTheme.board === 'threads' && (
         <div className={styles.backgroundComponent}>
           <Threads 
-            amplitude={3} 
+            amplitude={2} 
             distance={0}
             enableMouseInteraction={false}
           />
@@ -383,6 +383,7 @@ function BoardComponent() {
                                 color2="#16213e"
                                 color3="#0f3460"
                                 mouseInteraction={false}
+                                isRotate={false}
                               />
                             </div>
                           )}

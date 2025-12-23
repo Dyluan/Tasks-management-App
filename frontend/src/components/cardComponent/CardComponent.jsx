@@ -269,6 +269,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                             style={{backgroundColor: elem}}
                             onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
                           >
+                            {/* {elem.text} */}
                           </button>
                         </li>
                       ))}

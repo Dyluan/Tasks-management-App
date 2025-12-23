@@ -1,0 +1,75 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.previousContainer, .closeContainer {
+  display: flex;
+  align-items: center;
+}
+.previousContainer img {
+  height: 23px;
+  width: 23px;
+}
+.previousContainer img:hover {
+  cursor: pointer;
+}
+.closeContainer {
+  cursor: pointer;
+  border: transparent;
+  border-radius: 4px;
+  background-color: inherit;
+}
+.closeContainer:hover {
+  background-color: #e9e9ed;
+}
+.selectedColor {
+  background-color: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 -12px 0 -12px;
+}
+.color {
+  border: transparent;
+  border-radius: 4px;
+  width: 80%;
+  height: 30px;
+  margin: 20px;
+}
+.titleContainer {
+  margin-top: 12px;
+}
+.labelInputContainer {
+  margin: 6px 0 6px 0;
+}
+.labelInput {
+  width: 100%;
+}
+.selectColorTitle {
+  font-size: 12px;
+  margin: 12px 0 6px 0;
+}
+.colorsContainer ul {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.colorsContainer li {
+  list-style: none;
+}
+.colorsContainer button {
+  border: transparent;
+  height: 30px;
+  width: 100%;
+  border-radius: 6px;
+}
+.colorsContainer button:hover {
+  cursor: pointer;
+  filter: brightness(0.92);
+}
