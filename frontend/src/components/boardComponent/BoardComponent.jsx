@@ -104,6 +104,40 @@ function BoardComponent() {
     }
   ];
   const [boardTheme, setBoardTheme] = useState(boardThemes[0]);
+  
+  const [colorList, setColorList] = useState([
+    {id: 0, color: '#d6f5e3', text:''},
+    {id: 1, color: '#f0f4b1', text:''},
+    {id: 2, color: '#fde8b8', text:''},
+    {id: 3, color: '#ffd1c1', text:''},
+    {id: 4, color: '#f0d5fa', text:''},
+    {id: 5, color: '#d6e4ff', text:''},
+    {id: 6, color: '#cdeff7', text:''},
+    {id: 7, color: '#e6e6e6', text:''}
+  ]);
+
+  const updateColorList = (selectedColorEdit, updatedColor) => {
+    const oldColor = selectedColorEdit.color;
+    const newColor = updatedColor.color;
+    
+    setColorList(colorList.map(color => 
+      color.id === selectedColorEdit.id ? updatedColor : color
+    ));
+    
+    // Update all cards in all columns that use the old color
+    setColumns(prev => 
+      prev.map(col => ({
+        ...col,
+        items: col.items.map(card => ({
+          ...card,
+          labels: (card.labels ?? []).map(label => 
+            label === oldColor ? newColor : label
+          )
+        }))
+      }))
+    );
+  };
+  
   const [columns, setColumns] = useState([
     {
       id: uuidv4(), 
@@ -444,6 +478,8 @@ function BoardComponent() {
             updateColumnItems={updateColumnItems}
             updateColumnColor={updateColumnColor}
             updateColumnTitle={updateColumnTitle}
+            colorList={colorList}
+            updateColorList={updateColorList}
           />
         </DndContext>
           <button className={styles.addButton} onClick={addColumn}>

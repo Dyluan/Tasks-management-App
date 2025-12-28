@@ -16,7 +16,7 @@ import Button from '@mui/material/Button';
 import LabelComponent from '../labelComponent/LabelComponent';
 import { v4 as uuidv4 } from 'uuid';
 
-function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard}) {
+function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCard, colorList, updateColorList}) {
 
   const [cardTitle, setCardTitle] = useState(card.cardName);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -253,6 +253,8 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       onClose={handlePopoverClose} 
                       toggleLabel={toggleLabel}
                       selectedLabels={selectedLabels}
+                      colorList={colorList}
+                      updateColorList={updateColorList}
                     />
                   </div>
                   <div className={styles.labelsContainer}>

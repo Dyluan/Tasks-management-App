@@ -3,7 +3,7 @@ import CardComponent from "../cardComponent/CardComponent";
 import styles from "./CardList.module.css";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
-function CardListComponent({cards, deleteFunction, columnColor, columnTitle, updateCard}) {
+function CardListComponent({cards, deleteFunction, columnColor, columnTitle, updateCard, colorList, updateColorList}) {
 
   const [cardList, setCardList] = useState(cards);
 
@@ -24,6 +24,8 @@ function CardListComponent({cards, deleteFunction, columnColor, columnTitle, upd
                 columnColor={columnColor} 
                 columnTitle={columnTitle}
                 updateCard={updateCard}
+                colorList={colorList}
+                updateColorList={updateColorList}
               />
             </li>
           ))}

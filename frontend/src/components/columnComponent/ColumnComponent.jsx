@@ -13,7 +13,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 
-function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, updateColumnColor, updateColumnTitle}) {
+function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, updateColumnColor, updateColumnTitle, colorList, updateColorList}) {
 
   const items = column.items;
   const columnTitle = column.title;
@@ -22,7 +22,7 @@ function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, u
   const titleInputRef = useRef(null);
   const prevTitleRef = useRef(columnTitle);
   const [anchorEl, setAnchorEl] = useState(null);
-  const colorList = ['#baf3db', '#f5e989', '#fce4a6', '#ffd5d2', '#eed7fc', '#cfe1fd', '#c6edfb', '#F5F5F5'];
+  const columnColorList = ['#baf3db', '#f5e989', '#fce4a6', '#ffd5d2', '#eed7fc', '#cfe1fd', '#c6edfb', '#F5F5F5'];
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 
@@ -197,7 +197,7 @@ function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, u
                       Edit list color
                     </div>
                     <ul className={styles.modalColorsList}>
-                      {colorList.map((elem, index) => (
+                      {columnColorList.map((elem, index) => (
                         <li className={styles.modalColorsElem} key={index}>
                           <button 
                             className={styles.modalColorButton} 
@@ -223,6 +223,8 @@ function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, u
             columnColor={columnColor} 
             columnTitle={columnTitle} 
             updateCard={updateCard}
+            colorList={colorList}
+            updateColorList={updateColorList}
           />
         </DndContext>
       </div>
