@@ -1,33 +1,37 @@
 import styles from './LabelComponent.module.css';
 import Popover from '@mui/material/Popover';
-import { useState } from 'react';
 import DisplayLabelsComponent from '../displayLabels/DisplayLabelsComponent';
 import EditLabelComponent from '../editLabel/EditLabelComponent';
 
-function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels, colorList, updateColorList }) {
-
-  const [selectedColorEdit, setSelectedColorEdit] = useState(null);
-  const [isEditSelected, setIsEditSelected] = useState(false);
-
-  const toggleEditButton = () => {
-    setIsEditSelected(!isEditSelected);
-  }
+function LabelComponent({ 
+  open, 
+  anchorEl, 
+  onClose, 
+  toggleLabel, 
+  selectedLabels, 
+  colorList, 
+  updateColorList,
+  openEditLabel,
+  toggleEditButton,
+  selectedLabelColor,
+  updateSelectedLabelColor
+  }) {
 
   const handleEditClick = (color) => {
     toggleEditButton();
-    setSelectedColorEdit(color);
+    updateSelectedLabelColor(color);
   }
 
   const handleColorChange = (newColor) => {
-    const updatedColor = { ...selectedColorEdit, color: newColor };
-    setSelectedColorEdit(updatedColor);
-    updateColorList(selectedColorEdit, updatedColor);
+    const updatedColor = { ...selectedLabelColor, color: newColor };
+    updateSelectedLabelColor(updatedColor);
+    updateColorList(selectedLabelColor, updatedColor);
   }
 
   const handleSaveLabel = (newText) => {
-    const updatedColor = { ...selectedColorEdit, text: newText };
-    setSelectedColorEdit(updatedColor);
-    updateColorList(selectedColorEdit, updatedColor);
+    const updatedColor = { ...selectedLabelColor, text: newText };
+    updateSelectedLabelColor(updatedColor);
+    updateColorList(selectedLabelColor, updatedColor);
   }
 
   return (
@@ -46,7 +50,7 @@ function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels, 
       className={styles.mainContainer}
     >
       <div className={styles.main}>
-        {!isEditSelected ? (
+        {!openEditLabel ? (
           <DisplayLabelsComponent 
             labels={colorList} 
             toggleLabel={toggleLabel} 
@@ -57,7 +61,7 @@ function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels, 
         ) : (
           <EditLabelComponent 
             onClose={onClose} 
-            color={selectedColorEdit}
+            color={selectedLabelColor}
             handleColorChange={handleColorChange}
             toggleEditButton={toggleEditButton}
             handleSaveLabel={handleSaveLabel}

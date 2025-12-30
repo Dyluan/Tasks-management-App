@@ -38,6 +38,24 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [tempEditComment, setTempEditComment] = useState('');
   const editCommentInputRef = useRef(null);
+
+  // bool variable responsible for the display of EditLabel/ DisplayLabel Component
+  const [openEditLabel, setOpenEditLabel] = useState(false);
+
+  const [selectedLabelColor, setSelectedLabelColor] = useState(null);
+  const updateSelectedLabelColor = (color) => {
+    setSelectedLabelColor(color);
+  }
+
+  const openLabelPopOver = (color) => {
+    setOpenEditLabel(true);
+    setSelectedLabelColor(color);
+    setPopoverAnchorEl(labelButtonRef.current);
+  }
+
+  const toggleOpenEditLabelButton = () => {
+    setOpenEditLabel(!openEditLabel);
+  }
   
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -46,6 +64,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
 
   const handlePopoverClose = () => {
     setPopoverAnchorEl(null);
+    setOpenEditLabel(false);
   }
 
   function toggleLabel(color) {
@@ -255,6 +274,10 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       selectedLabels={selectedLabels}
                       colorList={colorList}
                       updateColorList={updateColorList}
+                      openEditLabel={openEditLabel}
+                      toggleEditButton={toggleOpenEditLabelButton}
+                      selectedLabelColor={selectedLabelColor}
+                      updateSelectedLabelColor={updateSelectedLabelColor}
                     />
                   </div>
                   <div className={styles.labelsContainer}>
@@ -272,7 +295,7 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                             <button 
                               className={styles.labelButtons} 
                               style={{backgroundColor: elem}}
-                              onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
+                              onClick={() => openLabelPopOver(colorObj)}
                             >
                               {colorObj?.text}
                             </button>

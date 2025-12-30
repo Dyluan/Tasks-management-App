@@ -47,8 +47,6 @@ function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton
   "#616161"
   ];
 
-  // TODO:
-  // add a function to modify the text of the label after closing/ saving modal
   const [labelText, setLabelText] = useState(color.text);
 
   return (
