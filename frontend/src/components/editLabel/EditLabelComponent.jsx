@@ -5,7 +5,14 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
 
-function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton, handleSaveLabel}) {
+function EditLabelComponent({
+  color, 
+  onClose, 
+  handleColorChange, 
+  toggleEditButton, 
+  handleSaveLabel,
+  deleteColorFromList
+  }) {
 
   const colorList = [
   // Rouges
@@ -48,6 +55,10 @@ function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton
   ];
 
   const [labelText, setLabelText] = useState(color.text);
+  const handleDelete = (id) => {
+    deleteColorFromList(id);
+    onClose();
+  }
 
   return (
     <div className={styles.container}>
@@ -109,7 +120,7 @@ function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton
             <Button variant="outlined" onClick={() => handleSaveLabel(labelText)}>Save</Button>
           </div>
           <div className={styles.cancelButton}>
-            <Button variant="outlined" disabled>Cancel</Button>
+            <Button variant="outlined" color="error" onClick={() => handleDelete(color.id)}>Delete</Button>
           </div>
         </div>
       </div>

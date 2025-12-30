@@ -137,6 +137,26 @@ function BoardComponent() {
       }))
     );
   };
+
+  const deleteColorFromList = (id) => {
+    const colorToDelete = colorList.find(color => color.id === id);
+    
+    if (colorToDelete) {
+      // Remove the color from colorList
+      setColorList(prev => prev.filter(color => color.id !== id));
+      
+      // Remove the color from all card labels
+      setColumns(prev => 
+        prev.map(col => ({
+          ...col,
+          items: col.items.map(card => ({
+            ...card,
+            labels: (card.labels ?? []).filter(label => label !== colorToDelete.color)
+          }))
+        }))
+      );
+    }
+  };
   
   const [columns, setColumns] = useState([
     {
@@ -480,6 +500,7 @@ function BoardComponent() {
             updateColumnTitle={updateColumnTitle}
             colorList={colorList}
             updateColorList={updateColorList}
+            deleteColorFromList={deleteColorFromList}
           />
         </DndContext>
           <button className={styles.addButton} onClick={addColumn}>

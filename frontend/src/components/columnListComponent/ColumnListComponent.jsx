@@ -2,7 +2,17 @@ import ColumnComponent from "../columnComponent/ColumnComponent";
 import styles from './ColumnListComponent.module.css';
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
-function ColumnListComponent({columns, deleteColumn, copyColumn, updateColumnItems, updateColumnColor, updateColumnTitle, colorList, updateColorList}) {
+function ColumnListComponent({
+  columns, 
+  deleteColumn, 
+  copyColumn, 
+  updateColumnItems, 
+  updateColumnColor, 
+  updateColumnTitle, 
+  colorList, 
+  updateColorList,
+  deleteColorFromList
+  }) {
 
   return (
     <>
@@ -21,6 +31,7 @@ function ColumnListComponent({columns, deleteColumn, copyColumn, updateColumnIte
                   updateColumnTitle={updateColumnTitle}
                   colorList={colorList}
                   updateColorList={updateColorList}
+                  deleteColorFromList={deleteColorFromList}
                 />
               </li>
             ))}

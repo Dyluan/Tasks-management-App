@@ -13,7 +13,17 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 
-function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, updateColumnColor, updateColumnTitle, colorList, updateColorList}) {
+function ColumnComponent({
+  column, 
+  deleteColumn, 
+  copyColumn, 
+  updateColumnItems, 
+  updateColumnColor, 
+  updateColumnTitle, 
+  colorList, 
+  updateColorList,
+  deleteColorFromList
+  }) {
 
   const items = column.items;
   const columnTitle = column.title;
@@ -225,6 +235,7 @@ function ColumnComponent({column, deleteColumn, copyColumn, updateColumnItems, u
             updateCard={updateCard}
             colorList={colorList}
             updateColorList={updateColorList}
+            deleteColorFromList={deleteColorFromList}
           />
         </DndContext>
       </div>

@@ -14,7 +14,8 @@ function LabelComponent({
   openEditLabel,
   toggleEditButton,
   selectedLabelColor,
-  updateSelectedLabelColor
+  updateSelectedLabelColor,
+  deleteColorFromList
   }) {
 
   const handleEditClick = (color) => {
@@ -65,6 +66,7 @@ function LabelComponent({
             handleColorChange={handleColorChange}
             toggleEditButton={toggleEditButton}
             handleSaveLabel={handleSaveLabel}
+            deleteColorFromList={deleteColorFromList}
           />
         )}
       </div>
