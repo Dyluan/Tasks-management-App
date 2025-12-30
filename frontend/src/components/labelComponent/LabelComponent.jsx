@@ -24,6 +24,12 @@ function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels, 
     updateColorList(selectedColorEdit, updatedColor);
   }
 
+  const handleSaveLabel = (newText) => {
+    const updatedColor = { ...selectedColorEdit, text: newText };
+    setSelectedColorEdit(updatedColor);
+    updateColorList(selectedColorEdit, updatedColor);
+  }
+
   return (
     <Popover
       open={open}
@@ -54,6 +60,7 @@ function LabelComponent({ open, anchorEl, onClose, toggleLabel, selectedLabels, 
             color={selectedColorEdit}
             handleColorChange={handleColorChange}
             toggleEditButton={toggleEditButton}
+            handleSaveLabel={handleSaveLabel}
           />
         )}
       </div>

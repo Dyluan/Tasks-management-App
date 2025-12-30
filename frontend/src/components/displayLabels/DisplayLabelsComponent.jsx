@@ -30,7 +30,7 @@ function DisplayLabelsComponent({labels, toggleLabel, handleEditClick, onClose, 
                 className={styles.colorButton} 
                 onClick={() => toggleLabel(elem.color)}
               >
-                
+                {elem.text}
               </button>
               <div className={styles.editIconContainer}>
                 <img 

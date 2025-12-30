@@ -264,17 +264,21 @@ function CardComponent({card, deleteFunction, columnColor, columnTitle, updateCa
                       </div>
                     )}
                     <ul>
-                      {selectedLabels.map((elem, index) => (
-                        <li key={index}>
-                          <button 
-                            className={styles.labelButtons} 
-                            style={{backgroundColor: elem}}
-                            onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
-                          >
-                            {/* {elem.text} */}
-                          </button>
-                        </li>
-                      ))}
+                      {selectedLabels.map((elem, index) => {
+                        // TODO: modify selectedLabels to reflect the true form of the labels, ie: include text and color
+                        const colorObj = colorList.find(c => c.color === elem);
+                        return (
+                          <li key={index}>
+                            <button 
+                              className={styles.labelButtons} 
+                              style={{backgroundColor: elem}}
+                              onClick={() => setPopoverAnchorEl(labelButtonRef.current)}
+                            >
+                              {colorObj?.text}
+                            </button>
+                          </li>
+                        );
+                      })}
                       {selectedLabels.length > 0 && (
                         <li>
                           <button

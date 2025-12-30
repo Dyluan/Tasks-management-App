@@ -120,7 +120,7 @@ function BoardComponent() {
     const oldColor = selectedColorEdit.color;
     const newColor = updatedColor.color;
     
-    setColorList(colorList.map(color => 
+    setColorList(prev => prev.map(color => 
       color.id === selectedColorEdit.id ? updatedColor : color
     ));
     

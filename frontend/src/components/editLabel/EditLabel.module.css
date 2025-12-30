@@ -73,3 +73,11 @@
   cursor: pointer;
   filter: brightness(0.92);
 }
+.buttonsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 12px;
+}

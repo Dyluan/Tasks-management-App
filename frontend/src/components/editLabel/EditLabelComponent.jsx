@@ -2,9 +2,10 @@ import styles from './EditLabel.module.css';
 import previousIcon from '../../assets/previous_icon.svg';
 import closeIcon from '../../assets/close_icon.png';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 import { useState } from 'react';
 
-function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton}) {
+function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton, handleSaveLabel}) {
 
   const colorList = [
   // Rouges
@@ -80,7 +81,8 @@ function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton
             <TextField 
               className={styles.labelInput}
               variant='outlined' 
-              size='small' 
+              size='small'
+              value={labelText}
               onChange={(e) => setLabelText(e.target.value)}
             />
           </div>
@@ -102,6 +104,14 @@ function EditLabelComponent({color, onClose, handleColorChange, toggleEditButton
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+        <div className={styles.buttonsContainer}>
+          <div className={styles.saveButton}>
+            <Button variant="outlined" onClick={() => handleSaveLabel(labelText)}>Save</Button>
+          </div>
+          <div className={styles.cancelButton}>
+            <Button variant="outlined" disabled>Cancel</Button>
           </div>
         </div>
       </div>
