@@ -11,7 +11,8 @@ function CardListComponent({
   updateCard, 
   colorList, 
   updateColorList,
-  deleteColorFromList
+  deleteColorFromList,
+  addColorToList
   }) {
 
   const [cardList, setCardList] = useState(cards);
@@ -36,6 +37,7 @@ function CardListComponent({
                 colorList={colorList}
                 updateColorList={updateColorList}
                 deleteColorFromList={deleteColorFromList}
+                addColorToList={addColorToList}
               />
             </li>
           ))}

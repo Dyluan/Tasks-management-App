@@ -2,7 +2,14 @@ import styles from './DisplayLabels.module.css';
 import editIcon from'../../assets/edit_icon.svg';
 import closeIcon from '../../assets/close_icon.png';
 
-function DisplayLabelsComponent({labels, toggleLabel, handleEditClick, onClose, selectedLabels}) {
+function DisplayLabelsComponent({
+  labels, 
+  toggleLabel, 
+  handleEditClick, 
+  onClose, 
+  selectedLabels,
+  handleCreateButtonClick
+  }) {
   return (
     <>
       <div className={styles.header}>
@@ -43,6 +50,14 @@ function DisplayLabelsComponent({labels, toggleLabel, handleEditClick, onClose, 
             </li>
           ))}
         </ul>
+      </div>
+      <div className={styles.newLabelContainer}>
+        <button 
+          className={styles.newLabelButton}
+          onClick={() => handleCreateButtonClick()}
+        >
+          Create a new label
+        </button>
       </div>
     </>
   )

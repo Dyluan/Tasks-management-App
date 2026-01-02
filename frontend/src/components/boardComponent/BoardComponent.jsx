@@ -157,6 +157,10 @@ function BoardComponent() {
       );
     }
   };
+
+  const addColorToList = (newColor) => {
+    setColorList(prev => [...prev, newColor]);
+  };
   
   const [columns, setColumns] = useState([
     {
@@ -501,6 +505,7 @@ function BoardComponent() {
             colorList={colorList}
             updateColorList={updateColorList}
             deleteColorFromList={deleteColorFromList}
+            addColorToList={addColorToList}
           />
         </DndContext>
           <button className={styles.addButton} onClick={addColumn}>

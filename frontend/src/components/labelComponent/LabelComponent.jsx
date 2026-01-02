@@ -2,6 +2,8 @@ import styles from './LabelComponent.module.css';
 import Popover from '@mui/material/Popover';
 import DisplayLabelsComponent from '../displayLabels/DisplayLabelsComponent';
 import EditLabelComponent from '../editLabel/EditLabelComponent';
+import { v4 as uuidv4 } from 'uuid';
+import { useState } from 'react';
 
 function LabelComponent({ 
   open, 
@@ -15,12 +17,27 @@ function LabelComponent({
   toggleEditButton,
   selectedLabelColor,
   updateSelectedLabelColor,
-  deleteColorFromList
+  deleteColorFromList,
+  addColorToList
   }) {
 
+  const [shouldEditComponentRenderCreateButton, setShouldEditComponentRenderCreateButton] = useState(false);
+
   const handleEditClick = (color) => {
+    setShouldEditComponentRenderCreateButton(false);
     toggleEditButton();
     updateSelectedLabelColor(color);
+  }
+
+  const handleCreateButtonClick = () => {
+    const defaultColorForCreateDisplay = {
+      id: uuidv4(),
+      color: '#bdbdbd',
+      text: ''
+    }
+    setShouldEditComponentRenderCreateButton(true);
+    updateSelectedLabelColor(defaultColorForCreateDisplay);
+    toggleEditButton();
   }
 
   const handleColorChange = (newColor) => {
@@ -33,6 +50,13 @@ function LabelComponent({
     const updatedColor = { ...selectedLabelColor, text: newText };
     updateSelectedLabelColor(updatedColor);
     updateColorList(selectedLabelColor, updatedColor);
+    toggleEditButton();
+  }
+
+  const handleCreateLabel = (newText) => {
+    const newColor = { ...selectedLabelColor, text: newText };
+    addColorToList(newColor);
+    toggleEditButton();
   }
 
   return (
@@ -58,6 +82,7 @@ function LabelComponent({
             handleEditClick={handleEditClick} 
             onClose={onClose} 
             selectedLabels={selectedLabels} 
+            handleCreateButtonClick={handleCreateButtonClick}
           />
         ) : (
           <EditLabelComponent 
@@ -67,6 +92,8 @@ function LabelComponent({
             toggleEditButton={toggleEditButton}
             handleSaveLabel={handleSaveLabel}
             deleteColorFromList={deleteColorFromList}
+            shouldEditComponentRenderCreateButton={shouldEditComponentRenderCreateButton}
+            handleCreateLabel={handleCreateLabel}
           />
         )}
       </div>

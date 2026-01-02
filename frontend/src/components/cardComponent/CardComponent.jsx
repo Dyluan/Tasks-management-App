@@ -24,7 +24,8 @@ function CardComponent({
   updateCard, 
   colorList, 
   updateColorList,
-  deleteColorFromList
+  deleteColorFromList,
+  addColorToList
   }) {
 
   const [cardTitle, setCardTitle] = useState(card.cardName);
@@ -288,6 +289,7 @@ function CardComponent({
                       selectedLabelColor={selectedLabelColor}
                       updateSelectedLabelColor={updateSelectedLabelColor}
                       deleteColorFromList={deleteColorFromList}
+                      addColorToList={addColorToList}
                     />
                   </div>
                   <div className={styles.labelsContainer}>

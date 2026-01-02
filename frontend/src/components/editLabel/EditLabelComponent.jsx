@@ -11,7 +11,9 @@ function EditLabelComponent({
   handleColorChange, 
   toggleEditButton, 
   handleSaveLabel,
-  deleteColorFromList
+  deleteColorFromList,
+  shouldEditComponentRenderCreateButton,
+  handleCreateLabel
   }) {
 
   const colorList = [
@@ -57,7 +59,7 @@ function EditLabelComponent({
   const [labelText, setLabelText] = useState(color.text);
   const handleDelete = (id) => {
     deleteColorFromList(id);
-    onClose();
+    toggleEditButton();
   }
 
   return (
@@ -67,7 +69,11 @@ function EditLabelComponent({
           <img src={previousIcon} alt="previous" onClick={toggleEditButton} />
         </div>
         <div className={styles.title}>
-          Edit Label
+          {shouldEditComponentRenderCreateButton ? (
+            <>Create a new label</>
+          ):(
+            <>Edit label</>
+          )}
         </div>
         <div className={styles.closeContainer}>
           <img src={closeIcon} alt="close" onClick={onClose} />
@@ -115,14 +121,21 @@ function EditLabelComponent({
             </ul>
           </div>
         </div>
-        <div className={styles.buttonsContainer}>
-          <div className={styles.saveButton}>
-            <Button variant="outlined" onClick={() => handleSaveLabel(labelText)}>Save</Button>
+        {shouldEditComponentRenderCreateButton ? (
+          <div className={styles.createButtonContainer}>
+            <Button variant="contained" size='small' onClick={() => handleCreateLabel(labelText)}>Create</Button>
           </div>
-          <div className={styles.cancelButton}>
-            <Button variant="outlined" color="error" onClick={() => handleDelete(color.id)}>Delete</Button>
+        ):(
+          <div className={styles.buttonsContainer}>
+            <div className={styles.saveButton}>
+              <Button variant="outlined" onClick={() => handleSaveLabel(labelText)}>Save</Button>
+            </div>
+            <div className={styles.cancelButton}>
+              <Button variant="outlined" color="error" onClick={() => handleDelete(color.id)}>Delete</Button>
+            </div>
           </div>
-        </div>
+        )}
+        
       </div>
     </div>
   )

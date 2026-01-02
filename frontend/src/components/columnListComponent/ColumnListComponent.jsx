@@ -11,7 +11,8 @@ function ColumnListComponent({
   updateColumnTitle, 
   colorList, 
   updateColorList,
-  deleteColorFromList
+  deleteColorFromList,
+  addColorToList
   }) {
 
   return (
@@ -32,6 +33,7 @@ function ColumnListComponent({
                   colorList={colorList}
                   updateColorList={updateColorList}
                   deleteColorFromList={deleteColorFromList}
+                  addColorToList={addColorToList}
                 />
               </li>
             ))}

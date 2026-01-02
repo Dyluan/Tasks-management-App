@@ -22,7 +22,8 @@ function ColumnComponent({
   updateColumnTitle, 
   colorList, 
   updateColorList,
-  deleteColorFromList
+  deleteColorFromList,
+  addColorToList
   }) {
 
   const items = column.items;
@@ -236,6 +237,7 @@ function ColumnComponent({
             colorList={colorList}
             updateColorList={updateColorList}
             deleteColorFromList={deleteColorFromList}
+            addColorToList={addColorToList}
           />
         </DndContext>
       </div>
