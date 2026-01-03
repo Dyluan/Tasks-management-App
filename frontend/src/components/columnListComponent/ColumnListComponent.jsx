@@ -1,6 +1,7 @@
 import ColumnComponent from "../columnComponent/ColumnComponent";
 import styles from './ColumnListComponent.module.css';
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { useMemo } from "react";
 
 function ColumnListComponent({
   columns, 
@@ -15,11 +16,14 @@ function ColumnListComponent({
   addColorToList
   }) {
 
+  // Memoize the items array to prevent unnecessary re-renders
+  const columnIds = useMemo(() => columns.map(col => col.id), [columns]);
+
   return (
     <>
       <div className={styles.main}>
         <ul className={styles.list}>
-          <SortableContext items={columns.map(col => col.id)} strategy={horizontalListSortingStrategy}>
+          <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
             {columns.map((elem) => (
               <li className={styles.elem} key={elem.id}>
                 <ColumnComponent 

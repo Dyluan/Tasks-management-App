@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
 import CardComponent from "../cardComponent/CardComponent";
 import styles from "./CardList.module.css";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useMemo } from "react";
 
 function CardListComponent({
   cards, 
@@ -15,17 +15,14 @@ function CardListComponent({
   addColorToList
   }) {
 
-  const [cardList, setCardList] = useState(cards);
-
-  useEffect(() => {
-    setCardList(cards);
-  }, [cards]);
+  // Memoize the items array to prevent unnecessary re-renders
+  const cardIds = useMemo(() => cards.map(card => card.id), [cards]);
 
   return (
     <div className={styles.main}>
       <ul className={styles.cardList}>
-        <SortableContext items={cards.map(card => card.id)} strategy={verticalListSortingStrategy}>
-          {cardList.map((elem) => (
+        <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
+          {cards.map((elem) => (
             <li className={styles.cardElem} key={elem.id}>
               <CardComponent 
                 card={elem} 

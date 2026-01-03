@@ -8,8 +8,6 @@ import { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 
@@ -113,31 +111,6 @@ function ColumnComponent({
     );
   };
 
-  // this part of the code is relative to the dnd-kit library
-  const getCardPosition = (id) => items.findIndex(item => item.id === id);
-
-  const handleDragEnd = (event) => {
-    const {active, over} = event;
-    if (active.id === over.id) return;
-
-    const originalPos = getCardPosition(active.id);
-    const newPos = getCardPosition(over.id);
-
-    const reorderedItems = arrayMove(items, originalPos, newPos);
-
-    updateColumnItems(column.id, reorderedItems);
-  }
-
-  // got rid of KeyboardSensor as it interferes with input writing (was not allowing space key to work properly)
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      }
-    }),
-    useSensor(TouchSensor),
-  );
-
   return (
     <div className={styles.main} ref={setNodeRef} {...attributes} {...listeners} style={style} >
       <div className={styles.titleContainer}>
@@ -227,19 +200,17 @@ function ColumnComponent({
         </div>
       </div>
       <div className={styles.cardsList}>
-        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners} sensors={sensors}>
-          <CardListComponent 
-            cards={items} 
-            deleteFunction={deleteItems} 
-            columnColor={columnColor} 
-            columnTitle={columnTitle} 
-            updateCard={updateCard}
-            colorList={colorList}
-            updateColorList={updateColorList}
-            deleteColorFromList={deleteColorFromList}
-            addColorToList={addColorToList}
-          />
-        </DndContext>
+        <CardListComponent 
+          cards={items} 
+          deleteFunction={deleteItems} 
+          columnColor={columnColor} 
+          columnTitle={columnTitle} 
+          updateCard={updateCard}
+          colorList={colorList}
+          updateColorList={updateColorList}
+          deleteColorFromList={deleteColorFromList}
+          addColorToList={addColorToList}
+        />
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>

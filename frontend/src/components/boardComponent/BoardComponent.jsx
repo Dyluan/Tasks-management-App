@@ -5,7 +5,7 @@ import add from '../../assets/add_white.png';
 import verticalDots from '../../assets/vertical_dots.svg';
 import closeIcon from '../../assets/close_icon.png';
 import { v4 as uuidv4 } from 'uuid';
-import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
+import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor, pointerWithin, rectIntersection } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
 import Threads from "../threadsComponent/Threads";
@@ -182,6 +182,13 @@ function BoardComponent() {
       ]
     }
   ]);
+  
+  // Ref to track columns for collision detection
+  const columnsRef = useRef(columns);
+  useEffect(() => {
+    columnsRef.current = columns;
+  }, [columns]);
+  
   const [editingTitle, setEditingTitle] = useState(false);
   const [boardName, setBoardName] = useState('My Board');
   const prevBoardNameRef = useRef(boardName);
@@ -285,18 +292,155 @@ function BoardComponent() {
   }
 
   // this part of the code is relative to the dnd-kit library
-  const getColumPosition = (id) => columns.findIndex(column => column.id === id);
+  function findContainer(id) {
+    // Check if id is a column
+    if (columns.some(col => col.id === id)) {
+      return id;
+    }
+    
+    // Check if id is a card - return its parent column id
+    for (const column of columns) {
+      if (column.items.some(item => item.id === id)) {
+        return column.id;
+      }
+    }
+    return null;
+  }
+
+  // Custom collision detection that handles nested sortables
+  // When dragging a column, only detect collisions with other columns
+  function customCollisionDetection(args, columnsRef) {
+    const { active } = args;
+    const columns = columnsRef.current;
+    
+    // Check if we're dragging a column
+    const isColumnDrag = columns.some(col => col.id === active.id);
+    
+    if (isColumnDrag) {
+      // For columns, filter droppableContainers to only include other columns
+      const columnIds = new Set(columns.map(col => col.id));
+      const filteredArgs = {
+        ...args,
+        droppableContainers: args.droppableContainers.filter(
+          container => columnIds.has(container.id)
+        )
+      };
+      return closestCorners(filteredArgs);
+    }
+    
+    // For cards, use default behavior
+    return closestCorners(args);
+  }
+
+  function isColumn(id) {
+    return columns.some(col => col.id === id);
+  }
+
+  const handleDragOver = (event) => {
+    const { active, over } = event;
+    const overId = over?.id;
+    const activeId = active?.id;
+
+    if (!overId || activeId === overId) return;
+
+    // Skip if we're dragging a column - columns are handled in handleDragEnd only
+    if (isColumn(activeId)) return;
+
+    const activeContainer = findContainer(activeId);
+    const overContainer = findContainer(overId);
+
+    if (!activeContainer || !overContainer) return;
+    if (activeContainer === overContainer) return;
+
+    // Handle card movement between columns
+    setColumns((prev) => {
+      const activeCol = prev.find(col => col.id === activeContainer);
+      const overCol = prev.find(col => col.id === overContainer);
+
+      if (!activeCol || !overCol) return prev;
+
+      const activeItems = [...activeCol.items];
+      const overItems = [...overCol.items];
+
+      const activeIndex = activeItems.findIndex(item => item.id === activeId);
+      const overIndex = overItems.findIndex(item => item.id === overId);
+
+      let newIndex;
+      if (isColumn(overId)) {
+        // Dropping on column itself - add to end
+        newIndex = overItems.length;
+      } else {
+        // Dropping on a card - insert at that position
+        newIndex = overIndex >= 0 ? overIndex : overItems.length;
+      }
+
+      // Remove from active column and add to over column
+      const [movedCard] = activeItems.splice(activeIndex, 1);
+      overItems.splice(newIndex, 0, movedCard);
+
+      return prev.map(col => {
+        if (col.id === activeContainer) {
+          return { ...col, items: activeItems };
+        }
+        if (col.id === overContainer) {
+          return { ...col, items: overItems };
+        }
+        return col;
+      });
+    });
+  };
 
   const handleDragEnd = (event) => {
-    const {active, over} = event;
-    if (active.id === over.id) return;
+    const { active, over } = event;
+    if (!over) return;
 
-    setColumns((colums) => {
-      const originalPos = getColumPosition(active.id);
-      const newPos = getColumPosition(over.id);
+    const activeId = active.id;
+    const overId = over.id;
 
-      return arrayMove(columns, originalPos, newPos);
-    })
+    if (activeId === overId) return;
+
+    // Dragging columns - check this first and handle separately
+    if (isColumn(activeId)) {
+      // For columns, we need overIndex to be the column index
+      // overId could be a column OR a card inside that column
+      let overColumnId = overId;
+      if (!isColumn(overId)) {
+        // If dropping on a card, get its parent column
+        overColumnId = findContainer(overId);
+      }
+      
+      const activeIndex = columns.findIndex(col => col.id === activeId);
+      const overIndex = columns.findIndex(col => col.id === overColumnId);
+      
+      if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
+        setColumns(arrayMove(columns, activeIndex, overIndex));
+      }
+      return;
+    }
+
+    const activeContainer = findContainer(activeId);
+    const overContainer = findContainer(overId);
+
+    // Dragging cards within same column
+    if (activeContainer && overContainer && activeContainer === overContainer) {
+      setColumns((prev) => {
+        return prev.map(col => {
+          if (col.id === activeContainer) {
+            const activeIndex = col.items.findIndex(item => item.id === activeId);
+            const overIndex = col.items.findIndex(item => item.id === overId);
+            
+            if (activeIndex !== -1 && overIndex !== -1) {
+              return {
+                ...col,
+                items: arrayMove(col.items, activeIndex, overIndex)
+              };
+            }
+          }
+          return col;
+        });
+      });
+    }
+    // Note: Cross-column moves are already handled in handleDragOver
   }
 
   // got rid of KeyboardSensor as it interferes with input writing (was not allowing space key to work properly)
@@ -494,7 +638,12 @@ function BoardComponent() {
         </div>
       </div>
       <div className={styles.main}>
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+        <DndContext 
+          sensors={sensors} 
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd} 
+          collisionDetection={(args) => customCollisionDetection(args, columnsRef)}
+        >
           <ColumnListComponent 
             columns={columns} 
             deleteColumn={deleteColumn} 
