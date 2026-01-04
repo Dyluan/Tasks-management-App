@@ -1,5 +1,6 @@
 import ColumnListComponent from "../columnListComponent/ColumnListComponent";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
 import verticalDots from '../../assets/vertical_dots.svg';
@@ -124,16 +125,21 @@ function BoardComponent() {
     {id: 6, color: '#cdeff7', text:''},
     {id: 7, color: '#e6e6e6', text:''}
   ]);
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => {
     setIsDrawerOpen(newOpen);
   }
 
+  const handleHomeClick = () => {
+    const homePath = "/home";
+    navigate(homePath);
+  }
+
   const drawerList = (
     <List>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleHomeClick()}>
         <ListItemIcon>
           <HomeIcon sx={{ color: 'white' }} />
         </ListItemIcon>
@@ -143,7 +149,7 @@ function BoardComponent() {
         <ListItemIcon>
           <GroupAddIcon sx={{ color: 'white' }} />
         </ListItemIcon>
-        <ListItemText primary="Add people" />
+        <ListItemText primary="Add members" />
       </ListItemButton>
       <ListItemButton>
         <ListItemIcon>

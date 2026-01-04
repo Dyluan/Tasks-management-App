@@ -9,6 +9,10 @@
     min-width: 300px;
     width: 300px;
     height: fit-content;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.main:hover {
+    cursor: grab;
 }
 .titleContainer {
     display: flex;
