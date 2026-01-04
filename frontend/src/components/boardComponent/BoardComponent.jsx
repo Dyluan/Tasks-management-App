@@ -4,14 +4,23 @@ import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
 import verticalDots from '../../assets/vertical_dots.svg';
 import closeIcon from '../../assets/close_icon.png';
+import leftArrow from '../../assets/left_arrow.svg';
+import HomeIcon from '@mui/icons-material/Home';
+import LoginIcon from '@mui/icons-material/Login';
 import { v4 as uuidv4 } from 'uuid';
 import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor, pointerWithin, rectIntersection } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
+import Drawer from '@mui/material/Drawer';
 import Threads from "../threadsComponent/Threads";
 import Balatro from "../balatroComponent/Balatro";
 import Iridescence from '../iridescenceComponent/Iridescence';
 import Beams from '../beamsComponent/Beams';
+import { List } from "@mui/material";
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 function BoardComponent() {
 
@@ -115,6 +124,36 @@ function BoardComponent() {
     {id: 6, color: '#cdeff7', text:''},
     {id: 7, color: '#e6e6e6', text:''}
   ]);
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const toggleDrawer = (newOpen) => {
+    setIsDrawerOpen(newOpen);
+  }
+
+  const drawerList = (
+    <List>
+      <ListItemButton>
+        <ListItemIcon>
+          <HomeIcon sx={{ color: 'white' }} />
+        </ListItemIcon>
+        <ListItemText primary="Home" />
+      </ListItemButton>
+      <ListItemButton>
+        <ListItemIcon>
+          <GroupAddIcon sx={{ color: 'white' }} />
+        </ListItemIcon>
+        <ListItemText primary="Add people" />
+      </ListItemButton>
+      <ListItemButton>
+        <ListItemIcon>
+          <LoginIcon sx={{ color: 'white' }} />
+        </ListItemIcon>
+        <ListItemText primary="Login" />
+      </ListItemButton>
+      
+    </List>
+  )
 
   const updateColorList = (selectedColorEdit, updatedColor) => {
     const oldColor = selectedColorEdit.color;
@@ -507,135 +546,160 @@ function BoardComponent() {
         }}
       >
       <div className={styles.header} style={{ background: boardTheme.header }}>
-        <div className={styles.edit}>
-          <img 
-            src={verticalDots} 
-            alt="vertical dots" 
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-          />
-          <Popover
-            open={Boolean(anchorEl)}
-            anchorEl={anchorEl}
-            onClose={handlePopoverClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-          >
-            <div className={styles.modalContainer}>
-              <div className={styles.modalHeader}>
-                <div className={styles.modalTitle}>
-                  Actions
-                </div>
-                <button 
-                  className={styles.modalCloseButton} 
-                  onClick={handlePopoverClose}>
-                    <img src={closeIcon} alt="close" />
-                </button>
-              </div>
-              <div className={styles.modalLine}></div>
-              <div className={styles.modalMain}>
-                <div className={styles.modalCards}>
-                  <ul>
-                    <li>
-                      <button
-                        onClick={() => {
-                          handlePopoverClose();
-                          startEdit();
-                        }}
-                      >Rename Board</button>
-                    </li>
-                    <li>
-                      <button>
-                        Create new Board
-                      </button>
-                    </li>
-                  </ul>
+        <div className={styles.left}>
+          <div className={styles.edit}>
+            <img 
+              src={verticalDots} 
+              alt="vertical dots" 
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            />
+            <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={handlePopoverClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
+              <div className={styles.modalContainer}>
+                <div className={styles.modalHeader}>
+                  <div className={styles.modalTitle}>
+                    Actions
+                  </div>
+                  <button 
+                    className={styles.modalCloseButton} 
+                    onClick={handlePopoverClose}>
+                      <img src={closeIcon} alt="close" />
+                  </button>
                 </div>
                 <div className={styles.modalLine}></div>
-                <div className={styles.modalColors}>
-                  <div className={styles.modalColorsTitle}>
-                    Edit Board color
-                  </div>
-                  <ul className={styles.modalColorsList}>
-                    {boardThemes.map((elem, index) => (
-                      <li className={styles.modalColorsElem} key={index}>
-                        <button 
-                          className={styles.modalColorButton} 
-                          style={{ 
-                            background: elem.type === 'gradient' ? elem.board : '#1a1a2e',
-                            position: 'relative',
-                            overflow: 'hidden'
+                <div className={styles.modalMain}>
+                  <div className={styles.modalCards}>
+                    <ul>
+                      <li>
+                        <button
+                          onClick={() => {
+                            handlePopoverClose();
+                            startEdit();
                           }}
-                          onClick={() => handleBoardColorChange(elem)}
-                        >
-                          {elem.type === 'component' && elem.board === 'threads' && (
-                            <div style={{ position: 'absolute', inset: 0 }}>
-                              <Threads amplitude={2} distance={0} enableMouseInteraction={false} />
-                            </div>
-                          )}
-                          {elem.type === 'component' && elem.board === 'balatro' && (
-                            <div style={{ position: 'absolute', inset: 0 }}>
-                              <Balatro 
-                                color1="#1a1a2e"
-                                color2="#16213e"
-                                color3="#0f3460"
-                                mouseInteraction={false}
-                                isRotate={false}
-                              />
-                            </div>
-                          )}
-                          {elem.type === 'component' && elem.board === 'iridescence' && (
-                            <div style={{ position: 'absolute', inset: 0 }}>
-                              <Iridescence color={[0.7, 0.6, 0.8]} mouseReact={false} />
-                            </div>
-                          )}
-                          {elem.type === 'component' && elem.board === 'beams' && (
-                            <div style={{ position: 'absolute', inset: 0 }}>
-                              <Beams 
-                                beamWidth={3}
-                                beamHeight={25}
-                                beamNumber={8}
-                                lightColor="#ffffff"
-                                speed={2}
-                                noiseIntensity={1.75}
-                                scale={0.2}
-                                rotation={45}
-                              />
-                            </div>
-                          )}
+                        >Rename Board</button>
+                      </li>
+                      <li>
+                        <button>
+                          Create new Board
                         </button>
                       </li>
-                    ))}
-                  </ul>
+                    </ul>
+                  </div>
+                  <div className={styles.modalLine}></div>
+                  <div className={styles.modalColors}>
+                    <div className={styles.modalColorsTitle}>
+                      Edit Board color
+                    </div>
+                    <ul className={styles.modalColorsList}>
+                      {boardThemes.map((elem, index) => (
+                        <li className={styles.modalColorsElem} key={index}>
+                          <button 
+                            className={styles.modalColorButton} 
+                            style={{ 
+                              background: elem.type === 'gradient' ? elem.board : '#1a1a2e',
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                            onClick={() => handleBoardColorChange(elem)}
+                          >
+                            {elem.type === 'component' && elem.board === 'threads' && (
+                              <div style={{ position: 'absolute', inset: 0 }}>
+                                <Threads amplitude={2} distance={0} enableMouseInteraction={false} />
+                              </div>
+                            )}
+                            {elem.type === 'component' && elem.board === 'balatro' && (
+                              <div style={{ position: 'absolute', inset: 0 }}>
+                                <Balatro 
+                                  color1="#1a1a2e"
+                                  color2="#16213e"
+                                  color3="#0f3460"
+                                  mouseInteraction={false}
+                                  isRotate={false}
+                                />
+                              </div>
+                            )}
+                            {elem.type === 'component' && elem.board === 'iridescence' && (
+                              <div style={{ position: 'absolute', inset: 0 }}>
+                                <Iridescence color={[0.7, 0.6, 0.8]} mouseReact={false} />
+                              </div>
+                            )}
+                            {elem.type === 'component' && elem.board === 'beams' && (
+                              <div style={{ position: 'absolute', inset: 0 }}>
+                                <Beams 
+                                  beamWidth={3}
+                                  beamHeight={25}
+                                  beamNumber={8}
+                                  lightColor="#ffffff"
+                                  speed={2}
+                                  noiseIntensity={1.75}
+                                  scale={0.2}
+                                  rotation={45}
+                                />
+                              </div>
+                            )}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Popover>
+            </Popover>
+          </div>
+          <div className={styles.title}>
+            {editingTitle ? (
+              <input 
+                ref={titleInputRef}
+                className={styles.titleInput}
+                defaultValue={boardName}
+                onKeyDown={onTitleKeyDown}
+                onBlur={(e) => saveTitle(e.target.value)}
+                aria-label='Edit board title'
+              />
+            ) : (
+              <div className={styles.titleText} 
+                onClick={startEdit}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEdit(); }}
+              >
+                {boardName}
+              </div>
+            )}
+          </div>
         </div>
-        <div className={styles.title}>
-          {editingTitle ? (
-            <input 
-              ref={titleInputRef}
-              className={styles.titleInput}
-              defaultValue={boardName}
-              onKeyDown={onTitleKeyDown}
-              onBlur={(e) => saveTitle(e.target.value)}
-              aria-label='Edit board title'
+        <div className={styles.right}>
+          <div className={styles.drawerContainer}>
+            <img 
+              src={leftArrow} 
+              alt="left Icon" 
+              onClick={() => toggleDrawer(true)}
             />
-          ) : (
-            <div className={styles.titleText} 
-              onClick={startEdit}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEdit(); }}
-            >
-              {boardName}
-            </div>
-          )}
+          </div>
         </div>
+        <Drawer
+          anchor="right"
+          open={isDrawerOpen}
+          onClose={() => toggleDrawer(false)}
+          sx={{
+            '.MuiPaper-root': {
+              background: boardTheme.header,
+              color: "white",
+              fontFamily: "Noto-Sans"
+            }
+          }}
+        >
+          {drawerList}
+        </Drawer>
       </div>
       <div className={styles.main}>
         <DndContext 
