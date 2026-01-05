@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import BoardComponent from './components/boardComponent/BoardComponent';
 import HomeComponent from './components/homeComponent/HomeComponent';
+import LoginPage from './pages/LoginPage/LoginPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -13,6 +14,7 @@ root.render(
       <Routes>
         <Route path="/" element={<BoardComponent />} />
         <Route path='/home' element={<HomeComponent />} />
+        <Route path='/login' element={<LoginPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

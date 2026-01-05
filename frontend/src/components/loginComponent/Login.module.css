@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+.container {
+  background: rgba(255, 255, 255, 0.15); 
+  backdrop-filter: blur(2px); 
+  color: white;
+  border: transparent;
+  border-radius: 8px;
+  font-family: "Noto Sans";
+}
+.main {
+  padding: 40px 80px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: inherit;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+.emailField {
+  margin-bottom: 16px;
+}
+.passwordField, .signField {
+  margin-bottom: 24px;
+}
+.emailTitle, .passwordTitle, .continue {
+  font-size: 13px;
+}
+.emailTitle, .passwordTitle {
+  margin-bottom: 8px;
+}
+.signField {
+  width: 100%;
+}
+.continue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.socials button {
+  padding: 9px 24px 9px 24px;
+  border: transparent;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.socials button:hover {
+  cursor: pointer;
+}
+.socials {
+  gap: 17px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.bottomText {
+  margin-top: 24px;
+  font-size: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.registerLink {
+  margin: 0 2px 0 2px;
+}
+.registerLink:hover {
+  cursor: pointer;
+  filter: brightness(0.9);
+}
