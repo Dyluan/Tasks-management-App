@@ -137,6 +137,11 @@ function BoardComponent() {
     navigate(homePath);
   }
 
+  const handleLoginClick = () => {
+    const loginPath = '/login';
+    navigate(loginPath);
+  }
+
   const drawerList = (
     <List>
       <ListItemButton onClick={() => handleHomeClick()}>
@@ -151,7 +156,7 @@ function BoardComponent() {
         </ListItemIcon>
         <ListItemText primary="Add members" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleLoginClick()}>
         <ListItemIcon>
           <LoginIcon sx={{ color: 'white' }} />
         </ListItemIcon>
