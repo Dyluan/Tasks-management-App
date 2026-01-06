@@ -7,6 +7,7 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useGitHubLogin } from '@react-oauth/github';
 import axios from 'axios';
 
 function LoginComponent({ userHasAnAccount=true }) {
@@ -31,7 +32,7 @@ function LoginComponent({ userHasAnAccount=true }) {
 
   const navigate = useNavigate();
 
-  const login = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         // Fetch user info using the access token
@@ -46,8 +47,6 @@ function LoginComponent({ userHasAnAccount=true }) {
         console.log('Email:', userInfo.data.email);
         console.log('Profile Picture:', userInfo.data.picture);
         
-        // You can now use this data to authenticate or register the user
-        // Navigate to home or save to your state management
         navigate('/home');
       } catch (error) {
         console.error('Error fetching user info:', error);
@@ -55,6 +54,17 @@ function LoginComponent({ userHasAnAccount=true }) {
     },
     onError: (error) => console.log('Google Login Failed:', error)
   });
+
+  const githubLogin = useGitHubLogin({
+    clientId: process.env.REACT_APP_GITHUB_CLIENT_ID,
+    redirectUri: 'http://localhost:3000',
+    onSuccess: response => {
+      console.log('Authorization code: ', response);
+    },
+    onError: error => {
+      console.log('Grosse erreur MDR: ', error);
+    }
+  })
 
   // Password strength validation
   const validatePasswordStrength = (pwd) => {
@@ -172,9 +182,10 @@ function LoginComponent({ userHasAnAccount=true }) {
               or continue with
             </div>
             <div className={styles.socials}>
-              <button><GoogleIcon onClick={() => login()} /></button>
+              <button><GoogleIcon onClick={() => googleLogin()} /></button>
               <button><FacebookIcon /></button>
-              <button><GitHubIcon /></button>
+              {/* <button><GitHubIcon onClick={() => githubLogin()} /></button> */}
+              <button><GitHubIcon onClick={() => githubLogin()} /></button>
             </div>
             <div className={styles.bottomText}>
               Don't have an account yet? <a className={styles.registerLink} onClick={() => setDisplayLogin(false)}>Register</a> for free
