@@ -5,6 +5,9 @@ import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 function LoginComponent({ userHasAnAccount=true }) {
 
@@ -25,6 +28,33 @@ function LoginComponent({ userHasAnAccount=true }) {
   const [userNameTouched, setUserNameTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [tempPasswordTouched, setTempPasswordTouched] = useState(false);
+
+  const navigate = useNavigate();
+
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Fetch user info using the access token
+        const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`
+          }
+        });
+        
+        console.log('User Info:', userInfo.data);
+        console.log('Name:', userInfo.data.name);
+        console.log('Email:', userInfo.data.email);
+        console.log('Profile Picture:', userInfo.data.picture);
+        
+        // You can now use this data to authenticate or register the user
+        // Navigate to home or save to your state management
+        navigate('/home');
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    },
+    onError: (error) => console.log('Google Login Failed:', error)
+  });
 
   // Password strength validation
   const validatePasswordStrength = (pwd) => {
@@ -90,7 +120,8 @@ function LoginComponent({ userHasAnAccount=true }) {
   };
 
   const handleLoginClick = () => {
-    
+    const homePath = '/home';
+    navigate(homePath);
   }
 
   return (
@@ -141,7 +172,7 @@ function LoginComponent({ userHasAnAccount=true }) {
               or continue with
             </div>
             <div className={styles.socials}>
-              <button><GoogleIcon /></button>
+              <button><GoogleIcon onClick={() => login()} /></button>
               <button><FacebookIcon /></button>
               <button><GitHubIcon /></button>
             </div>
