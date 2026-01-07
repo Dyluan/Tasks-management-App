@@ -4,11 +4,13 @@ import Button from '@mui/material/Button';
 import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import FacebookIcon from '@mui/icons-material/Facebook';
+import siteLogo from '../../assets/site_logo.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useGitHubLogin } from '@react-oauth/github';
 import axios from 'axios';
+import { useUser } from '../../context/UserContext';
 
 function LoginComponent({ userHasAnAccount=true }) {
 
@@ -31,6 +33,7 @@ function LoginComponent({ userHasAnAccount=true }) {
   const [tempPasswordTouched, setTempPasswordTouched] = useState(false);
 
   const navigate = useNavigate();
+  const { updateUser } = useUser();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -46,6 +49,8 @@ function LoginComponent({ userHasAnAccount=true }) {
         console.log('Name:', userInfo.data.name);
         console.log('Email:', userInfo.data.email);
         console.log('Profile Picture:', userInfo.data.picture);
+
+        updateUser(userInfo.data);
         
         navigate('/home');
       } catch (error) {
@@ -138,7 +143,7 @@ function LoginComponent({ userHasAnAccount=true }) {
     <div className={styles.container}>
       <div className={styles.main}>
         <div className={styles.logo}>
-          My logo
+          <img src={siteLogo} alt="logo" />
         </div>
         {displayLogin ? (
           <>

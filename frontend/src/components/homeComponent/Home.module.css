@@ -12,6 +12,34 @@
   font-family: "Noto Sans";
   padding: 48px 30vw 0 30vw;
 }
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+.left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.left img, .right img {
+  height: 48px;
+  width: 48px;
+}
+.left img:hover{
+  cursor: pointer;
+  transform: translateY(-1px)
+}
+.right img {
+  border-radius: 50%;
+}
+.right img:hover {
+  cursor: pointer;
+}
 .separatingLine {
   width: 100%;
   height: 1px;

@@ -7,19 +7,23 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { UserProvider } from './context/UserContext';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} > 
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<BoardComponent />} />
-          <Route path='/home' element={<HomeComponent />} />
-          <Route path='/login' element={<LoginPage />} />
-        </Routes>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <UserProvider>
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} > 
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<BoardComponent />} />
+            <Route path='/home' element={<HomeComponent />} />
+            <Route path='/login' element={<LoginPage />} />
+          </Routes>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    </UserProvider>
   </React.StrictMode>
 );
 
