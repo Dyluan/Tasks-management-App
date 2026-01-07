@@ -3,7 +3,7 @@ import BoardCardComponent from '../boardCardComponent/BoardCardComponent';
 import { useUser } from '../../context/UserContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Divider, Collapse } from '@mui/material';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import ContrastIcon from '@mui/icons-material/Contrast';
@@ -13,6 +13,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 function HomeComponent () {
 
@@ -29,6 +30,40 @@ function HomeComponent () {
   const [secondListOpen, setSecondListOpen] = useState(false);
   const handleSecondListOpening = () => {
     setSecondListOpen(!secondListOpen);
+  }
+
+  const [titleEdit, setTitleEdit] = useState(false);
+  const [workspaceTitle, setWorkspaceTitle] = useState('My workspace');
+  const prevWorkspaceTitleRef = useRef(workspaceTitle);
+  const titleInputRef = useRef(null);
+
+  useEffect(() => {
+    if (titleEdit && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [titleEdit]);
+
+  const startEditTitle = () => {
+    prevWorkspaceTitleRef.current = workspaceTitle;
+    setTitleEdit(true);
+  }
+  const cancelEdit = () => {
+    setWorkspaceTitle(prevWorkspaceTitleRef.current);
+    setTitleEdit(false);
+  }
+  const onTitleKeyDown = (e) => {
+    if (e.key === 'Enter') saveTitle(e.target.value);
+    if (e.key === 'Escape') cancelEdit();
+  }
+  const saveTitle = (newTitle) => {
+    const trimmed = String(newTitle).trim();
+    if (trimmed.length === 0) {
+      setWorkspaceTitle(prevWorkspaceTitleRef.current);
+    } else {
+      setWorkspaceTitle(trimmed);
+    }
+    setTitleEdit(false);
   }
 
   // TODO: make those buttons do something.
@@ -49,7 +84,7 @@ function HomeComponent () {
       <ListItem>
         <ListItemIcon>
           <img 
-            src={user.picture} 
+            src={user?.picture || ''} 
             alt="user" 
             style={{
               height:'38px',
@@ -58,7 +93,10 @@ function HomeComponent () {
             }}
           />
         </ListItemIcon>
-        <ListItemText primary={user.name} secondary={user.email} />
+        <ListItemText 
+          primary={user?.name || ''} 
+          secondary={user?.email || ''} 
+        />
       </ListItem>
       <ListItemButton>
         <ListItemText primary="Change account" />
@@ -123,7 +161,7 @@ function HomeComponent () {
           <img src={siteLogo} alt="site logo" />
         </div>
         <div className={styles.right}>
-          {user != null && user.picture && (
+          {user?.picture && (
             <img 
               src={user.picture} 
               onClick={(e) => handlePopoverClick(e)}
@@ -149,7 +187,31 @@ function HomeComponent () {
           {popoverContent}
         </Popover>
         <div className={styles.workspaceTitle}>
-          My Workspace  
+          {titleEdit ? (
+            <input 
+              ref={titleInputRef}
+              className={styles.titleInput}
+              defaultValue={workspaceTitle}
+              onKeyDown={onTitleKeyDown}
+              onBlur={(e) => saveTitle(e.target.value)}
+              aria-label='Edit workspace title'
+            />
+          ) : (
+            <>
+              {workspaceTitle}
+            </>
+          )}
+          <button 
+            onClick={() => startEditTitle(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEditTitle(); }}
+          >
+            <ModeEditIcon 
+              sx={{
+                height: '16px',
+                width: '16px',
+              }}
+            />
+          </button>
         </div>
         <div className={styles.separatingLine}></div>
         <div className={styles.boardContainer}>
