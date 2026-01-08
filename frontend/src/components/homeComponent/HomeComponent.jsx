@@ -1,5 +1,6 @@
 import styles from './Home.module.css';
 import BoardCardComponent from '../boardCardComponent/BoardCardComponent';
+import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
 import { useUser } from '../../context/UserContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
@@ -80,6 +81,10 @@ function HomeComponent () {
   ];
   const [theme, setTheme] = useState(themes[0]);
 
+  const [openModal, setOpenModal] = useState(false);
+  const handleModalOpen = () => setOpenModal(true);
+  const handleModalClose = () => setOpenModal(false);
+
   // TODO: make those buttons do something.
   // New Workspace
   // Add members
@@ -121,7 +126,7 @@ function HomeComponent () {
       <ListItem>
         <ListItemText secondary="Task Management App" />
       </ListItem>
-      <ListItemButton>
+      <ListItemButton onClick={handleModalOpen}>
         <ListItemIcon>
           <GroupAddIcon />
         </ListItemIcon>
@@ -181,6 +186,10 @@ function HomeComponent () {
         color: theme.textColor
       }}
     >
+      <AddModalComponent 
+        open={openModal}
+        onClose={handleModalClose}
+      />
       <div className={styles.header}>
         <div className={styles.left}>
           <img src={siteLogo} alt="site logo" />

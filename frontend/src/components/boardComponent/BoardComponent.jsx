@@ -162,7 +162,6 @@ function BoardComponent() {
         </ListItemIcon>
         <ListItemText primary="Login" />
       </ListItemButton>
-      
     </List>
   )
 

@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: "Noto Sans";
+  padding: 20px;
+  color: #292A2E;
+  width: 540px;
+}
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+.right button {
+  border: transparent;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: inherit;
+  color: #172b4d;
+}
+.right button:hover {
+  cursor: pointer;
+  background-color: #f5f5f5;
+}
+.right img {
+  height: 24px;
+  width: 24px;
+}
+.searchSpace {
+  width: 100%;
+}
+.searchSpace input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  outline: none;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 6px 12px 6px 12px;
+  font-size: 16px;
+  color: #616161;
+}
+.bottom {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 16px;
+  margin-top: 16px;
+}
+.bottomRight button {
+  padding: 6px 12px 6px 12px;
+  border-color: transparent;
+  border-radius: 4px;
+}
+.bottomRight button:hover {
+  cursor: pointer;
+}
+.popoverContainer {
+  font-family: inherit;
+  padding: 6px;
+  background-color: #fcf5b8;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
