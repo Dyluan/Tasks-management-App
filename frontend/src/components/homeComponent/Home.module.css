@@ -3,7 +3,7 @@
 .container {
   height: 100vh;
   box-sizing: border-box;
-  background-color: rgba(245, 245, 220, 0.575);
+  /* background-color: rgba(245, 245, 220, 0.575); */
 }
 .main {
   display: flex;
@@ -45,7 +45,7 @@
   font-size: 28px;
 }
 .workspaceTitle button {
-  background-color: rgba(245, 245, 220, 0.575);
+  background-color: inherit;
   border-radius: 4px;
   border: transparent;
   margin-left: 6px;
@@ -53,7 +53,7 @@
 }
 .workspaceTitle button:hover {
   cursor: pointer;
-  filter: brightness(0.9);
+  background-color: rgb(175, 175, 175);
 }
 .titleInput {
   font-size: 26px;

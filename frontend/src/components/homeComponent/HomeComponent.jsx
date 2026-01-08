@@ -47,15 +47,15 @@ function HomeComponent () {
   const startEditTitle = () => {
     prevWorkspaceTitleRef.current = workspaceTitle;
     setTitleEdit(true);
-  }
+  };
   const cancelEdit = () => {
     setWorkspaceTitle(prevWorkspaceTitleRef.current);
     setTitleEdit(false);
-  }
+  };
   const onTitleKeyDown = (e) => {
     if (e.key === 'Enter') saveTitle(e.target.value);
     if (e.key === 'Escape') cancelEdit();
-  }
+  };
   const saveTitle = (newTitle) => {
     const trimmed = String(newTitle).trim();
     if (trimmed.length === 0) {
@@ -64,10 +64,23 @@ function HomeComponent () {
       setWorkspaceTitle(trimmed);
     }
     setTitleEdit(false);
-  }
+  };
+
+  const themes = [
+    {
+      theme: 'light',
+      backgroundColor: 'rgba(245, 245, 220, 0.575)',
+      textColor: 'black'
+    },
+    {
+      theme: 'dark',
+      backgroundColor: '#1f2337',
+      textColor: 'white'
+    }
+  ];
+  const [theme, setTheme] = useState(themes[0]);
 
   // TODO: make those buttons do something.
-  // Themes
   // New Workspace
   // Add members
   // manage account?
@@ -123,13 +136,19 @@ function HomeComponent () {
       </ListItemButton>
       <Collapse in={secondListOpen} timeout="auto" unmountOnExit>
         <List dense="true">
-          <ListItemButton sx={{ pl: 4 }}>
+          <ListItemButton 
+            sx={{ pl: 4 }}
+            onClick={() => setTheme(themes[1])}
+          >
             <ListItemIcon>
               <DarkModeIcon />
             </ListItemIcon>
             <ListItemText primary="Dark mode" />
           </ListItemButton>
-          <ListItemButton sx={{ pl: 4 }}>
+          <ListItemButton 
+            sx={{ pl: 4 }}
+            onClick={() => setTheme(themes[0])}
+          >
             <ListItemIcon>
               <LightModeIcon />
             </ListItemIcon>
@@ -155,7 +174,13 @@ function HomeComponent () {
   );
 
   return (
-    <div className={styles.container}>
+    <div 
+      className={styles.container}
+      style={{
+        backgroundColor: theme.backgroundColor,
+        color: theme.textColor
+      }}
+    >
       <div className={styles.header}>
         <div className={styles.left}>
           <img src={siteLogo} alt="site logo" />
@@ -209,6 +234,7 @@ function HomeComponent () {
               sx={{
                 height: '16px',
                 width: '16px',
+                color: theme.theme === 'light'? 'black': 'white'
               }}
             />
           </button>

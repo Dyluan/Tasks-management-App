@@ -1,7 +1,7 @@
 import styles from './Login.module.css';
 import LoginComponent from '../../components/loginComponent/LoginComponent';
 
-function LoginPage({  }) {
+function LoginPage() {
   return (
     <div className={styles.container}>
       <LoginComponent />
