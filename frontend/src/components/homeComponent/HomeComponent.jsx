@@ -1,6 +1,7 @@
 import styles from './Home.module.css';
 import BoardCardComponent from '../boardCardComponent/BoardCardComponent';
 import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
+import WorkspaceModalComponent from '../workspaceModalComponent/WorkspaceModalComponent';
 import { useUser } from '../../context/UserContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
@@ -15,10 +16,11 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import { useNavigate } from 'react-router-dom';
 
 function HomeComponent () {
 
-  const { user } = useUser();
+  const { user, workspaces, createWorkspace } = useUser();
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const handlePopoverClick = (e) => {
@@ -85,6 +87,12 @@ function HomeComponent () {
   const handleModalOpen = () => setOpenModal(true);
   const handleModalClose = () => setOpenModal(false);
 
+  const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
+  const handleWorkspaceModalOpen = () => setOpenWorkspaceModal(true);
+  const handleWorkspaceModalClose = () => setOpenWorkspaceModal(false);
+
+  const navigate = useNavigate();
+
   // TODO: make those buttons do something.
   // New Workspace
   // Add members
@@ -116,7 +124,7 @@ function HomeComponent () {
           secondary={user?.email || ''} 
         />
       </ListItem>
-      <ListItemButton>
+      <ListItemButton onClick={() => navigate('/login')}>
         <ListItemText primary="Change account" />
       </ListItemButton>
       <ListItemButton>
@@ -162,7 +170,7 @@ function HomeComponent () {
         </List>
       </Collapse>
       <Divider />
-      <ListItemButton>
+      <ListItemButton onClick={handleWorkspaceModalOpen}>
         <ListItemIcon>
           <AddIcon />
         </ListItemIcon>
@@ -189,6 +197,11 @@ function HomeComponent () {
       <AddModalComponent 
         open={openModal}
         onClose={handleModalClose}
+      />
+      <WorkspaceModalComponent 
+        open={openWorkspaceModal}
+        onClose={handleWorkspaceModalClose}
+        createWorkspace={createWorkspace}
       />
       <div className={styles.header}>
         <div className={styles.left}>

@@ -50,7 +50,7 @@ function AddModalComponent({
       sx={{
         display: 'flex',
         justifyContent: 'center',
-        top: '50%',
+        top: '40vh',
         height: 'fit-content'
       }}
     >

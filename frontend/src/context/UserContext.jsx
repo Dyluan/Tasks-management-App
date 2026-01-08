@@ -1,9 +1,12 @@
 import { useState, useContext, createContext } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
+  
   const [user, setUser] = useState(null);
+  const [workspaces, setWorkspaces] = useState([]);
 
   const updateUser = (userInfo) => {
     setUser(userInfo);
@@ -13,8 +16,22 @@ export function UserProvider({ children }) {
     setUser(null);
   }
 
+  const createWorkspace = (workspaceName, workspaceDescription) => {
+    const newWorkspace = {
+      id: uuidv4(),
+      name: workspaceName,
+      description: workspaceDescription,
+      boards: [],
+      createdAt: new Date()
+    };
+    console.log(`new workspace created! ${JSON.stringify(newWorkspace)}`);
+    setWorkspaces(prev => [...prev, newWorkspace]);
+  }
+  // TODO: create a function to update existing workspace
+  // Add a memberList key.
+
   return (
-    <UserContext.Provider value={{ user, updateUser, clearUser }}>
+    <UserContext.Provider value={{ user, updateUser, clearUser, createWorkspace }}>
       {children}
     </UserContext.Provider>
   );
