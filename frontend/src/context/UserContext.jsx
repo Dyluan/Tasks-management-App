@@ -22,16 +22,32 @@ export function UserProvider({ children }) {
       name: workspaceName,
       description: workspaceDescription,
       boards: [],
-      createdAt: new Date()
+      createdAt: new Date(),
+      owner: user.userId
     };
     console.log(`new workspace created! ${JSON.stringify(newWorkspace)}`);
     setWorkspaces(prev => [...prev, newWorkspace]);
-  }
-  // TODO: create a function to update existing workspace
-  // Add a memberList key.
+  };
+
+  const updateWorkspace = (updatedWorkspace) => {
+    setWorkspaces(prev => 
+      prev.map(workspace => 
+        workspace.id === updatedWorkspace.id ? updatedWorkspace : workspace
+      )
+    );
+  };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, clearUser, createWorkspace }}>
+    <UserContext.Provider 
+      value={{ 
+        user, 
+        updateUser, 
+        clearUser, 
+        createWorkspace, 
+        workspaces, 
+        updateWorkspace 
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

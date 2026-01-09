@@ -11,6 +11,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useGitHubLogin } from '@react-oauth/github';
 import axios from 'axios';
 import { useUser } from '../../context/UserContext';
+import { v4 as uuidv4 } from 'uuid';
 
 function LoginComponent({ userHasAnAccount=true }) {
 
@@ -44,11 +45,11 @@ function LoginComponent({ userHasAnAccount=true }) {
             Authorization: `Bearer ${tokenResponse.access_token}`
           }
         });
-        
-        console.log('User Info:', userInfo.data);
-        console.log('Name:', userInfo.data.name);
-        console.log('Email:', userInfo.data.email);
-        console.log('Profile Picture:', userInfo.data.picture);
+        // TODO: added a userId here. To be replaced in the future when backend ready
+        const userId = `user-${uuidv4()}`;
+
+        userInfo.data.userId = userId;
+        console.log(`userInfos: ${JSON.stringify(userInfo.data)}`);
 
         updateUser(userInfo.data);
         

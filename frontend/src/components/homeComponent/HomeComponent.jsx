@@ -2,6 +2,7 @@ import styles from './Home.module.css';
 import BoardCardComponent from '../boardCardComponent/BoardCardComponent';
 import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
 import WorkspaceModalComponent from '../workspaceModalComponent/WorkspaceModalComponent';
+import CreateBoardPopoverComponent from '../createBoardPopover/CreateBoardPopoverComponent';
 import { useUser } from '../../context/UserContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
@@ -30,10 +31,18 @@ function HomeComponent () {
     setPopoverAnchorEl(null);
   };
   const popoverOpen = Boolean(popoverAnchorEl);
+
   const [secondListOpen, setSecondListOpen] = useState(false);
   const handleSecondListOpening = () => {
     setSecondListOpen(!secondListOpen);
   }
+
+  const [boardPopoverAnchorEl, setBoardPopoverAnchorEl] = useState(null);
+  const boardPopoverOpen = Boolean(boardPopoverAnchorEl);
+  const handleBoardPopoverClick = (e) => {
+    setBoardPopoverAnchorEl(e.currentTarget);
+  };
+  const handleBoardPopoverClose = () => setBoardPopoverAnchorEl(null);
 
   const [titleEdit, setTitleEdit] = useState(false);
   const [workspaceTitle, setWorkspaceTitle] = useState('My workspace');
@@ -218,6 +227,7 @@ function HomeComponent () {
         </div>
       </div>
       <div className={styles.main}> 
+        {/* User settings Popover */}
         <Popover
           open={popoverOpen}
           onClose={handlePopoverClose}
@@ -233,6 +243,12 @@ function HomeComponent () {
         >
           {popoverContent}
         </Popover>
+        {/* create new Board Popover */}
+        <CreateBoardPopoverComponent 
+          open={boardPopoverOpen}
+          anchorEl={boardPopoverAnchorEl}
+          onClose={handleBoardPopoverClose}
+        />
         <div className={styles.workspaceTitle}>
           {titleEdit ? (
             <input 
@@ -275,6 +291,7 @@ function HomeComponent () {
             />
             <BoardCardComponent 
               isDefault={true} 
+              onClick={(e) => handleBoardPopoverClick(e)}
             />
           </div>
         </div>

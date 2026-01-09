@@ -78,3 +78,24 @@
   flex-direction: row;
   gap: 8px;
 }
+.boardPopoverMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.boardPopoverHeader {
+  font-size: 22px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.boardPopoverHeader button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: transparent;
+  border-radius: 4px;
+}
+.boardPopoverHeader button:hover {
+  cursor: pointer;
+}

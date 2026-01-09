@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  font-family: "Noto Sans";
+  width: 300px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 16px;
+}
+.title {
+  flex: 1;
+  text-align: center;
+}
+.right {
+  position: absolute;
+  right: 0;
+}
+.right button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: transparent;
+  border-radius: 4px;
+}
+.right button:hover {
+  cursor: pointer;
+}
+.colorButton {
+  width: 100%;
+  height: 100%;
+  border: transparent;
+  border-radius: 6px;
+  min-height: 30px;
+}
+.colorButton:hover {
+  cursor: pointer;
+  filter: brightness(0.92);
+}
+.boardColors ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  box-sizing: border-box;
+}
+.boardColors {
+  margin-bottom: 12px;
+}
+.boardColor {
+  border: transparent;
+}
+.colorTitle, .boardInputTitle {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.boardInput {
+  margin-bottom: 16px;
+}
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
