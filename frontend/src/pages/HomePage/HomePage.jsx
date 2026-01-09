@@ -1,8 +1,8 @@
 import styles from './Home.module.css';
-import BoardCardComponent from '../boardCardComponent/BoardCardComponent';
-import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
-import WorkspaceModalComponent from '../workspaceModalComponent/WorkspaceModalComponent';
-import CreateBoardPopoverComponent from '../createBoardPopover/CreateBoardPopoverComponent';
+import BoardCardComponent from '../../components/boardCardComponent/BoardCardComponent';
+import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
+import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
+import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 import { useUser } from '../../context/UserContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
@@ -19,7 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { useNavigate } from 'react-router-dom';
 
-function HomeComponent () {
+function HomePage () {
 
   const { user, workspaces, createWorkspace } = useUser();
 
@@ -300,4 +300,4 @@ function HomeComponent () {
   )
 }
 
-export default HomeComponent;
+export default HomePage;

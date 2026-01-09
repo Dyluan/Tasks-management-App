@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import BoardComponent from './components/boardComponent/BoardComponent';
-import HomeComponent from './components/homeComponent/HomeComponent';
+import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -18,7 +18,7 @@ root.render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<BoardComponent />} />
-            <Route path='/home' element={<HomeComponent />} />
+            <Route path='/home' element={<HomePage />} />
             <Route path='/login' element={<LoginPage />} />
           </Routes>
         </BrowserRouter>
