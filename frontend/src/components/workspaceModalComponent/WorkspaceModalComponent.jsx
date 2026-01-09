@@ -49,7 +49,7 @@ function WorkspaceModalComponent( {
               Create a new workspace
             </div>
             <div className={styles.right}>
-              <button>
+              <button onClick={onClose}>
                 <img src={closeIcon} alt="close" />
               </button>
             </div>

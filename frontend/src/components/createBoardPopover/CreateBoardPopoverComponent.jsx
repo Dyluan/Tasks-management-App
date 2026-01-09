@@ -2,6 +2,7 @@ import styles from './CreateBoardPopover.module.css';
 import { TextField, Popover, Button } from '@mui/material';
 import { useState } from 'react';
 import closeIcon from '../../assets/close_icon.png';
+import CheckIcon from '@mui/icons-material/Check';
 
 function CreateBoardPopoverComponent({
   open,
@@ -9,6 +10,26 @@ function CreateBoardPopoverComponent({
   onClose, }) {
 
   const [title, setTitle] = useState('');
+  const [titleTouched, setTitleTouched] = useState(false);
+  const [titleError, setTitleError] = useState('');
+  const [colorSelected, setColorSelected] = useState(null);
+  const handleColorClick = (elem) => {
+    setColorSelected(elem);
+  };
+  const handleSaveClick = () => {
+    // logic here
+    setColorSelected(null);
+    setTitle('');
+    onClose();
+  };
+  const handleTitleBlur = () => {
+    setTitleTouched(true);
+    if (!title.trim()) {
+      setTitleError('A board title is required');
+    } else {
+      setTitleError('');
+    }
+  };
   const boardThemes = [
     {
       board: 'linear-gradient(135deg, #f6b365, #fda085)',
@@ -97,7 +118,16 @@ function CreateBoardPopoverComponent({
                   style={{
                     background: elem.board
                   }}
-                ></button>
+                  onClick={() => handleColorClick(elem.board)}
+                >
+                  {colorSelected && colorSelected === elem.board && (
+                    <CheckIcon 
+                      sx={{
+                        color: 'white'
+                      }}
+                    />
+                  )}
+                </button>
               </li>
             ))}
           </ul>
@@ -113,21 +143,28 @@ function CreateBoardPopoverComponent({
               width: '100%'
             }}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (titleTouched && !e.target.value.trim()) {
+                setTitleError('A board title is required');
+              } else if (titleTouched) {
+                setTitleError('');
+              }
+            }}
+            onBlur={handleTitleBlur}
+            error={!!titleError}
+            helperText={titleError}
           />
-          {title.trim().length === 0 && (
-            <div className={styles.errorText}>
-              The board must have a name
-            </div>
-          )}
         </div>
         <div className={styles.createButtonContainer}>
           <Button 
             variant='contained'
             sx={{
-              width: '100%'
+              width: '100%',
+              textTransform: 'none'
             }}
             disabled={title.trim().length === 0}
+            onClick={handleSaveClick}
           >
             Create
           </Button>
