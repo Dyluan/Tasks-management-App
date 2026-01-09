@@ -34,7 +34,7 @@ function LoginComponent({ userHasAnAccount=true }) {
   const [tempPasswordTouched, setTempPasswordTouched] = useState(false);
 
   const navigate = useNavigate();
-  const { updateUser } = useUser();
+  const { updateUser, createWorkspace } = useUser();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -52,6 +52,7 @@ function LoginComponent({ userHasAnAccount=true }) {
         console.log(`userInfos: ${JSON.stringify(userInfo.data)}`);
 
         updateUser(userInfo.data);
+        createWorkspace('Default workspace', '', userInfo.data);
         
         navigate('/home');
       } catch (error) {

@@ -23,6 +23,8 @@ function HomePage () {
 
   const { user, workspaces, createWorkspace } = useUser();
 
+  const [boards, setBoards] = useState(workspaces.boards);
+
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const handlePopoverClick = (e) => {
     setPopoverAnchorEl(e.currentTarget);

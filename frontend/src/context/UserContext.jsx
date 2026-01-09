@@ -16,14 +16,19 @@ export function UserProvider({ children }) {
     setUser(null);
   }
 
-  const createWorkspace = (workspaceName, workspaceDescription) => {
+  const createWorkspace = (workspaceName, workspaceDescription, userData = null) => {
+    const currentUser = userData || user;
+    if (!currentUser) {
+      console.error('Cannot create workspace: user is not logged in');
+      return;
+    }
     const newWorkspace = {
       id: uuidv4(),
       name: workspaceName,
       description: workspaceDescription,
       boards: [],
       createdAt: new Date(),
-      owner: user.userId
+      owner: currentUser.userId
     };
     console.log(`new workspace created! ${JSON.stringify(newWorkspace)}`);
     setWorkspaces(prev => [...prev, newWorkspace]);
