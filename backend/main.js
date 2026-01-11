@@ -6,6 +6,9 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
+const PORT = Number(process.env.PORT);
+const BASE_URL = `http://localhost:${PORT}`;
+
 const app = express();
 
 app.use(express.json());
@@ -69,19 +72,70 @@ app.get('/auth/github/callback', async (req, res) => {
   }
 });
 
-app.get('/me', requireAuth, (req,res) => {
-  res.json(req.user);
+app.get('/auth/facebook/login', (req, res) => {
+  const redirectUrl = `https://www.facebook.com/v24.0/dialog/oauth?` + 
+    `client_id=${process.env.FB_CLIENT_ID}` + 
+    `&redirect_uri=${BASE_URL}/auth/facebook/callback&scope=email,public_profile`;
+  
+  res.redirect(redirectUrl);
+});
+
+app.get('/auth/facebook/callback', async(req, res) => {
+  const { code } = req.query;
+
+  const tokenRes = await axios.get(
+    `https://graph.facebook.com/v24.0/oauth/access_token`,
+    {
+      params: {
+        client_id: `${process.env.FB_CLIENT_ID}`,
+        client_secret: `${process.env.FB_CLIENT_SECRET}`,
+        redirect_uri: `${BASE_URL}/auth/facebook/callback`,
+        code,
+      },
+    }
+  )
+
+  const accessToken = tokenRes.data.access_token;
+
+  const userRes = await axios.get(
+    `https://graph.facebook.com/me`, {
+      params: {
+        fields: `id,name,email,picture`,
+        access_token: accessToken,
+      },
+    }
+  )
+
+  const fbUser = userRes.data;
+
+  const user = {
+    id: fbUser.id,
+    name: fbUser.name,
+    email: fbUser.email,
+    avatar: fbUser.picture.data.url
+  };
+
+  console.log('We got our user connected: ');
+  console.log(JSON.stringify(user));
+
+  const jwtToken = jwt.sign(
+    user,
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '7d'
+    }
+  )
+
+  // redirect to front
+  res.redirect(`http://localhost:3000/home?token=${jwtToken}`);
+
 })
 
-app.get('/test', async (req, res) => {
-  try {
-    const result = pool.query('SELECT NOW()');
-    res.json((await result).rows[0]);
-  } catch(err) {
-    console.error(err);
-    res.status(500).send('DB connection failed');
-  }
-});
+app.get('/me', requireAuth, (req,res) => {
+  console.log(req.user);
+  console.log(JSON.stringify(req.user));
+  res.json(req.user);
+})
 
 function requireAuth(req, res, next) {
   const header = req.headers.authorization;
@@ -97,8 +151,6 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Invalid token' });
   }
 }
-
-const PORT = Number(process.env.PORT);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
