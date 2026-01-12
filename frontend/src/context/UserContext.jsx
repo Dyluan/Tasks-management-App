@@ -16,6 +16,18 @@ export function UserProvider({ children }) {
     setUser(null);
   }
 
+  const setUserGithubInfo = async () => {
+    const response = await fetch('http://localhost:5500/me', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`
+      }
+    });
+    const data = await response.json();
+    setUser(data);
+    console.log(user)
+    return data;
+  }
+
   const createWorkspace = (workspaceName, workspaceDescription, userData = null) => {
     const currentUser = userData || user;
     if (!currentUser) {
@@ -50,7 +62,8 @@ export function UserProvider({ children }) {
         clearUser, 
         createWorkspace, 
         workspaces, 
-        updateWorkspace 
+        updateWorkspace,
+        setUserGithubInfo
       }}
     >
       {children}

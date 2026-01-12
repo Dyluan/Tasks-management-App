@@ -21,7 +21,18 @@ import { useNavigate } from 'react-router-dom';
 
 function HomePage () {
 
-  const { user, workspaces, createWorkspace } = useUser();
+  const { user, workspaces, createWorkspace, setUserGithubInfo } = useUser();
+  
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  useEffect(() => {
+    if(token) {
+      localStorage.setItem('jwt', token);
+      window.history.replaceState({}, '', '/home');
+      setUserGithubInfo();
+    }
+  }, [token, user]);
 
   const [boards, setBoards] = useState(workspaces.boards);
 
@@ -121,7 +132,7 @@ function HomePage () {
       <ListItem>
         <ListItemIcon>
           <img 
-            src={user?.picture || ''} 
+            src={user?.picture || user?.avatar || ''} 
             alt="user" 
             style={{
               height:'38px',
@@ -131,7 +142,7 @@ function HomePage () {
           />
         </ListItemIcon>
         <ListItemText 
-          primary={user?.name || ''} 
+          primary={user?.username || ''} 
           secondary={user?.email || ''} 
         />
       </ListItem>
@@ -219,9 +230,9 @@ function HomePage () {
           <img src={siteLogo} alt="site logo" />
         </div>
         <div className={styles.right}>
-          {user?.picture && (
+          {(user?.picture || user?.avatar) && (
             <img 
-              src={user.picture} 
+              src={user?.picture || user?.avatar} 
               onClick={(e) => handlePopoverClick(e)}
               alt='user'
             />
