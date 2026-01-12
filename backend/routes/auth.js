@@ -2,6 +2,7 @@ import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import { findOrCreateOAuthUser } from '../findOrCreateOAuthUser.js';
 
 dotenv.config();
 
@@ -42,14 +43,33 @@ router.get('/github/callback', async (req, res) => {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
+    // have to call this endpoint to access user's email
+    const emailRes = await axios.get('https://api.github.com/user/emails', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    const emails= emailRes.data;
+    const primaryMail = emails.find(e => e.primary && e.verified)?.email;
+
     const githubUser = userRes.data;
+
+    const user = await findOrCreateOAuthUser({
+      provider: 'github',
+      providerUserId: githubUser.id,
+      // email: githubUser.email,
+      // FAKE email in case github doesnt send user's one
+      email: primaryMail || `${githubUser.id}@github.local`,
+      name: githubUser.login,
+      avatar: githubUser.avatar_url
+    });
 
     // create JWT
     const token = jwt.sign(
       {
-        sub: githubUser.id,
-        username: githubUser.login,
-        avatar: githubUser.avatar_url
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.image
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -99,26 +119,30 @@ router.get('/facebook/callback', async(req, res) => {
     );
     const fbUser = userRes.data;
 
-    const user = {
-      id: fbUser.id,
-      name: fbUser.name,
+    const user = await findOrCreateOAuthUser({
+      provider: 'facebook',
+      providerUserId: fbUser.id,
       email: fbUser.email,
+      name: fbUser.name,
       avatar: fbUser.picture.data.url
-    };
+    });
 
     console.log('We got our user connected: ');
     console.log(JSON.stringify(user));
 
-    const jwtToken = jwt.sign(
-      user,
-      process.env.JWT_SECRET,
+    const token = jwt.sign(
       {
-        expiresIn: '7d'
-      }
-    )
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.image
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     // redirect to front
-    res.redirect(`http://localhost:3000/home?token=${jwtToken}`);
+    res.redirect(`http://localhost:3000/home?token=${token}`);
   } catch(err) {
     console.log(err);
     res.status(500).send('Facebook login failed lol');
@@ -154,22 +178,26 @@ router.get('/google/callback', async (req, res) => {
     const ticket = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken);
     const googleUser = await ticket.json();
 
-    // TODO: 
-    // find or create my user here
+    const user = await findOrCreateOAuthUser({
+      provider: 'google',
+      providerUserId: googleUser.sub,
+      email: googleUser.email,
+      name: googleUser.name,
+      avatar: googleUser.picture
+    });
 
-    const jwtToken = jwt.sign(
-      { 
-        sub: googleUser.sub,
-        email: googleUser.email,
-        name: googleUser.name,
-        avatar: googleUser.picture,
-        provider: 'google'
+    const token = jwt.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.image
       },
-      process.env.JWT_SECRET, 
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.redirect(`http://localhost:3000/home?token=${jwtToken}`);
+    res.redirect(`http://localhost:3000/home?token=${token}`);
 
   } catch(err) {
     console.log(err);
