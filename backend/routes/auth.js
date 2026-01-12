@@ -125,4 +125,56 @@ router.get('/facebook/callback', async(req, res) => {
   }
 })
 
+router.get('/google/login', (req, res) => {
+  const redirectUrl = 
+  `https://accounts.google.com/o/oauth2/v2/auth` + 
+  `?client_id=${process.env.GOOGLE_CLIENT_ID}` + 
+  `&response_type=code&scope=openid email profile` + 
+  `&redirect_uri=${BASE_URL}/auth/google/callback`;
+
+  res.redirect(redirectUrl);
+});
+
+router.get('/google/callback', async (req, res) => {
+  try {
+    const code = req.query.code;
+
+    const tokenRes = await axios.post(
+      'https://oauth2.googleapis.com/token',
+      {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        code,
+        grant_type: 'authorization_code',
+        redirect_uri: `${BASE_URL}/auth/google/callback`
+      }
+    );
+    const idToken = tokenRes.data.id_token;
+
+    const ticket = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken);
+    const googleUser = await ticket.json();
+
+    // TODO: 
+    // find or create my user here
+
+    const jwtToken = jwt.sign(
+      { 
+        sub: googleUser.sub,
+        email: googleUser.email,
+        name: googleUser.name,
+        avatar: googleUser.picture,
+        provider: 'google'
+      },
+      process.env.JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+
+    res.redirect(`http://localhost:3000/home?token=${jwtToken}`);
+
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Google login failed lol');
+  }
+})
+
 export default router;
