@@ -21,18 +21,26 @@ import { useNavigate } from 'react-router-dom';
 
 function HomePage () {
 
-  const { user, workspaces, createWorkspace, setUserGithubInfo } = useUser();
+  const { user, workspaces, createWorkspace, setUserInfo } = useUser();
   
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
 
+  // useEffect called because login with socials redirects to homePage
   useEffect(() => {
     if(token) {
       localStorage.setItem('jwt', token);
       window.history.replaceState({}, '', '/home');
-      setUserGithubInfo();
+      // calling /me
+      setUserInfo();
     }
-  }, [token, user]);
+  }, [token]);
+
+  // auto-connects the user
+  useEffect(() => {
+    localStorage.getItem('jwt');
+    setUserInfo();
+  }, [])
 
   const [boards, setBoards] = useState(workspaces.boards);
 
@@ -142,7 +150,7 @@ function HomePage () {
           />
         </ListItemIcon>
         <ListItemText 
-          primary={user?.username || ''} 
+          primary={user?.name || ''} 
           secondary={user?.email || ''} 
         />
       </ListItem>

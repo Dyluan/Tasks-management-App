@@ -17,6 +17,7 @@ function CreateBoardPopoverComponent({
     setColorSelected(elem);
   };
   const handleSaveClick = () => {
+    
     // logic here
     setColorSelected(null);
     setTitle('');

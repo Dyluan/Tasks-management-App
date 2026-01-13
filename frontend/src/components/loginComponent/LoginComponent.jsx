@@ -7,9 +7,12 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import siteLogo from '../../assets/site_logo.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useUser } from '../../context/UserContext';
 
 function LoginComponent({ userHasAnAccount=true }) {
+
+  const { updateUser } = useUser();
 
   const [displayLogin, setDisplayLogin] = useState(userHasAnAccount);
   const [email, setEmail] = useState('');
@@ -30,7 +33,6 @@ function LoginComponent({ userHasAnAccount=true }) {
   const [tempPasswordTouched, setTempPasswordTouched] = useState(false);
 
   const navigate = useNavigate();
-  const { updateUser, createWorkspace } = useUser();
 
   // Password strength validation
   const validatePasswordStrength = (pwd) => {
@@ -95,9 +97,40 @@ function LoginComponent({ userHasAnAccount=true }) {
     }
   };
 
-  const handleLoginClick = () => {
-    const homePath = '/home';
-    navigate(homePath);
+  const handleLoginClick = async () => {
+    try {
+      const response = await axios.post('http://localhost:5500/auth/login', {
+        email: email,
+        password: password
+      });
+
+      navigate(`/home?token=${response.data.token}`);
+    } catch(err) {
+      console.error('Login failed: ', err);
+    }
+  }
+
+  const handleRegisterClick = async () => {
+    try {
+      const response = await axios.post('http://localhost:5500/auth/register', {
+        username: userName,
+        email: email,
+        password: password
+      });
+      console.log('Response from server : ', response.data);
+      
+      // Store JWT token in localStorage and navigate to home
+      // localStorage.setItem('jwt', response.data.token);
+
+      // updateUser(response.data.user);
+      navigate(`/home?token=${response.data.token}`);
+      
+    } catch(err) {
+      console.error('Registration failed', err);
+      if (err.response && err.response.status === 409) {
+        setEmailError(err.response.data);
+      }
+    }
   }
 
   return (
@@ -171,7 +204,7 @@ function LoginComponent({ userHasAnAccount=true }) {
             <div className={styles.emailField}>
               <div className={styles.emailTitle}>Username</div>
               <TextField 
-                label='Username' 
+                placeholder='Username'
                 variant='outlined' 
                 size='small' 
                 sx={{width: '100%'}} 
@@ -191,7 +224,7 @@ function LoginComponent({ userHasAnAccount=true }) {
             <div className={styles.emailField}>
               <div className={styles.emailTitle}>Email</div>
               <TextField 
-                label='Email' 
+                placeholder='Email'
                 variant='outlined' 
                 size='small' 
                 sx={{width: '100%'}} 
@@ -210,7 +243,7 @@ function LoginComponent({ userHasAnAccount=true }) {
             <div className={styles.passwordField}>
               <div className={styles.passwordTitle}>Password</div>
               <TextField 
-                label='Password' 
+                placeholder='Password'
                 type='password' 
                 size='small' 
                 sx={{width: '100%'}} 
@@ -237,7 +270,7 @@ function LoginComponent({ userHasAnAccount=true }) {
             <div className={styles.passwordField}>
               <div className={styles.passwordTitle}>Repeat password</div>
               <TextField 
-                label='Password' 
+                placeholder='Password'
                 type='password' 
                 size='small' 
                 sx={{width: '100%'}} 
@@ -266,7 +299,8 @@ function LoginComponent({ userHasAnAccount=true }) {
                   textTransform: 'none',
                   fontSize: '16px'
                 }}
-                onClick={() => handleLoginClick()}
+                onClick={() => handleRegisterClick()}
+                disabled={!userName.trim() || validateEmail(email) !== '' || password !== tempPassword || validatePasswordStrength(password) !== ''}
               >Register</Button>
             </div>
           </>

@@ -9,6 +9,8 @@ export function UserProvider({ children }) {
   const [workspaces, setWorkspaces] = useState([]);
 
   const updateUser = (userInfo) => {
+    console.log('updateUser here. Heres yuour info:');
+    console.log(userInfo);
     setUser(userInfo);
   }
 
@@ -16,15 +18,15 @@ export function UserProvider({ children }) {
     setUser(null);
   }
 
-  const setUserGithubInfo = async () => {
+  const setUserInfo = async () => {
     const response = await fetch('http://localhost:5500/me', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('jwt')}`
       }
     });
     const data = await response.json();
+    console.log('mys user:', data);
     setUser(data);
-    console.log(user)
     return data;
   }
 
@@ -63,7 +65,7 @@ export function UserProvider({ children }) {
         createWorkspace, 
         workspaces, 
         updateWorkspace,
-        setUserGithubInfo
+        setUserInfo
       }}
     >
       {children}
