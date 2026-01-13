@@ -3,6 +3,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { findOrCreateOAuthUser } from '../findOrCreateOAuthUser.js';
+import pool from '../db.js';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -10,6 +12,8 @@ const PORT = Number(process.env.PORT);
 const BASE_URL = `http://localhost:${PORT}`;
 
 const router = express.Router();
+
+const SALT_ROUNDS = 12;
 
 router.get('/github/login', (req, res) => {
   const redirectUrl = 'https://github.com/login/oauth/authorize' + 
@@ -203,6 +207,67 @@ router.get('/google/callback', async (req, res) => {
     console.log(err);
     res.status(500).send('Google login failed lol');
   }
+})
+
+// /register receives, in req.body, an object:
+// username: username
+// email: email
+// password: password
+router.post('/register', async (req, res) => {
+
+  try {
+    console.log('Hello from /register. What can I do for you ?');
+    console.log(req.body);
+
+    const email = req.body.email;
+    const result = await pool.query(
+      `SELECT * FROM users WHERE email = $1`
+    , [email]);
+
+    if (result.rows.length > 0) {
+      console.log('Oops, un tel user existe déjà');
+      // I should maybe use another status code
+      res.status(409).send('Email address already in use!');
+      return;
+    }
+
+    const username = req.body.username;
+    const passwordHash = await bcrypt.hash(req.body.password, SALT_ROUNDS);
+
+    const newUser = await pool.query(
+      `INSERT INTO users(name, email, password_hash) VALUES($1, $2, $3)
+      RETURNING *`,
+      [username, email, passwordHash]
+    );
+
+    const user = newUser.rows[0];
+
+    const token = jwt.sign(
+      {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.image
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // If user is created, returns the user and the jwt token
+    res.status(200).json(
+      {
+        token: token,
+        user: user
+      }
+    );
+
+    // res.redirect(`http://localhost:3000/home?token=${token}`);
+
+  } catch(err) {
+    console.log(err);
+    res.status(500).send('Registration failed lol');
+  }
+  
 })
 
 export default router;
