@@ -4,10 +4,15 @@ import { useState } from 'react';
 import closeIcon from '../../assets/close_icon.png';
 import CheckIcon from '@mui/icons-material/Check';
 
+import axios from 'axios';
+import { useUser } from '../../context/UserContext';
+
 function CreateBoardPopoverComponent({
   open,
   anchorEl,
   onClose, }) {
+
+  const { user } = useUser();
 
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
@@ -16,7 +21,17 @@ function CreateBoardPopoverComponent({
   const handleColorClick = (elem) => {
     setColorSelected(elem);
   };
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
+    // TODO: TO BE REMOVED!!
+    const response = await axios.get('http://localhost:5500/workspace/all', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`
+      },
+      params : {
+        id: user.sub
+      }
+    });
+    console.log('Workspaces:', response.data);
     
     // logic here
     setColorSelected(null);

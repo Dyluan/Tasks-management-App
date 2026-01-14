@@ -30,41 +30,13 @@ export function UserProvider({ children }) {
     return data;
   }
 
-  const createWorkspace = (workspaceName, workspaceDescription, userData = null) => {
-    const currentUser = userData || user;
-    if (!currentUser) {
-      console.error('Cannot create workspace: user is not logged in');
-      return;
-    }
-    const newWorkspace = {
-      id: uuidv4(),
-      name: workspaceName,
-      description: workspaceDescription,
-      boards: [],
-      createdAt: new Date(),
-      owner: currentUser.userId
-    };
-    console.log(`new workspace created! ${JSON.stringify(newWorkspace)}`);
-    setWorkspaces(prev => [...prev, newWorkspace]);
-  };
-
-  const updateWorkspace = (updatedWorkspace) => {
-    setWorkspaces(prev => 
-      prev.map(workspace => 
-        workspace.id === updatedWorkspace.id ? updatedWorkspace : workspace
-      )
-    );
-  };
-
   return (
     <UserContext.Provider 
       value={{ 
         user, 
         updateUser, 
         clearUser, 
-        createWorkspace, 
         workspaces, 
-        updateWorkspace,
         setUserInfo
       }}
     >

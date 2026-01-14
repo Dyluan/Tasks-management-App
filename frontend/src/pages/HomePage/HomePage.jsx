@@ -4,6 +4,7 @@ import AddModalComponent from '../../components/addMembersModalComponent/AddModa
 import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 import { useUser } from '../../context/UserContext';
+import { useApp } from '../../context/AppContext';
 import siteLogo from '../../assets/site_logo.svg';
 import Popover from '@mui/material/Popover';
 import { useRef, useState, useEffect } from 'react';
@@ -21,7 +22,8 @@ import { useNavigate } from 'react-router-dom';
 
 function HomePage () {
 
-  const { user, workspaces, createWorkspace, setUserInfo } = useUser();
+  const { user, workspaces, setUserInfo } = useUser();
+  const { workspace, workspaceList, createWorkspace } = useApp();
   
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
@@ -66,7 +68,7 @@ function HomePage () {
   const handleBoardPopoverClose = () => setBoardPopoverAnchorEl(null);
 
   const [titleEdit, setTitleEdit] = useState(false);
-  const [workspaceTitle, setWorkspaceTitle] = useState('My workspace');
+  const [workspaceTitle, setWorkspaceTitle] = useState(workspace.title);
   const prevWorkspaceTitleRef = useRef(workspaceTitle);
   const titleInputRef = useRef(null);
 
@@ -282,6 +284,7 @@ function HomePage () {
             />
           ) : (
             <>
+            {/* TODO: */}
               {workspaceTitle}
             </>
           )}

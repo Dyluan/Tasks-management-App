@@ -6,15 +6,14 @@ import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { UserProvider } from './context/UserContext';
-
+import { AppProvider } from './context/AppContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <UserProvider>
-      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} > 
+      <AppProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<BoardComponent />} />
@@ -22,7 +21,7 @@ root.render(
             <Route path='/login' element={<LoginPage />} />
           </Routes>
         </BrowserRouter>
-      </GoogleOAuthProvider>
+      </AppProvider>
     </UserProvider>
   </React.StrictMode>
 );
