@@ -59,7 +59,7 @@ export async function findOrCreateOAuthUser({
       user = newUser.rows[0];
     }
 
-    // 4. Create auth identity
+    // Create auth identity
     await client.query(
       `
       INSERT INTO auth_identities

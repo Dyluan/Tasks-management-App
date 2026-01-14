@@ -4,6 +4,8 @@ import cors from 'cors';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import authRouter from './routes/auth.js';
+import workspaceRouter from './routes/workspace.js';
+import { requireAuth } from './middleware/requireAuth.js';
 
 dotenv.config();
 
@@ -19,27 +21,12 @@ app.use(cors({
 }));
 
 app.use('/auth', authRouter);
+app.use('/workspace', workspaceRouter);
 
 app.get('/me', requireAuth, (req,res) => {
-  console.log(req.user);
-  console.log(JSON.stringify(req.user));
+  console.log('/me called.');
   res.json(req.user);
 })
-
-function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header) return res.status(401).json({ error: 'Missing token' });
-
-  const token = header.split(' ')[1];
-
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload;
-    next();
-  } catch {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

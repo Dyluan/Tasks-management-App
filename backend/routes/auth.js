@@ -244,6 +244,7 @@ router.post('/register', async (req, res) => {
 
     const token = jwt.sign(
       {
+        userId: user.id,
         sub: user.id,
         email: user.email,
         name: user.name,
@@ -254,10 +255,10 @@ router.post('/register', async (req, res) => {
     );
 
     // If user is created, returns the user and the jwt token
+    // THIS FUNCTION IS WRONG. SHOULD ONLY RETURN THE TOKEN
     res.status(200).json(
       {
         token: token,
-        user: user
       }
     );
 
@@ -268,6 +269,43 @@ router.post('/register', async (req, res) => {
     res.status(500).send('Registration failed lol');
   }
   
+})
+
+router.post('/login', async(req, res) => {
+  try {
+    const { email, password } = req.body;
+    const result = await pool.query(
+      `SELECT id, email, name, image, password_hash FROM users WHERE email = $1`,
+      [email]);
+    
+    const user = result.rows[0];
+    if (!user) return res.status(401).send("Invalid username");
+
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) return res.status(401).send("Invalid password");
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.image
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    res.status(200).json(
+      {
+        token: token
+      }
+    );
+
+  } catch(err) {
+    console.log(err);
+    res.status(401).send('Invalid username or password');
+  }
 })
 
 export default router;
