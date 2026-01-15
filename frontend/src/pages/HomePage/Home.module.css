@@ -76,7 +76,12 @@
 .boards {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 8px;
+}
+.defaultBoardContainer {
+  height: 84px;
+  width: 200px;
 }
 .boardPopoverMain {
   display: flex;

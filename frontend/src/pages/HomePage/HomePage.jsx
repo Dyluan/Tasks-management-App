@@ -22,8 +22,15 @@ import { useNavigate } from 'react-router-dom';
 
 function HomePage () {
 
-  const { user, workspaces, setUserInfo } = useUser();
-  const { workspace, workspaceList, createWorkspace } = useApp();
+  const { user, setUserInfo } = useUser();
+  const { 
+    workspace, 
+    workspaceList, 
+    createWorkspace, 
+    editWorkspaceTitle,
+    boards,
+    getBoard
+    } = useApp();
   
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
@@ -44,7 +51,7 @@ function HomePage () {
     setUserInfo();
   }, [])
 
-  const [boards, setBoards] = useState(workspaces.boards);
+  // const [boards, setBoards] = useState(workspace.boards);
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const handlePopoverClick = (e) => {
@@ -72,6 +79,13 @@ function HomePage () {
   const prevWorkspaceTitleRef = useRef(workspaceTitle);
   const titleInputRef = useRef(null);
 
+  // Sync workspaceTitle with workspace.title from context
+  useEffect(() => {
+    if (workspace.title) {
+      setWorkspaceTitle(workspace.title);
+    }
+  }, [workspace.title]);
+
   useEffect(() => {
     if (titleEdit && titleInputRef.current) {
       titleInputRef.current.focus();
@@ -96,6 +110,7 @@ function HomePage () {
     if (trimmed.length === 0) {
       setWorkspaceTitle(prevWorkspaceTitleRef.current);
     } else {
+      editWorkspaceTitle(trimmed, workspace.id);
       setWorkspaceTitle(trimmed);
     }
     setTitleEdit(false);
@@ -237,7 +252,11 @@ function HomePage () {
       />
       <div className={styles.header}>
         <div className={styles.left}>
-          <img src={siteLogo} alt="site logo" />
+          <img 
+            src={siteLogo} 
+            alt="site logo" 
+            onClick={() => window.location.reload()}  
+          />
         </div>
         <div className={styles.right}>
           {(user?.picture || user?.avatar) && (
@@ -271,6 +290,7 @@ function HomePage () {
           open={boardPopoverOpen}
           anchorEl={boardPopoverAnchorEl}
           onClose={handleBoardPopoverClose}
+          workspace_id={workspace.id}
         />
         <div className={styles.workspaceTitle}>
           {titleEdit ? (
@@ -307,16 +327,21 @@ function HomePage () {
             Your boards
           </div>
           <div className={styles.boards}>
-            {/* need to loop through the user's list of boards */}
-            <BoardCardComponent
-              title={"My Board"}
-              backgroundColor={"linear-gradient(135deg, #f6b365, #fda085)"}
-              isDefault={false}
-            />
-            <BoardCardComponent 
-              isDefault={true} 
+            {boards.map(board => (
+              <BoardCardComponent 
+                title={board.name}
+                backgroundColor={board.colors.board}
+                onClick={getBoard}
+              />
+            ))}
+            <div 
+              className={styles.defaultBoardContainer}
               onClick={(e) => handleBoardPopoverClick(e)}
-            />
+            >
+              <BoardCardComponent 
+                isDefault={true} 
+              />
+            </div>
           </div>
         </div>
       </div>

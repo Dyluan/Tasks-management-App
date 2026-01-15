@@ -16,8 +16,20 @@ export function AppProvider({ children }) {
 
   const token = localStorage.getItem('jwt');
 
-  const editWorkspaceTitle = async (newWorkspace) => {
-
+  const editWorkspaceTitle = async (title, id) => {
+    console.log('edit::', title, id);
+    console.log(workspaceList);
+    console.log('user::', user);
+    const response = await axios.put(`http://localhost:5500/workspace/${id}`,
+      {
+        title: title,
+        id: id,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    console.log(response.data);
   }
 
   const createWorkspace = async (title, description) => {
@@ -32,6 +44,30 @@ export function AppProvider({ children }) {
     setWorkspaceList(prev => [...prev, response.data]);
   }
 
+  const fetchWorkspaceBoards = async (workspace_id) => {
+    const response = await axios.get(`http://localhost:5500/boards/all?workspace_id=${workspace_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    // console.log(response.data);
+    setBoards(response.data);
+  }
+
+  const updateBoards = (newBoard) => {
+    setBoards(prev => [...prev, newBoard]);
+  }
+
+  const getBoard = async (id) => {
+    const response = await axios.get(`http://localhost:5500/boards/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log('/id: response:', response.data);
+
+  }
+
   useEffect(() => {
     const fetchWorkspaces = async () => {
       if (token) {
@@ -42,6 +78,8 @@ export function AppProvider({ children }) {
         });
         setWorkspaceList(response.data);
         setWorkspace(response.data[0]);
+
+        fetchWorkspaceBoards(response.data[0].id);
       }
     };
     
@@ -53,7 +91,12 @@ export function AppProvider({ children }) {
       value={{
         workspace,
         workspaceList,
-        createWorkspace
+        createWorkspace,
+        editWorkspaceTitle,
+        fetchWorkspaceBoards,
+        boards,
+        updateBoards,
+        getBoard
       }}  
     >
       { children }

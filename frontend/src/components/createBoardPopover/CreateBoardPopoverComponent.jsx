@@ -5,14 +5,16 @@ import closeIcon from '../../assets/close_icon.png';
 import CheckIcon from '@mui/icons-material/Check';
 
 import axios from 'axios';
-import { useUser } from '../../context/UserContext';
+import { useApp } from '../../context/AppContext';
 
 function CreateBoardPopoverComponent({
   open,
   anchorEl,
-  onClose, }) {
+  onClose, 
+  workspace_id
+  }) {
 
-  const { user } = useUser();
+  const { updateBoards } = useApp();
 
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
@@ -22,16 +24,23 @@ function CreateBoardPopoverComponent({
     setColorSelected(elem);
   };
   const handleSaveClick = async () => {
-    // TODO: TO BE REMOVED!!
-    const response = await axios.get('http://localhost:5500/workspace/all', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('jwt')}`
+    const token = localStorage.getItem('jwt');
+
+    const response = await axios.post('http://localhost:5500/boards/new', 
+      {
+        name: title,
+        workspace_id: workspace_id,
+        colors: colorSelected
       },
-      params : {
-        id: user.sub
+      {
+        headers: { Authorization: `Bearer ${token}` }
       }
-    });
-    console.log('Workspaces:', response.data);
+    )
+    
+    // DO SOMETHING WITH RESPONSE HERE
+    console.log('/boards/new ::', response.data);
+    // TODO: SHOULD HANDLE BAD RESPONSES HERE
+    updateBoards(response.data);
     
     // logic here
     setColorSelected(null);
@@ -134,9 +143,9 @@ function CreateBoardPopoverComponent({
                   style={{
                     background: elem.board
                   }}
-                  onClick={() => handleColorClick(elem.board)}
+                  onClick={() => handleColorClick(elem)}
                 >
-                  {colorSelected && colorSelected === elem.board && (
+                  {colorSelected && colorSelected.board === elem.board && (
                     <CheckIcon 
                       sx={{
                         color: 'white'

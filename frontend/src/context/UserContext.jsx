@@ -6,7 +6,6 @@ const UserContext = createContext();
 export function UserProvider({ children }) {
   
   const [user, setUser] = useState(null);
-  const [workspaces, setWorkspaces] = useState([]);
 
   const updateUser = (userInfo) => {
     console.log('updateUser here. Heres yuour info:');
@@ -36,7 +35,6 @@ export function UserProvider({ children }) {
         user, 
         updateUser, 
         clearUser, 
-        workspaces, 
         setUserInfo
       }}
     >
