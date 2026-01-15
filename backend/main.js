@@ -4,6 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import authRouter from './routes/auth.js';
 import workspaceRouter from './routes/workspace.js';
+import boardsRouter from './routes/boards.js';
 import { requireAuth } from './middleware/requireAuth.js';
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(cors({
 
 app.use('/auth', authRouter);
 app.use('/workspace', workspaceRouter);
+app.use('/boards', boardsRouter);
 
 app.get('/me', requireAuth, (req,res) => {
   console.log('/me called.');
