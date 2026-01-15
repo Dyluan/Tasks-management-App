@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import cors from 'cors';
 import express from 'express';
-import jwt from 'jsonwebtoken';
 import authRouter from './routes/auth.js';
 import workspaceRouter from './routes/workspace.js';
 import { requireAuth } from './middleware/requireAuth.js';
@@ -10,7 +9,6 @@ import { requireAuth } from './middleware/requireAuth.js';
 dotenv.config();
 
 const PORT = Number(process.env.PORT);
-const BASE_URL = `http://localhost:${PORT}`;
 
 const app = express();
 

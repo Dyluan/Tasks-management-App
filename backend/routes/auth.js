@@ -215,18 +215,20 @@ router.get('/google/callback', async (req, res) => {
 // password: password
 router.post('/register', async (req, res) => {
 
-  try {
-    console.log('Hello from /register. What can I do for you ?');
-    console.log(req.body);
+  const client = await pool.connect();
 
+  try {
+    await client.query('BEGIN');
+    
     const email = req.body.email;
-    const result = await pool.query(
+    const result = await client.query(
       `SELECT * FROM users WHERE email = $1`
     , [email]);
 
     if (result.rows.length > 0) {
       console.log('Oops, un tel user existe déjà');
       // I should maybe use another status code
+      await client.query('ROLLBACK');
       res.status(409).send('Email address already in use!');
       return;
     }
@@ -234,13 +236,19 @@ router.post('/register', async (req, res) => {
     const username = req.body.username;
     const passwordHash = await bcrypt.hash(req.body.password, SALT_ROUNDS);
 
-    const newUser = await pool.query(
+    const newUser = await client.query(
       `INSERT INTO users(name, email, password_hash) VALUES($1, $2, $3)
       RETURNING *`,
       [username, email, passwordHash]
     );
 
     const user = newUser.rows[0];
+
+    // Create default workspace for new user
+    await client.query(
+      `INSERT INTO workspaces (title, owner_id) VALUES($1, $2)`,
+      ['My Workspace', user.id]
+    );
 
     const token = jwt.sign(
       {
@@ -254,19 +262,19 @@ router.post('/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // If user is created, returns the user and the jwt token
-    // THIS FUNCTION IS WRONG. SHOULD ONLY RETURN THE TOKEN
     res.status(200).json(
       {
         token: token,
       }
     );
 
-    // res.redirect(`http://localhost:3000/home?token=${token}`);
-
+    await client.query('COMMIT');
   } catch(err) {
+    await client.query('ROLLBACK');
     console.log(err);
     res.status(500).send('Registration failed lol');
+  } finally {
+    client.release();
   }
   
 })

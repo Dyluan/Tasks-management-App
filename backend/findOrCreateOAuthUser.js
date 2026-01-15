@@ -42,6 +42,7 @@ export async function findOrCreateOAuthUser({
     );
 
     let user;
+    let isNewUser = false;
 
     if (userRes.rows.length > 0) {
       user = userRes.rows[0];
@@ -57,6 +58,7 @@ export async function findOrCreateOAuthUser({
       );
 
       user = newUser.rows[0];
+      isNewUser = true;
     }
 
     // Create auth identity
@@ -68,6 +70,17 @@ export async function findOrCreateOAuthUser({
       `,
       [user.id, provider, providerUserId]
     );
+
+    // Create default workspace for new users
+    if (isNewUser) {
+      await client.query(
+        `
+        INSERT INTO workspaces (title, owner_id)
+        VALUES ($1, $2)
+        `,
+        ['My Workspace', user.id]
+      );
+    }
 
     await client.query('COMMIT');
     return user;
