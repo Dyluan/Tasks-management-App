@@ -77,9 +77,58 @@ router.put('/:id', requireAuth, async (req, res) => {
 
     console.log('Edited workspace: ', JSON.stringify(result.rows[0]));
     res.json(result.rows[0]);
-  }catch(err) {
+  } catch(err) {
     console.error(err);
     res.status(500).send('Editing workspace title failed lol');
+  }
+})
+
+router.patch('/:id', requireAuth, async (req, res) => {
+  console.log('patch   /workspapces/id');
+  try {
+    const allowedFields = ['title', 'theme', 'members'];
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(req.body)) {
+      if (!allowedFields.includes(key)) continue;
+
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+
+      index ++;
+    };
+
+    // prevents empty requests which will crash the server
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const owner = req.user.sub;
+    const workspace_id = req.params.id;
+
+    values.push(workspace_id, owner);
+
+    const query = `
+      UPDATE workspaces
+      SET ${updates.join(', ')}
+      WHERE id = $${index} AND owner_id = $${index +1}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Updating board failed lol');
   }
 })
 

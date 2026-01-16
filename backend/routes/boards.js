@@ -63,7 +63,7 @@ router.get('/:id', requireAuth, async(req, res) => {
   console.log('/boards/id');
   try {
     const userId = req.user.sub;
-    const board_id = req.query.id;
+    const board_id = req.params.id;
 
     console.log('user: boardID');
     console.log(userId, board_id);
@@ -71,10 +71,10 @@ router.get('/:id', requireAuth, async(req, res) => {
     // TODO: fetch columns, cards
     const result = await pool.query(
       `SELECT * FROM boards WHERE owner_id = $1 AND id = $2`
-    , [userId, workspace_id]);
+    , [userId, board_id]);
 
     if (result.rows.length > 0) {
-      const boards = result.rows;
+      const boards = result.rows[0];
       res.send(boards);
     } else {
       console.log('No board found');
@@ -82,7 +82,59 @@ router.get('/:id', requireAuth, async(req, res) => {
     }
   } catch(err) {
     console.error(err);
-    res.status(500).send('Fetching workspaces failed lol');
+    res.status(500).send('Getting board data failed lol');
+  }
+})
+
+router.patch('/:id', requireAuth, async(req, res) => {
+  console.log('put  /boards/id');
+  try {
+
+    const allowedFields = ['name', 'colors'];
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(req.body)) {
+      // prevents user from making malicious requests
+      if (!allowedFields.includes(key)) continue;
+
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+
+      index ++;
+    };
+
+    // prevents empty requests which will crash the server
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+
+    const owner = req.user.sub;
+    const board_id = req.params.id;
+
+    values.push(board_id, owner);
+
+    const query = `
+      UPDATE boards
+      SET ${updates.join(', ')}
+      WHERE id = $${index} AND owner_id = $${index + 1}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+    
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Updating board failed lol');
   }
 })
 
