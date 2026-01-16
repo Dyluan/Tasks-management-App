@@ -36,18 +36,8 @@ export function AppProvider({ children }) {
       updates,
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    console.log('/edit ::', response.data);
 
-    const updatedWorkspace = { ...response.data };
-    
-    // Parse theme if it's a JSON string from the server
-    if (typeof updatedWorkspace.theme === 'string') {
-      try {
-        updatedWorkspace.theme = JSON.parse(updatedWorkspace.theme);
-      } catch (e) {
-        console.error('Failed to parse theme:', e);
-      }
-    }
+    const updatedWorkspace = response.data;
     
     // Update the workspace state if it's the current workspace
     setWorkspace(prev => prev.id === id ? { ...prev, ...updatedWorkspace } : prev);
@@ -110,16 +100,7 @@ export function AppProvider({ children }) {
         });
         
         // Parse theme for each workspace if it's a JSON string
-        const workspaces = response.data.map(ws => {
-          if (typeof ws.theme === 'string') {
-            try {
-              return { ...ws, theme: JSON.parse(ws.theme) };
-            } catch (e) {
-              return ws;
-            }
-          }
-          return ws;
-        });
+        const workspaces = response.data;
         
         setWorkspaceList(workspaces);
         setWorkspace(workspaces[0]);
