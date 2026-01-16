@@ -7,7 +7,6 @@ const AppContext = createContext();
 export function AppProvider({ children }) {
   
   // We will store our data here: board, workspace,..
-
   const { user } = useUser();
 
   const [workspace, setWorkspace] = useState({});
@@ -30,6 +29,33 @@ export function AppProvider({ children }) {
       }
     );
     console.log(response.data);
+  }
+
+  const editWorkspace = async (id, updates) => {
+    const response = await axios.patch(`http://localhost:5500/workspace/${id}`, 
+      updates,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log('/edit ::', response.data);
+
+    const updatedWorkspace = { ...response.data };
+    
+    // Parse theme if it's a JSON string from the server
+    if (typeof updatedWorkspace.theme === 'string') {
+      try {
+        updatedWorkspace.theme = JSON.parse(updatedWorkspace.theme);
+      } catch (e) {
+        console.error('Failed to parse theme:', e);
+      }
+    }
+    
+    // Update the workspace state if it's the current workspace
+    setWorkspace(prev => prev.id === id ? { ...prev, ...updatedWorkspace } : prev);
+    
+    // Update the workspace in workspaceList
+    setWorkspaceList(prev => prev.map(ws => 
+      ws.id === id ? { ...ws, ...updatedWorkspace } : ws
+    ));
   }
 
   const createWorkspace = async (title, description) => {
@@ -58,6 +84,12 @@ export function AppProvider({ children }) {
     setBoards(prev => [...prev, newBoard]);
   }
 
+  const updateBoard = (boardId, updatedData) => {
+    setBoards(prev => prev.map(board => 
+      board.id === boardId ? { ...board, ...updatedData } : board
+    ));
+  }
+
   const getBoard = async (id) => {
     const response = await axios.get(`http://localhost:5500/boards/${id}`, {
       headers: {
@@ -65,7 +97,7 @@ export function AppProvider({ children }) {
       }
     });
     console.log('/id: response:', response.data);
-
+    return response.data;
   }
 
   useEffect(() => {
@@ -76,10 +108,24 @@ export function AppProvider({ children }) {
             Authorization: `Bearer ${token}`
           }
         });
-        setWorkspaceList(response.data);
-        setWorkspace(response.data[0]);
+        
+        // Parse theme for each workspace if it's a JSON string
+        const workspaces = response.data.map(ws => {
+          if (typeof ws.theme === 'string') {
+            try {
+              return { ...ws, theme: JSON.parse(ws.theme) };
+            } catch (e) {
+              return ws;
+            }
+          }
+          return ws;
+        });
+        
+        setWorkspaceList(workspaces);
+        setWorkspace(workspaces[0]);
 
-        fetchWorkspaceBoards(response.data[0].id);
+        // fetch all the boards linked to that workspace id
+        fetchWorkspaceBoards(workspaces[0].id);
       }
     };
     
@@ -96,7 +142,9 @@ export function AppProvider({ children }) {
         fetchWorkspaceBoards,
         boards,
         updateBoards,
-        getBoard
+        updateBoard,
+        getBoard,
+        editWorkspace
       }}  
     >
       { children }

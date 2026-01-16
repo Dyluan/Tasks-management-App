@@ -24,12 +24,11 @@ function HomePage () {
 
   const { user, setUserInfo } = useUser();
   const { 
-    workspace, 
-    workspaceList, 
+    workspace,
     createWorkspace, 
     editWorkspaceTitle,
     boards,
-    getBoard
+    editWorkspace
     } = useApp();
   
   const params = new URLSearchParams(window.location.search);
@@ -73,6 +72,10 @@ function HomePage () {
     setBoardPopoverAnchorEl(e.currentTarget);
   };
   const handleBoardPopoverClose = () => setBoardPopoverAnchorEl(null);
+
+  const handleBoardCardClick = (id) => {
+    navigate(`/board/${id}`);
+  }
 
   const [titleEdit, setTitleEdit] = useState(false);
   const [workspaceTitle, setWorkspaceTitle] = useState(workspace.title);
@@ -129,6 +132,12 @@ function HomePage () {
     }
   ];
   const [theme, setTheme] = useState(themes[0]);
+
+  useEffect(() => {
+    if (workspace.theme) {
+      setTheme(workspace.theme)
+    };
+  }, [workspace.theme]);
 
   const [openModal, setOpenModal] = useState(false);
   const handleModalOpen = () => setOpenModal(true);
@@ -198,7 +207,10 @@ function HomePage () {
         <List dense="true">
           <ListItemButton 
             sx={{ pl: 4 }}
-            onClick={() => setTheme(themes[1])}
+            onClick={async () => {
+              setTheme(themes[1]);
+              editWorkspace(workspace.id, {theme: themes[1]})
+            }}
           >
             <ListItemIcon>
               <DarkModeIcon />
@@ -207,7 +219,10 @@ function HomePage () {
           </ListItemButton>
           <ListItemButton 
             sx={{ pl: 4 }}
-            onClick={() => setTheme(themes[0])}
+            onClick={async () => {
+              setTheme(themes[0]);
+              editWorkspace(workspace.id, {theme: themes[0]})
+            }}
           >
             <ListItemIcon>
               <LightModeIcon />
@@ -331,7 +346,10 @@ function HomePage () {
               <BoardCardComponent 
                 title={board.name}
                 backgroundColor={board.colors.board}
-                onClick={getBoard}
+                onClick={() => {
+                  // getBoard(board.id)
+                  handleBoardCardClick(board.id);
+                }}
               />
             ))}
             <div 

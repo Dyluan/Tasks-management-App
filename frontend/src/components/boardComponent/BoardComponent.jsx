@@ -1,6 +1,6 @@
 import ColumnListComponent from "../columnListComponent/ColumnListComponent";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Board.module.css";
 import add from '../../assets/add_white.png';
 import verticalDots from '../../assets/vertical_dots.svg';
@@ -9,7 +9,7 @@ import leftArrow from '../../assets/left_arrow.svg';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import { v4 as uuidv4 } from 'uuid';
-import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor, pointerWithin, rectIntersection } from "@dnd-kit/core";
+import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensors, useSensor } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import Popover from '@mui/material/Popover';
 import Drawer from '@mui/material/Drawer';
@@ -22,8 +22,41 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import { useApp } from "../../context/AppContext";
+import axios from "axios";
 
 function BoardComponent() {
+
+  const { getBoard, updateBoard } = useApp();
+  const { id } = useParams();
+  const [board, setBoard] = useState({});
+  const token = localStorage.getItem('jwt');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const boardData = await getBoard(id);
+      setBoard(boardData);
+      console.log('Yay, new board data:', boardData);
+    };
+    fetchData();
+  }, [id]);
+
+  // takes 2 args: name and colors, and sends the request with appropriate data
+  // allows me to either change the name or the color or both
+  const saveChanges = async({name=boardName, colors=boardTheme}) => {
+    const response = await axios.patch(`http://localhost:5500/boards/${board.id}`, 
+      {
+        name: name,
+        colors: colors
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    console.log(response.data);
+    
+    // Update the boards state in AppContext
+    updateBoard(board.id, { name, colors });
+  }
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handlePopoverClose = () => setAnchorEl(null);
@@ -114,6 +147,12 @@ function BoardComponent() {
     }
   ];
   const [boardTheme, setBoardTheme] = useState(boardThemes[0]);
+
+  useEffect(() => {
+    if (board.colors) {
+      setBoardTheme(board.colors);
+    }
+  }, [board.colors]);
   
   const [colorList, setColorList] = useState([
     {id: 0, color: '#d6f5e3', text:''},
@@ -242,6 +281,13 @@ function BoardComponent() {
   const [boardName, setBoardName] = useState('My Board');
   const prevBoardNameRef = useRef(boardName);
   const titleInputRef = useRef(null);
+
+  // updates board title with data from backend
+  useEffect(() => {
+    if (board.name) {
+      setBoardName(board.name);
+    }
+  }, [board.name]);
   
   useEffect(() => {
     if (editingTitle && titleInputRef.current) {
@@ -255,12 +301,14 @@ function BoardComponent() {
     setEditingTitle(true);
   }
 
-  function saveTitle(newTitle) {
+  const saveTitle = async (newTitle) => {
     const trimmed = String(newTitle).trim();
     if (trimmed.length === 0) {
       setBoardName(prevBoardNameRef.current);
     } else {
       setBoardName(trimmed);
+      // calling server to change the name
+      saveChanges({name: trimmed});
     }
     setEditingTitle(false);
   }

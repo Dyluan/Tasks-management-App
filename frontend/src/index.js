@@ -16,7 +16,8 @@ root.render(
       <AppProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<BoardComponent />} />
+            {/* <Route path="/" element={<BoardComponent />} /> */}
+            <Route path='/board/:id' element={<BoardComponent />} />
             <Route path='/home' element={<HomePage />} />
             <Route path='/login' element={<LoginPage />} />
           </Routes>

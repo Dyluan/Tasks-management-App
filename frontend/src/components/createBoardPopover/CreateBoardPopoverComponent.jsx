@@ -14,7 +14,7 @@ function CreateBoardPopoverComponent({
   workspace_id
   }) {
 
-  const { updateBoards } = useApp();
+  const { updateBoards, fetchWorkspaceBoards } = useApp();
 
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
@@ -40,7 +40,9 @@ function CreateBoardPopoverComponent({
     // DO SOMETHING WITH RESPONSE HERE
     console.log('/boards/new ::', response.data);
     // TODO: SHOULD HANDLE BAD RESPONSES HERE
-    updateBoards(response.data);
+    
+    // Refetch boards to ensure state is in sync with server
+    await fetchWorkspaceBoards(workspace_id);
     
     // logic here
     setColorSelected(null);
@@ -57,50 +59,62 @@ function CreateBoardPopoverComponent({
   };
   const boardThemes = [
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #f6b365, #fda085)',
       header: 'linear-gradient(135deg, #f46b45, #eea849)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #bbd2c5, #536976, #292e49)',
       header: 'linear-gradient(to right, #1f2337, #292e49, #3a475a',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #f7f8f8, #acbb78)',
       header: 'linear-gradient(to right, #7d8f4e, #acbb78, #cfd8b6)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
       header: 'linear-gradient(135deg, #ff758c, #ff7eb3)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #43cea2, #185a9d)',
       header: 'linear-gradient(135deg, #1d2b64, #f8cdda)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #ff512f, #dd2476)',
       header: 'linear-gradient(135deg, #cb2d3e, #ef473a)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(to left, #ffefba, #ffffff)',
       header: 'linear-gradient(to right, #f2d98b, #ffefba, #fff6d8)',
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #56ab2f, #a8e063)',
       header: 'linear-gradient(135deg, #134e5e, #71b280)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #e0eafc, #cfdef3)',
       header: 'linear-gradient(135deg, #373b44, #4286f4)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #cfd9df, #e2ebf0)',
       header: 'linear-gradient(135deg, #005c97, #363795)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #2c3e50, #bdc3c7)',
       header: 'linear-gradient(135deg, #000428, #004e92)'
     },
     {
+      type: 'gradient',
       board: 'linear-gradient(135deg, #d7d2cc, #304352)',
       header: 'linear-gradient(135deg, #232526, #414345)'
     }
