@@ -386,6 +386,7 @@ function BoardComponent() {
 
   const handleBoardColorChange = (newTheme) => {
     setBoardTheme(newTheme);
+    saveChanges({colors: newTheme});
   }
 
   // this part of the code is relative to the dnd-kit library

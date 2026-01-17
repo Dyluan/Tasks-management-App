@@ -3,6 +3,7 @@ import BoardCardComponent from '../../components/boardCardComponent/BoardCardCom
 import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
 import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
+import DisplayWorkspacesComponent from '../../components/displayWorkspacesComponent/DisplayWorkSpacesComponent';
 import { useUser } from '../../context/UserContext';
 import { useApp } from '../../context/AppContext';
 import siteLogo from '../../assets/site_logo.svg';
@@ -25,6 +26,7 @@ function HomePage () {
   const { user, setUserInfo } = useUser();
   const { 
     workspace,
+    workspaceList,
     createWorkspace, 
     editWorkspaceTitle,
     boards,
@@ -282,6 +284,12 @@ function HomePage () {
             />
           )}
         </div>
+      </div>
+      <div className={styles.left}>
+          <DisplayWorkspacesComponent 
+            workspaces={workspaceList}
+            theme={theme}
+          />
       </div>
       <div className={styles.main}> 
         {/* User settings Popover */}
