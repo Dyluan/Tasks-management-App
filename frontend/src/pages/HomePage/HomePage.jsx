@@ -19,7 +19,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function HomePage () {
 
@@ -30,11 +30,21 @@ function HomePage () {
     createWorkspace, 
     editWorkspaceTitle,
     boards,
-    editWorkspace
+    editWorkspace,
+    getWorkspace
     } = useApp();
   
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
+
+  // parses the workspace's id from the url and calls a function to update workspace infos
+  // to match with workspace url
+  const {id} = useParams();
+  useEffect(() => {
+    if (id) {
+      getWorkspace(id);
+    }
+  }, [id]);
 
   // useEffect called because login with socials redirects to homePage
   useEffect(() => {
@@ -268,7 +278,7 @@ function HomePage () {
         createWorkspace={createWorkspace}
       />
       <div className={styles.header}>
-        <div className={styles.left}>
+        <div className={styles.leftHeader}>
           <img 
             src={siteLogo} 
             alt="site logo" 
@@ -285,88 +295,90 @@ function HomePage () {
           )}
         </div>
       </div>
-      <div className={styles.left}>
-          <DisplayWorkspacesComponent 
-            workspaces={workspaceList}
-            theme={theme}
-          />
-      </div>
-      <div className={styles.main}> 
-        {/* User settings Popover */}
-        <Popover
-          open={popoverOpen}
-          onClose={handlePopoverClose}
-          anchorEl={popoverAnchorEl}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          {popoverContent}
-        </Popover>
-        {/* create new Board Popover */}
-        <CreateBoardPopoverComponent 
-          open={boardPopoverOpen}
-          anchorEl={boardPopoverAnchorEl}
-          onClose={handleBoardPopoverClose}
-          workspace_id={workspace.id}
-        />
-        <div className={styles.workspaceTitle}>
-          {titleEdit ? (
-            <input 
-              ref={titleInputRef}
-              className={styles.titleInput}
-              defaultValue={workspaceTitle}
-              onKeyDown={onTitleKeyDown}
-              onBlur={(e) => saveTitle(e.target.value)}
-              aria-label='Edit workspace title'
+      <div className={styles.mainContent}>
+        <div className={styles.left}>
+           <DisplayWorkspacesComponent 
+              workspaces={workspaceList}
+              theme={theme}
             />
-          ) : (
-            <>
-            {/* TODO: */}
-              {workspaceTitle}
-            </>
-          )}
-          <button 
-            onClick={() => startEditTitle(true)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEditTitle(); }}
-          >
-            <ModeEditIcon 
-              sx={{
-                height: '16px',
-                width: '16px',
-                color: theme.theme === 'light'? 'black': 'white'
-              }}
-            />
-          </button>
         </div>
-        <div className={styles.separatingLine}></div>
-        <div className={styles.boardContainer}>
-          <div className={styles.boardTitle}>
-            Your boards
-          </div>
-          <div className={styles.boards}>
-            {boards.map(board => (
-              <BoardCardComponent 
-                title={board.name}
-                backgroundColor={board.colors.board}
-                onClick={() => {
-                  // getBoard(board.id)
-                  handleBoardCardClick(board.id);
+        <div className={styles.main}> 
+          {/* User settings Popover */}
+          <Popover
+            open={popoverOpen}
+            onClose={handlePopoverClose}
+            anchorEl={popoverAnchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+            {popoverContent}
+          </Popover>
+          {/* create new Board Popover */}
+          <CreateBoardPopoverComponent 
+            open={boardPopoverOpen}
+            anchorEl={boardPopoverAnchorEl}
+            onClose={handleBoardPopoverClose}
+            workspace_id={workspace.id}
+          />
+          <div className={styles.workspaceTitle}>
+            {titleEdit ? (
+              <input 
+                ref={titleInputRef}
+                className={styles.titleInput}
+                defaultValue={workspaceTitle}
+                onKeyDown={onTitleKeyDown}
+                onBlur={(e) => saveTitle(e.target.value)}
+                aria-label='Edit workspace title'
+              />
+            ) : (
+              <>
+              {/* TODO: */}
+                {workspaceTitle}
+              </>
+            )}
+            <button 
+              onClick={() => startEditTitle(true)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startEditTitle(); }}
+            >
+              <ModeEditIcon 
+                sx={{
+                  height: '16px',
+                  width: '16px',
+                  color: theme.theme === 'light'? 'black': 'white'
                 }}
               />
-            ))}
-            <div 
-              className={styles.defaultBoardContainer}
-              onClick={(e) => handleBoardPopoverClick(e)}
-            >
-              <BoardCardComponent 
-                isDefault={true} 
-              />
+            </button>
+          </div>
+          <div className={styles.separatingLine}></div>
+          <div className={styles.boardContainer}>
+            <div className={styles.boardTitle}>
+              Your boards
+            </div>
+            <div className={styles.boards}>
+              {boards.map(board => (
+                <BoardCardComponent 
+                  title={board.name}
+                  backgroundColor={board.colors.board}
+                  onClick={() => {
+                    // getBoard(board.id)
+                    handleBoardCardClick(board.id);
+                  }}
+                />
+              ))}
+              <div 
+                className={styles.defaultBoardContainer}
+                onClick={(e) => handleBoardPopoverClick(e)}
+              >
+                <BoardCardComponent 
+                  isDefault={true} 
+                />
+              </div>
             </div>
           </div>
         </div>

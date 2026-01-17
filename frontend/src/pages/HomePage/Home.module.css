@@ -3,14 +3,19 @@
 .container {
   height: 100vh;
   box-sizing: border-box;
-  /* background-color: rgba(245, 245, 220, 0.575); */
 }
 .main {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: "Noto Sans";
-  padding: 48px 30vw 0 30vw;
+  padding: 48px 2rem 0 2rem;
 }
 .header {
   display: flex;
@@ -21,16 +26,16 @@
   padding: 12px;
   box-sizing: border-box;
 }
-.left {
+.leftHeader {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.left img, .right img {
+.leftHeader img, .right img {
   height: 48px;
   width: 48px;
 }
-.left img:hover{
+.leftHeader img:hover{
   cursor: pointer;
   transform: translateY(-1px)
 }
@@ -103,4 +108,13 @@
 }
 .boardPopoverHeader button:hover {
   cursor: pointer;
+}
+.mainContent {
+  position: relative;
+}
+.left {
+  position: absolute;
+  left: 0;
+  width: 260px;
+  padding-top: 48px;
 }

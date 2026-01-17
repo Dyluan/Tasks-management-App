@@ -19,6 +19,7 @@ root.render(
             {/* <Route path="/" element={<BoardComponent />} /> */}
             <Route path='/board/:id' element={<BoardComponent />} />
             <Route path='/home' element={<HomePage />} />
+            <Route path='/workspace/:id' element={<HomePage />} />
             <Route path='/login' element={<LoginPage />} />
           </Routes>
         </BrowserRouter>

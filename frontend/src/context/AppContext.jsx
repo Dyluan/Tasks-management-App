@@ -29,6 +29,15 @@ export function AppProvider({ children }) {
       }
     );
     console.log(response.data);
+  };
+
+  const getWorkspace = async (id) => {
+    const response = await axios.get(`http://localhost:5500/workspace/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log('My workspace::', response.data);
+    setWorkspace(response.data);
   }
 
   const editWorkspace = async (id, updates) => {
@@ -125,7 +134,8 @@ export function AppProvider({ children }) {
         updateBoards,
         updateBoard,
         getBoard,
-        editWorkspace
+        editWorkspace,
+        getWorkspace
       }}  
     >
       { children }
