@@ -28,10 +28,10 @@ function HomePage () {
     workspace,
     workspaceList,
     createWorkspace, 
-    editWorkspaceTitle,
     boards,
     editWorkspace,
-    getWorkspace
+    getWorkspace,
+    fetchWorkspaceBoards
     } = useApp();
   
   const params = new URLSearchParams(window.location.search);
@@ -43,6 +43,7 @@ function HomePage () {
   useEffect(() => {
     if (id) {
       getWorkspace(id);
+      fetchWorkspaceBoards(id);
     }
   }, [id]);
 
@@ -125,7 +126,8 @@ function HomePage () {
     if (trimmed.length === 0) {
       setWorkspaceTitle(prevWorkspaceTitleRef.current);
     } else {
-      editWorkspaceTitle(trimmed, workspace.id);
+      // editWorkspaceTitle(trimmed, workspace.id);
+      editWorkspace(workspace.id, {title: trimmed})
       setWorkspaceTitle(trimmed);
     }
     setTitleEdit(false);

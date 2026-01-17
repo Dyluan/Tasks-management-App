@@ -15,22 +15,6 @@ export function AppProvider({ children }) {
 
   const token = localStorage.getItem('jwt');
 
-  const editWorkspaceTitle = async (title, id) => {
-    console.log('edit::', title, id);
-    console.log(workspaceList);
-    console.log('user::', user);
-    const response = await axios.put(`http://localhost:5500/workspace/${id}`,
-      {
-        title: title,
-        id: id,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-    console.log(response.data);
-  };
-
   const getWorkspace = async (id) => {
     const response = await axios.get(`http://localhost:5500/workspace/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -128,7 +112,6 @@ export function AppProvider({ children }) {
         workspace,
         workspaceList,
         createWorkspace,
-        editWorkspaceTitle,
         fetchWorkspaceBoards,
         boards,
         updateBoards,
