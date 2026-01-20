@@ -56,9 +56,26 @@ export async function findOrCreateOAuthUser({
         `,
         [name, email, avatar, 'OAUTH']   // no real password
       );
-
       user = newUser.rows[0];
       isNewUser = true;
+
+      // Create default workspace for new users
+      const createDefaultWorkspace = await client.query(
+        `
+        INSERT INTO workspaces (title, owner_id)
+        VALUES ($1, $2)
+        RETURNING id
+        `,
+        ['My Workspace', user.id]
+      );
+      const defaultWorkspaceId = createDefaultWorkspace.rows[0].id;
+
+      const insertDefaultWorkspace = await client.query(
+        `UPDATE users
+        SET current_workspace = $1
+        WHERE id = $2`,
+        [defaultWorkspaceId, user.id]
+      );
     }
 
     // Create auth identity
@@ -70,17 +87,6 @@ export async function findOrCreateOAuthUser({
       `,
       [user.id, provider, providerUserId]
     );
-
-    // Create default workspace for new users
-    if (isNewUser) {
-      await client.query(
-        `
-        INSERT INTO workspaces (title, owner_id)
-        VALUES ($1, $2)
-        `,
-        ['My Workspace', user.id]
-      );
-    }
 
     await client.query('COMMIT');
     return user;

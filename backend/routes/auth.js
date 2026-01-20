@@ -245,9 +245,18 @@ router.post('/register', async (req, res) => {
     const user = newUser.rows[0];
 
     // Create default workspace for new user
-    await client.query(
-      `INSERT INTO workspaces (title, owner_id) VALUES($1, $2)`,
+    const defaultWorkspaceId = await client.query(
+      `INSERT INTO workspaces (title, owner_id) VALUES($1, $2)
+      RETURNING id`,
       ['My Workspace', user.id]
+    );
+
+    // Sets the current_workspace to newly created default workspace
+    const insertDefaultWorkspace = await client.query(
+      `UPDATE users
+      SET current_workspace = $1
+      WHERE id = $2`,
+      [defaultWorkspaceId.rows[0].id, user.id]
     );
 
     const token = jwt.sign(

@@ -111,7 +111,6 @@ router.patch('/:id', requireAuth, async(req, res) => {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-
     const owner = req.user.sub;
     const board_id = req.params.id;
 
@@ -138,4 +137,56 @@ router.patch('/:id', requireAuth, async(req, res) => {
   }
 })
 
+router.get('/:id/columns', requireAuth, async (req, res) => {
+  console.log('/columns');
+  try {
+    const boardId = req.params.id;
+
+    const result = await pool.query(
+      `SELECT * FROM columns WHERE board_id = $1`,
+      [boardId]
+    );
+
+    if (result.rows.length > 0) {
+      const columns = result.rows;
+      res.status(200).send(columns);
+    } else {
+      console.log('Columns not found');
+      res.send([]);
+    }
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Fetching columns failed lol');
+  }
+})
+
+// creates a default column each time the Add column button is clicked
+router.post('/:id/columns/new', requireAuth, async (req, res) => {
+  console.log('/columns/new');
+  try {
+    const boardId = req.params.id;
+
+    const position = req.body.position;
+
+    const name = 'New Column';
+    const color = 'rgb(245, 245, 245)';
+
+    const result = await pool.query(
+      `INSERT INTO columns (name, color, board_id, position) VALUES ($1, $2, $3, $4) 
+      RETURNING *`,
+      [name, color, boardId, position]
+    );
+
+    if (result.rows.length > 0) {
+      const newColumn = result.rows[0];
+      res.status(201).json(newColumn);
+    } else {
+      res.status(400).json({ success: false, message: "Insert failed" });
+    }
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Creating new column failed lol');
+  }
+})
 export default router;

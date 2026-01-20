@@ -1,7 +1,5 @@
 import express from 'express';
-import axios from 'axios';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
 import pool from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
@@ -55,9 +53,78 @@ router.post('/new', requireAuth, async (req, res) => {
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/current', requireAuth, async (req, res) => {
+  console.log('/workspaces/current');
+  try {
+    const userId = req.user.sub;
 
+    const result = await pool.query(
+      `
+      SELECT w.*
+      FROM workspaces w
+      INNER JOIN users u
+        ON u.current_workspace = w.id
+      WHERE u.id = $1
+      `,
+      [userId]
+    );
+    const workspace = result.rows[0];
+
+    res.status(200).send(workspace);
+
+  }catch(err) {
+    console.error(err);
+    res.status(500).send('Fetching default workspace failed lol');
+  }
+});
+
+router.post('/current', requireAuth, async (req, res) => {
+  console.log('/workspaces/current');
+  try {
+    const userId = req.user.sub;
+    const workspace_id = req.body.workspace_id;
+
+    const result = await pool.query(
+    `  
+    UPDATE users
+    SET current_workspace = $1
+    WHERE id = $2
+    `, [workspace_id, userId]);
+
+    if (result.rowCount > 0) {
+      res.status(200).json({ success: true, message: 'current workspace successfully set'});
+    } else {
+      res.status(400).json({ success: false, message: 'current workspace NOT set'});
+    }
+
+  }catch(err) {
+    console.error(err);
+    res.status(500).send('Setting default workspace failed lol');
+  }
 })
+
+router.get('/:id', requireAuth, async (req, res) => {
+  console.log('/workspace/id');
+  try {
+    const userId = req.user.sub;
+    const workspace_id = req.params.id;
+
+    const result = await pool.query(
+      `SELECT * FROM workspaces WHERE owner_id = $1 AND id = $2`
+    , [userId, workspace_id]);
+
+    if (result.rows.length > 0) {
+      const workspace = result.rows[0];
+      res.status(200).send(workspace);
+    } else {
+      console.log('No workspace found');
+      res.send([]);
+    }
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Getting workspace data failed lol');
+  }
+});
 
 router.put('/:id', requireAuth, async (req, res) => {
   console.log('/id CALLED');
@@ -130,6 +197,6 @@ router.patch('/:id', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).send('Updating board failed lol');
   }
-})
+});
 
 export default router;
