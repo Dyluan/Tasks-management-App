@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 function DisplayWorkspacesComponent({
   workspaces,
-  theme
+  theme,
+  setCurrentWorkspace
 }) {
 
   const navigate = useNavigate();
@@ -17,24 +18,33 @@ function DisplayWorkspacesComponent({
           <ListSubheader
           sx={{
             backgroundColor: 'transparent',
-            color: theme.textColor
+            color: theme.textColor,
+            fontFamily: 'Noto Sans'
           }}
           >
-            Workspaces
+            Your workspaces
           </ListSubheader>
         }
-        
+        dense='true'
       >
         {workspaces.map(workspace => (
           <ListItemButton
-            onClick={() => navigate(`/workspace/${workspace.id}`)}
+            sx={{
+              borderRadius: '6px'
+            }}  
+            onClick={() => {
+              navigate(`/workspace/${workspace.id}`)
+              setCurrentWorkspace(workspace.id)
+            }}
           >
             <ListItemIcon>
               <WorkIcon 
                 sx={{color: theme.textColor}}
               />
             </ListItemIcon>
-            <ListItemText primary={workspace.title} />
+            <ListItemText 
+              primary={workspace.title} 
+            />
           </ListItemButton>
         ))}
       </List>

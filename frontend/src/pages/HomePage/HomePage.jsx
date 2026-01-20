@@ -31,7 +31,8 @@ function HomePage () {
     boards,
     editWorkspace,
     getWorkspace,
-    fetchWorkspaceBoards
+    fetchWorkspaceBoards,
+    setCurrentWorkspace
     } = useApp();
   
   const params = new URLSearchParams(window.location.search);
@@ -302,6 +303,7 @@ function HomePage () {
            <DisplayWorkspacesComponent 
               workspaces={workspaceList}
               theme={theme}
+              setCurrentWorkspace={setCurrentWorkspace}
             />
         </div>
         <div className={styles.main}> 

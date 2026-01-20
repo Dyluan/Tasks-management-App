@@ -17,7 +17,7 @@ function WorkspaceModalComponent( {
 
   const handleSaveClick = () => {
     createWorkspace(modalTitle, modalDescription);
-
+    onClose();
   }
 
   // TODO: redirect user to newly created workspace

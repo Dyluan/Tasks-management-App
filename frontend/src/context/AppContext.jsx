@@ -15,12 +15,30 @@ export function AppProvider({ children }) {
 
   const token = localStorage.getItem('jwt');
 
+  // fetches the current user's workspace
+  const getCurrentWorkspace = async () => {
+    const response = await axios.get(`http://localhost:5500/workspace/current`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const currentWorkspace = response.data;
+    setWorkspace(currentWorkspace);
+    return currentWorkspace;
+  }
+  const setCurrentWorkspace = async (workspace_id) => {
+    const response = await axios.post(`http://localhost:5500/workspace/current`, {
+      workspace_id: workspace_id
+    }, 
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  // gets the user's workspace by workspace id
   const getWorkspace = async (id) => {
     const response = await axios.get(`http://localhost:5500/workspace/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    console.log('My workspace::', response.data);
     setWorkspace(response.data);
   }
 
@@ -32,8 +50,8 @@ export function AppProvider({ children }) {
 
     const updatedWorkspace = response.data;
     
-    // Update the workspace state if it's the current workspace
-    setWorkspace(prev => prev.id === id ? { ...prev, ...updatedWorkspace } : prev);
+    // Update the workspace state
+    setWorkspace(updatedWorkspace);
     
     // Update the workspace in workspaceList
     setWorkspaceList(prev => prev.map(ws => 
@@ -92,14 +110,15 @@ export function AppProvider({ children }) {
           }
         });
         
-        // Parse theme for each workspace if it's a JSON string
         const workspaces = response.data;
         
         setWorkspaceList(workspaces);
-        setWorkspace(workspaces[0]);
+
+        // get current workspace ::
+        const currentWorkspace = await getCurrentWorkspace();
 
         // fetch all the boards linked to that workspace id
-        fetchWorkspaceBoards(workspaces[0].id);
+        fetchWorkspaceBoards(currentWorkspace.id);
       }
     };
     
@@ -118,7 +137,8 @@ export function AppProvider({ children }) {
         updateBoard,
         getBoard,
         editWorkspace,
-        getWorkspace
+        getWorkspace,
+        setCurrentWorkspace
       }}  
     >
       { children }

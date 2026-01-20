@@ -8,7 +8,6 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const updateUser = (userInfo) => {
-    console.log('updateUser here. Heres yuour info:');
     console.log(userInfo);
     setUser(userInfo);
   }
@@ -24,7 +23,6 @@ export function UserProvider({ children }) {
       }
     });
     const data = await response.json();
-    console.log('mys user:', data);
     setUser(data);
     return data;
   }

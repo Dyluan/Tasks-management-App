@@ -32,13 +32,66 @@ function BoardComponent() {
   const [board, setBoard] = useState({});
   const token = localStorage.getItem('jwt');
 
+  const [nbOfColumns, setNbOfColumns] = useState(0);
+
+  const [columns, setColumns] = useState([
+    {
+      id: uuidv4(), 
+      title: "Done", 
+      columnColor: '#f5f5f5', 
+      items: [
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
+      ]
+    }, 
+    {
+      id: uuidv4(), 
+      title: "To Do", 
+      columnColor: '#f5f5f5', 
+      items: [
+        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
+        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
+      ]
+    }
+  ]);
+
+  const newColumn = async() => {
+    const response = await axios.post(`http://localhost:5500/boards/${id}/columns/new`, 
+      {
+        position: nbOfColumns+1
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    console.log('my new column: ', response.data);
+    setNbOfColumns(nbOfColumns+1);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const boardData = await getBoard(id);
       setBoard(boardData);
       console.log('Yay, new board data:', boardData);
     };
+
+    const fetchColumns = async() => {
+      const response = await axios.get(`http://localhost:5500/boards/${id}/columns`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log('mes colonnes :', response.data);
+      // setColumns creating bugs right now
+      // TODO:
+      setColumns(response.data);
+      setNbOfColumns(response.data.length);
+    };
+
     fetchData();
+    fetchColumns();
   }, [id]);
 
   // takes 2 args: name and colors, and sends the request with appropriate data
@@ -250,27 +303,6 @@ function BoardComponent() {
     setColorList(prev => [...prev, newColor]);
   };
   
-  const [columns, setColumns] = useState([
-    {
-      id: uuidv4(), 
-      title: "Done", 
-      columnColor: '#f5f5f5', 
-      items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
-      ]
-    }, 
-    {
-      id: uuidv4(), 
-      title: "To Do", 
-      columnColor: '#f5f5f5', 
-      items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
-      ]
-    }
-  ]);
-  
   // Ref to track columns for collision detection
   const columnsRef = useRef(columns);
   useEffect(() => {
@@ -323,7 +355,7 @@ function BoardComponent() {
     if (e.key === 'Escape') cancelEdit();
   }
 
-  const addColumn = () => {
+  const addColumn = async () => {
     setColumns(prev => [...prev, {
       title: "New column", 
       columnColor: '#f5f5f5', 
@@ -331,6 +363,7 @@ function BoardComponent() {
       items: [
         {id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}
       ]);
+    newColumn();
   }
 
   const copyColumn = (column) => {
