@@ -57,49 +57,55 @@ function BoardComponent() {
 
   const newColumn = async() => {
     const response = await axios.post(`http://localhost:5500/boards/${id}/columns/new`, 
-      {
-        position: nbOfColumns+1
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      { position: nbOfColumns+1 },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log('my new column: ', response.data);
-    setNbOfColumns(nbOfColumns+1);
+    
+    // Return the new column data from server
+    return response.data;
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const boardData = await getBoard(id);
-      setBoard(boardData);
-      console.log('Yay, new board data:', boardData);
-
-      console.log('Calling my BIG function:');
-      const blabla = await axios.get(`http://localhost:5500/boards/${id}/all`, {
+      const response = await axios.get(`http://localhost:5500/boards/${id}/all`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      console.log('My BIG BOARD:', blabla.data);
-    };
+      
+      const boardData = response.data;
+      console.log('My BIG DATA:', boardData);
+      
+      // Set board data
+      setBoard({
+        id: boardData.id,
+        name: boardData.name,
+        colors: boardData.colors,
+        created_at: boardData.created_at
+      });
 
-    const fetchColumns = async() => {
-      const response = await axios.get(`http://localhost:5500/boards/${id}/columns`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      console.log('mes colonnes :', response.data);
-      // setColumns creating bugs right now
-      // TODO:
-      setColumns(response.data);
-      setNbOfColumns(response.data.length);
+      // Map columns and cards to the component's expected structure
+      const mappedColumns = boardData.columns.map(column => ({
+        id: column.id,
+        title: column.name,
+        columnColor: column.color,
+        position: column.position,
+        items: column.cards.map(card => ({
+          id: card.id,
+          cardName: card.title,
+          description: card.description || '',
+          comments: card.comments || [],
+          labels: [], // Initialize with empty labels array
+          position: card.position
+        }))
+      }));
+
+      setColumns(mappedColumns);
+      setNbOfColumns(mappedColumns.length);
     };
 
     fetchData();
-    fetchColumns();
   }, [id]);
 
   // takes 2 args: name and colors, and sends the request with appropriate data
@@ -117,7 +123,22 @@ function BoardComponent() {
     
     // Update the boards state in AppContext
     updateBoard(board.id, { name, colors });
-  }
+  };
+
+  const updateColumn = async(column_id, updates) => {
+    const response = await axios.patch(`http://localhost:5500/boards/column/${column_id}`, 
+      updates,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = response.data;
+    console.log('updated column:', data);
+  };
+
+  const deleteColumnFromServer = async(column_id) => {
+    await axios.delete(`http://localhost:5500/boards/column/${column_id}`, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  };
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handlePopoverClose = () => setAnchorEl(null);
@@ -364,14 +385,19 @@ function BoardComponent() {
   }
 
   const addColumn = async () => {
+    // First create the column on the server
+    const newColumnData = await newColumn();
+    
+    // Then add it to state with the real ID from the database
     setColumns(prev => [...prev, {
-      title: "New column", 
-      columnColor: '#f5f5f5', 
-      id: uuidv4(), 
-      items: [
-        {id: uuidv4(), cardName: 'Card Text'}, {id: uuidv4(), cardName: 'Another Card'}]}
-      ]);
-    newColumn();
+      id: newColumnData.id,
+      title: newColumnData.name,
+      columnColor: newColumnData.color,
+      position: newColumnData.position,
+      items: []
+    }]);
+    
+    setNbOfColumns(prev => prev + 1);
   }
 
   const copyColumn = (column) => {
@@ -409,6 +435,8 @@ function BoardComponent() {
           : col
       )
     );
+    // updates the column color server side
+    updateColumn(columnId, { color: newColor });
   };
 
   const updateColumnTitle = (columnId, newTitle) => {
@@ -419,10 +447,13 @@ function BoardComponent() {
           : col
       )
     );
+    // updates the column title server side
+    updateColumn(columnId, { name: newTitle });
   };
 
   const deleteColumn = (idToRemove) => {
     setColumns(prev => prev.filter(column => column.id !== idToRemove));
+    deleteColumnFromServer(idToRemove);
   };
 
   const handleBoardColorChange = (newTheme) => {
