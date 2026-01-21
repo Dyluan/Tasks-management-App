@@ -75,6 +75,14 @@ function BoardComponent() {
       const boardData = await getBoard(id);
       setBoard(boardData);
       console.log('Yay, new board data:', boardData);
+
+      console.log('Calling my BIG function:');
+      const blabla = await axios.get(`http://localhost:5500/boards/${id}/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log('My BIG BOARD:', blabla.data);
     };
 
     const fetchColumns = async() => {
