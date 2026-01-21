@@ -59,6 +59,86 @@ router.post('/new', requireAuth, async(req, res) => {
   }
 })
 
+router.get('/:id/all', requireAuth, async (req, res) => {
+  console.log('/id/all');
+  try {
+    const board_id = req.params.id;
+
+    const result = await pool.query(
+      `
+      SELECT
+        b.id,
+        b.name,
+        b.colors,
+        b.created_at,
+
+        COALESCE(
+          jsonb_agg(
+            jsonb_build_object(
+              'id', c.id,
+              'name', c.name,
+              'color', c.color,
+              'position', c.position,
+              'cards', COALESCE(cards.cards, '[]'::jsonb)
+            )
+            ORDER BY c.position
+          ) FILTER (WHERE c.id IS NOT NULL),
+          '[]'::jsonb
+        ) AS columns
+
+      FROM boards b
+
+      LEFT JOIN columns c
+        ON c.board_id = b.id
+
+      LEFT JOIN LATERAL (
+        SELECT
+          jsonb_agg(
+            jsonb_build_object(
+              'id', ca.id,
+              'title', ca.title,
+              'description', ca.description,
+              'position', ca.position,
+              'comments', COALESCE(comments.comments, '[]'::jsonb)
+            )
+            ORDER BY ca.position
+          ) AS cards
+        FROM cards ca
+
+        LEFT JOIN LATERAL (
+          SELECT
+            jsonb_agg(
+              jsonb_build_object(
+                'id', co.id,
+                'title', co.title,
+                'owner_id', co.owner_id,
+                'created_at', co.created_at
+              )
+              ORDER BY co.created_at
+            ) AS comments
+          FROM comments co
+          WHERE co.card_id = ca.id
+        ) comments ON TRUE
+
+        WHERE ca.column_id = c.id
+      ) cards ON TRUE
+
+      WHERE b.id = $1
+      GROUP BY b.id;
+    `, 
+    [board_id]);
+
+    if (result.rows.length > 0) {
+      const data = result.rows[0];
+      res.status(200).send(data);
+    }
+
+  } catch(err){
+    console.error(err);
+    res.status(500).send('Getting board data failed lol');
+  }
+})
+
 router.get('/:id', requireAuth, async(req, res) => {
   console.log('/boards/id');
   try {
@@ -189,4 +269,5 @@ router.post('/:id/columns/new', requireAuth, async (req, res) => {
     res.status(500).send('Creating new column failed lol');
   }
 })
+
 export default router;
