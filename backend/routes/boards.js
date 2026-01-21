@@ -59,6 +59,79 @@ router.post('/new', requireAuth, async(req, res) => {
   }
 })
 
+router.patch('/column/:id', requireAuth, async (req, res) => {
+  console.log('patch     /column/id');
+  try {
+
+    const allowedFields = ['name', 'color', 'position'];
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(req.body)) {
+      // prevents user from making malicious requests
+      if (!allowedFields.includes(key)) continue;
+
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+
+      index ++;
+    };
+
+    // prevents empty requests which will crash the server
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const column_id = req.params.id;
+
+    values.push(column_id);
+
+    const query = `
+      UPDATE columns
+      SET ${updates.join(', ')}
+      WHERE id = $${index}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Column not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Updating column failed lol');
+  }
+});
+
+router.delete('/column/:id', requireAuth, async (req, res) => {
+  console.log('/column/delete');
+  try {
+
+    const column_id = req.params.id;
+
+    const result = await pool.query(
+      `
+      DELETE FROM columns WHERE id = $1
+      `, [column_id]);
+
+    if (result.rowCount === 0) {
+      res.status(404).send({ error: 'Column not found' });
+    }
+
+    res.status(204);
+
+  } catch(err) {
+    console.log(err);
+    res.status(400).send('Unable to delete column lol');
+  }
+});
+
 router.get('/:id/all', requireAuth, async (req, res) => {
   console.log('/id/all');
   try {
@@ -167,7 +240,7 @@ router.get('/:id', requireAuth, async(req, res) => {
 })
 
 router.patch('/:id', requireAuth, async(req, res) => {
-  console.log('put  /boards/id');
+  console.log('patch  /boards/id');
   try {
 
     const allowedFields = ['name', 'colors'];
