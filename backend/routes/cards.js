@@ -81,9 +81,8 @@ router.patch('/:id', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-    const column_id = req.params.id;
-
-    values.push(column_id);
+    const card_id = req.params.id;
+    values.push(card_id);
 
     const query = `
       UPDATE cards
@@ -104,6 +103,105 @@ router.patch('/:id', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).send('Updating cards failed lol');
   }
+});
+
+router.delete('/comment/:id', requireAuth, async (req, res) => {
+  console.log('delete     /cards/comment/id');
+  try {
+
+    const comment_id = req.params.id;
+
+    const result = await pool.query(
+      `DELETE FROM comments WHERE id = $1`,
+      [comment_id]
+    );
+
+    if (result.rowCount === 0) {
+      res.status(404).send({ error: 'Comment not found' });
+    }
+
+    res.status(204);
+
+  } catch(err) {
+    console.log(err);
+    res.status(400).send('Unable to delete comment lol');
+  }
+});
+
+router.patch('/comment/:id', requireAuth, async (req, res) => {
+  console.log('patch     /comment/id');
+  try {
+    const allowedFields = ['title'];
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(req.body)) {
+      // prevents user from making malicious requests
+      if (!allowedFields.includes(key)) continue;
+
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+
+      index ++;
+    };
+
+    // prevents empty requests which will crash the server
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const comment_id = req.params.id;
+
+    values.push(comment_id);
+
+    const query = `
+      UPDATE comments
+      SET ${updates.join(', ')}
+      WHERE id = $${index}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Updating comment failed lol');
+  }
 })
+
+router.post('/:id/comment', requireAuth, async (req, res) => {
+  console.log('cards/id/comment');
+  try {
+    const owner = req.user.sub;
+
+    const card_id = req.params.id;
+    const title = req.body.title;
+
+    const result = await pool.query(
+      `INSERT INTO comments (title, card_id, owner_id)
+      VALUES ($1, $2, $3) RETURNING *
+      `, [title, card_id, owner]
+    );
+
+    if (result.rows.length > 0) {
+      const newComment = result.rows[0];
+      res.status(201).json(newComment);
+    } else {
+      res.status(400).json({ success: false, message: 'Comment creation failed' });
+    }
+
+  } catch(err) {
+    console.err(err);
+    res.status(500).send('Error creating a new comment lol');
+  }
+});
 
 export default router;
