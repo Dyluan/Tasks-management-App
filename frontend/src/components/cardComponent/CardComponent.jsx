@@ -15,6 +15,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import LabelComponent from '../labelComponent/LabelComponent';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 function CardComponent({
   card, 
@@ -48,6 +49,7 @@ function CardComponent({
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [tempEditComment, setTempEditComment] = useState('');
   const editCommentInputRef = useRef(null);
+  const token = localStorage.getItem('jwt');
 
   // bool variable responsible for the display of EditLabel/ DisplayLabel Component
   const [openEditLabel, setOpenEditLabel] = useState(false);
@@ -55,7 +57,15 @@ function CardComponent({
   const [selectedLabelColor, setSelectedLabelColor] = useState(null);
   const updateSelectedLabelColor = (color) => {
     setSelectedLabelColor(color);
-  }
+  };
+
+  const patchCard = async (id, updates) => {
+    const response = await axios.patch(`http://localhost:5500/cards/${id}`, 
+      updates,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const updatedCard = response.data;
+  };
 
   const openLabelPopOver = (color) => {
     setOpenEditLabel(true);
@@ -93,7 +103,7 @@ function CardComponent({
     });
   }
 
-  const deleteComment = (commentId) => {
+  const deleteComment = async (commentId) => {
     // since the set function from usestate is async, I have to create a temp var at the moment
     // to sync the component with the parent. Otherwise, last change is not taken into account
     const updatedCommentList = commentList.filter(
@@ -106,6 +116,14 @@ function CardComponent({
       ...card,
       comments: updatedCommentList
     });
+
+    const response = await axios.delete(`http://localhost:5500/cards/comment/${commentId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const responseData = response.data;
+    console.log('Deleted comment!', responseData);
+
   }
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:card.id});
@@ -155,23 +173,36 @@ function CardComponent({
     setEditingTitle(true);
   }
 
-  function saveTitle(newTitle) {
+  const saveTitle = async (newTitle) => {
     const trimmed = String(newTitle).trim();
     if (trimmed.length === 0) {
       setCardTitle(prevTitleRef.current);
     } else {
       saveCardTitle(trimmed);
+      patchCard(card.id, { title: newTitle });
     }
     setEditingTitle(false);
   }
 
-  function saveCardTitle(newTitle) {
+  const saveCardTitle = async (newTitle) => {
     updateCard(card.id, {...card, cardName: newTitle});
     setCardTitle(newTitle);
+
+    // TODO:
+    // This function triggers EACH TIME a letter changes
+    // Too many server calls. Needs fixing
+    patchCard(card.id, { title: newTitle });
   }
 
-  function updateComments(newComment) {
-    const updatedComments = [{text: newComment, id: uuidv4()}, ...commentList];
+  const updateComments = async (newComment) => {
+    const response = await axios.post(`http://localhost:5500/cards/${card.id}/comment`,
+      { title: newComment },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const responseData = response.data;
+    console.log('Added a new comment:', responseData);
+
+    const updatedComments = [responseData, ...commentList];
     updateCard(card.id, {
       ...card,
       comments: updatedComments
@@ -179,7 +210,7 @@ function CardComponent({
     setCardComment(newComment);
     setCommentList(updatedComments);
     setTempCardComment('');
-  }
+  };
 
   // updates the commentList if the parent updates
   useEffect(() => {
@@ -196,10 +227,10 @@ function CardComponent({
     setEditingTitle(false);
   }
 
-  function saveEditedComment(commentId) {
+  const saveEditedComment = async (commentId) => {
     const updatedComments = commentList.map(comment =>
       comment.id === commentId
-        ? { ...comment, text: tempEditComment }
+        ? { ...comment, title: tempEditComment }
         : comment
     );
 
@@ -210,6 +241,13 @@ function CardComponent({
     });
 
     setEditingCommentId(null);
+
+    const response = await axios.patch(`http://localhost:5500/cards/comment/${commentId}`,
+      { title: tempEditComment },
+      { headers: {Authorization: `Bearer ${token}`} }
+    );
+    console.log('edited comment: ', response.data);
+
     setTempEditComment('');
   }
 
@@ -378,6 +416,7 @@ function CardComponent({
                                     description: tempDescription
                                   });
                                   setIsEditingDescription(false);
+                                  patchCard(card.id, { description: tempDescription })
                                 }}
                               >
                                 Save
@@ -458,7 +497,8 @@ function CardComponent({
                           ) : (
                             <>
                               <li className={styles.comment} key={elem.id}>
-                                {elem.text}
+                                {/* {elem.text} */}
+                                {elem.title}
                               </li>
                               <span className={styles.editComment}>
                                 <div className={styles.editCommentButton}>
@@ -467,7 +507,7 @@ function CardComponent({
                                     alt="edit" 
                                     onClick={() => {
                                       setEditingCommentId(elem.id);
-                                      setTempEditComment(elem.text);
+                                      setTempEditComment(elem.title);
                                     }}
                                   />
                                 </div>

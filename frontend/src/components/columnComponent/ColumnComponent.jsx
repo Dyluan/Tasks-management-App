@@ -5,7 +5,6 @@ import featuredLogo from '../../assets/featured_play_list.png';
 import closeIcon from '../../assets/close_icon.png';
 import CardListComponent from '../cardListComponent/CardListComponent';
 import { useState, useRef, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Box from '@mui/material/Box';
@@ -64,7 +63,7 @@ function ColumnComponent({
     );
     const data = response.data;
     console.log('updated card:', data);
-  }  
+  };
 
   const addCard = async () => {
     // First, get data from server
@@ -143,6 +142,7 @@ function ColumnComponent({
         card.id === cardId ? updatedCard : card
       )
     );
+    
   };
 
   return (
