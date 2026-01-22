@@ -10,6 +10,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
+import axios from "axios";
 
 function ColumnComponent({
   column, 
@@ -25,6 +26,7 @@ function ColumnComponent({
   }) {
 
   const items = column.items;
+  const [nbOfCards, setNbOfCards] = useState(items.length);
   const columnTitle = column.title;
   const columnColor = column.columnColor;
   const [editingTitle, setEditingTitle] = useState(false);
@@ -32,6 +34,7 @@ function ColumnComponent({
   const prevTitleRef = useRef(columnTitle);
   const [anchorEl, setAnchorEl] = useState(null);
   const columnColorList = ['#baf3db', '#f5e989', '#fce4a6', '#ffd5d2', '#eed7fc', '#cfe1fd', '#c6edfb', '#F5F5F5'];
+  const token = localStorage.getItem('jwt');
 
   const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id:column.id});
 
@@ -44,23 +47,54 @@ function ColumnComponent({
     }
   }, [editingTitle]);
 
-  const addItems = () => {
-    updateColumnItems(column.id, [
-      ...items,
-      {
-        id: uuidv4(),
-        cardName: 'New Card',
-        comments: [],
-        labels: [],
-        description: ''
-      }
-    ]);
+  const newCard = async () => {
+    const response = await axios.post('http://localhost:5500/cards/new', 
+      { title: 'New Card', column_id: column.id, position: nbOfCards },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    return response.data;
   };
 
-  const deleteItems = (idToRemove) => {
+  // TODO: make use of that function
+  const patchCard = async (id, updates) => {
+    const response = await axios.patch(`http://localhost:5500/cards/${id}`, 
+      { updates },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = response.data;
+    console.log('updated card:', data);
+  }  
+
+  const addCard = async () => {
+    // First, get data from server
+    const newCardData = await newCard();
+
+    // Map server response to frontend structure
+    const mappedCard = {
+      id: newCardData.id,
+      cardName: newCardData.title,
+      description: newCardData.description || '',
+      comments: [],
+      labels: [],
+      position: newCardData.position
+    };
+
+    // Then update local list with newly created data
+    updateColumnItems(column.id, [...items, mappedCard]);
+    setNbOfCards(nbOfCards+1);
+  }
+
+  const deleteItems = async (idToRemove) => {
+    //deleting card from column
     updateColumnItems(
       column.id,
       items.filter(item => item.id !== idToRemove)
+    );
+
+    // THEN deleting from server
+    await axios.delete(`http://localhost:5500/cards/${idToRemove}`,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   };
   
@@ -166,7 +200,7 @@ function ColumnComponent({
                 <div className={styles.modalContent}>
                   <div className={styles.modalCards}>
                     <ul>
-                      <li><button onClick={addItems} >New card</button></li>
+                      <li><button onClick={addCard} >New card</button></li>
                       <li><button onClick={() => {
                         handlePopoverClose();
                         startEdit();
@@ -215,7 +249,7 @@ function ColumnComponent({
       <div className={styles.footer}>
         <div className={styles.left}>
           <button 
-            onClick={addItems} 
+            onClick={addCard} 
             className={styles.leftButton} 
             onPointerDown={(e) => e.stopPropagation()} 
             style={addButtonStyle}

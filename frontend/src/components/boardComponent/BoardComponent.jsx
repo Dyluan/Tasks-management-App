@@ -34,34 +34,14 @@ function BoardComponent() {
 
   const [nbOfColumns, setNbOfColumns] = useState(0);
 
-  const [columns, setColumns] = useState([
-    {
-      id: uuidv4(), 
-      title: "Done", 
-      columnColor: '#f5f5f5', 
-      items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
-      ]
-    }, 
-    {
-      id: uuidv4(), 
-      title: "To Do", 
-      columnColor: '#f5f5f5', 
-      items: [
-        {id: uuidv4(), cardName: 'Card Text', comments:[], labels:[], description:''}, 
-        {id: uuidv4(), cardName: 'Another Card', comments:[], labels:[], description:''}
-      ]
-    }
-  ]);
+  const [columns, setColumns] = useState([]);
 
   const newColumn = async() => {
     const response = await axios.post(`http://localhost:5500/boards/${id}/columns/new`, 
       { position: nbOfColumns+1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    console.log('my new column: ', response.data);
-    
+     
     // Return the new column data from server
     return response.data;
   };
@@ -131,7 +111,6 @@ function BoardComponent() {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const data = response.data;
-    console.log('updated column:', data);
   };
 
   const deleteColumnFromServer = async(column_id) => {
@@ -388,7 +367,7 @@ function BoardComponent() {
     // First create the column on the server
     const newColumnData = await newColumn();
     
-    // Then add it to state with the real ID from the database
+    // Then add it to state
     setColumns(prev => [...prev, {
       id: newColumnData.id,
       title: newColumnData.name,
@@ -417,6 +396,7 @@ function BoardComponent() {
     ]);
   };
 
+  // TODO:
   const updateColumnItems = (columnId, newItems) => {
     setColumns(prev =>
       prev.map(col =>
