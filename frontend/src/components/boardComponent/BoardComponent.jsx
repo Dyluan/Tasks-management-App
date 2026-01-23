@@ -98,7 +98,6 @@ function BoardComponent() {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log('mes labels: ', response.data);
       const labels = response.data;
       setColorList(labels);
     };
@@ -297,7 +296,7 @@ function BoardComponent() {
   };
 
   // delete color from labels
-  const deleteColorFromList = (id) => {
+  const deleteColorFromList = async (id) => {
     const colorToDelete = colorList.find(color => color.id === id);
     
     if (colorToDelete) {
@@ -314,12 +313,22 @@ function BoardComponent() {
           }))
         }))
       );
+      // removes the color from the server as well
+      await axios.delete(`http://localhost:5500/boards/labels/${id}`, {
+        data: { board_id: board.id },
+        headers: { Authorization: `Bearer ${token}` }
+      });
     }
   };
 
   // add color to labels
-  const addColorToList = (newColor) => {
+  const addColorToList = async (newColor) => {
     setColorList(prev => [...prev, newColor]);
+    // adding label to color as well
+    await axios.post(`http://localhost:5500/boards/${board.id}/labels`, 
+      { text: newColor.text, color: newColor.color },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
   };
   
   // Ref to track columns for collision detection
