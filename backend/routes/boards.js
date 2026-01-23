@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import pool from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -31,7 +32,12 @@ router.get('/all', requireAuth, async (req, res) => {
 })
 
 router.post('/new', requireAuth, async(req, res) => {
+  
+  const client = await pool.connect();
+  
   try {
+    await client.query('BEGIN');
+
     console.log('/board/new');
 
     const owner = req.user.sub;
@@ -40,7 +46,7 @@ router.post('/new', requireAuth, async(req, res) => {
     const name = req.body.name;
     const colors = req.body.colors;
 
-    const result = await pool.query(
+    const result = await client.query(
       `INSERT INTO boards (name, workspace_id, owner_id, colors)
       VALUES ($1, $2, $3, $4) RETURNING *`,
       [name, workspace_id, owner, colors]
@@ -48,14 +54,41 @@ router.post('/new', requireAuth, async(req, res) => {
 
     if (result.rows.length > 0) {
       const newBoard = result.rows[0];
+
+      // Adding default labels for newly created board
+      const board_id = newBoard.id;
+      const colorList = [
+        '#d6f5e3', 
+        '#f0f4b1', 
+        '#fde8b8', 
+        '#ffd1c1', 
+        '#f0d5fa', 
+        '#d6e4ff', 
+        '#cdeff7', 
+        '#e6e6e6'
+      ];
+
+      for (const color of colorList) {
+        await client.query(
+          `INSERT INTO labels (board_id, color)
+          VALUES ($1, $2)`,
+          [board_id, color]
+        );
+      };
+
+      await client.query('COMMIT');
+
       res.status(201).json(newBoard);
     } else {
       res.status(400).json({ success: false, message: 'board creation failed' });
     }
 
   } catch(err) {
-    console.err(err);
+    await client.query('ROLLBACK');
+    console.error(err);
     res.status(500).send('Error creating a new board lol');
+  } finally {
+    client.release();
   }
 })
 
@@ -340,6 +373,29 @@ router.post('/:id/columns/new', requireAuth, async (req, res) => {
   } catch(err) {
     console.error(err);
     res.status(500).send('Creating new column failed lol');
+  }
+});
+
+router.get('/:id/labels', requireAuth, async (req, res) => {
+  console.log('get     /id/labels');
+  try {
+    const board_id = req.params.id;
+
+    const result = await pool.query(
+      `SELECT * from labels WHERE board_id = $1`
+      , [board_id]
+    );
+
+    if (result.rows.length > 0) {
+      const labels = result.rows;
+      res.status(200).send(labels);
+    } else {
+      console.log('No label found.');
+      res.status(404).send([]);
+    }
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Getting labels failed lol');
   }
 })
 
