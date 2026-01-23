@@ -36,6 +36,10 @@ function BoardComponent() {
 
   const [columns, setColumns] = useState([]);
 
+  // labels list
+  // empty for now as they are fetched from server
+  const [colorList, setColorList] = useState([]);
+
   const newColumn = async() => {
     const response = await axios.post(`http://localhost:5500/boards/${id}/columns/new`, 
       { position: nbOfColumns+1 },
@@ -87,6 +91,20 @@ function BoardComponent() {
 
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    const getLabels = async() => {
+      const response = await axios.get(`http://localhost:5500/boards/${id}/labels`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      console.log('mes labels: ', response.data);
+      const labels = response.data;
+      setColorList(labels);
+    };
+
+    getLabels();
+  }, [id])
 
   // takes 2 args: name and colors, and sends the request with appropriate data
   // allows me to either change the name or the color or both
@@ -215,16 +233,6 @@ function BoardComponent() {
     }
   }, [board.colors]);
   
-  const [colorList, setColorList] = useState([
-    {id: 0, color: '#d6f5e3', text:''},
-    {id: 1, color: '#f0f4b1', text:''},
-    {id: 2, color: '#fde8b8', text:''},
-    {id: 3, color: '#ffd1c1', text:''},
-    {id: 4, color: '#f0d5fa', text:''},
-    {id: 5, color: '#d6e4ff', text:''},
-    {id: 6, color: '#cdeff7', text:''},
-    {id: 7, color: '#e6e6e6', text:''}
-  ]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -265,6 +273,7 @@ function BoardComponent() {
     </List>
   )
 
+  // update the labels color
   const updateColorList = (selectedColorEdit, updatedColor) => {
     const oldColor = selectedColorEdit.color;
     const newColor = updatedColor.color;
@@ -287,6 +296,7 @@ function BoardComponent() {
     );
   };
 
+  // delete color from labels
   const deleteColorFromList = (id) => {
     const colorToDelete = colorList.find(color => color.id === id);
     
@@ -307,6 +317,7 @@ function BoardComponent() {
     }
   };
 
+  // add color to labels
   const addColorToList = (newColor) => {
     setColorList(prev => [...prev, newColor]);
   };
