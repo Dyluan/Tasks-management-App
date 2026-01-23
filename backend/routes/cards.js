@@ -204,4 +204,57 @@ router.post('/:id/comment', requireAuth, async (req, res) => {
   }
 });
 
+// below functions have not been tested yet
+router.post('/:id/labels', requireAuth, async (req, res) => {
+  console.log('post     /id/labels');
+  try {
+    const card_id = req.params.id;
+    const label_id = req.body.label_id;
+
+    const result = await pool.query(
+      `INSERT INTO card_labels (card_id, label_id) 
+      VALUES ($1, $2) RETURNING *`,
+      [card_id, label_id]
+    );
+
+    if (result.rows.length > 0) {
+      const newCardLabel = result.rows[0];
+      res.status(200).json(newCardLabel);
+    } else {
+      res.status(400).json({ success: false, message: "Insertion failed" });
+    }
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Getting card labels failed lol');
+  }
+});
+
+router.get('/:id/labels', requireAuth, async (req, res) => {
+  console.log('get     /id/labels');
+  try {
+    const card_id = req.params.id;
+    
+    const result = await pool.query(
+      `SELECT l.id, l.text, l.color 
+      FROM labels l
+      JOIN card_labels cl ON cl.label_id = l.id 
+      WHERE card_id = $1`
+      , [card_id]
+    );
+
+    if (result.rows.length > 0) {
+      const cardLabels = result.rows;
+      res.status(200).send(cardLabels);
+    } else {
+      console.log('No label found for card.');
+      res.status(404).send([]);
+    }
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Getting card label failed lol');
+  }
+})
+
 export default router;

@@ -376,6 +376,33 @@ router.post('/:id/columns/new', requireAuth, async (req, res) => {
   }
 });
 
+router.post('/:id/labels', requireAuth, async (req, res) => {
+  console.log('post     /id/labels');
+  try {
+    const board_id = req.params.id;
+
+    const text = req.body.text;
+    const color = req.body.color;
+
+    const result = await pool.query(
+      `INSERT INTO labels (text, color, board_id)
+      VALUES ($1, $2, $3) RETURNING *`,
+      [text, color, board_id]
+    );
+
+    if (result.rows.length > 0) {
+      const newLabel = result.rows[0];
+      res.status(200).json(newLabel);
+    } else {
+      res.status(400).json({ success: false, message: "Insertion failed" });
+    }
+    
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Creating label failed lol');
+  }
+});
+
 router.get('/:id/labels', requireAuth, async (req, res) => {
   console.log('get     /id/labels');
   try {
@@ -393,10 +420,86 @@ router.get('/:id/labels', requireAuth, async (req, res) => {
       console.log('No label found.');
       res.status(404).send([]);
     }
+
   } catch(err) {
     console.error(err);
     res.status(500).send('Getting labels failed lol');
   }
-})
+});
+
+router.delete('/labels/:id', requireAuth, async (req, res) => {
+  console.log('delete     /labels/id');
+  try {
+    const label_id = req.params.id;
+    const board_id = req.body.board_id;
+
+    const result = await pool.query(
+      `DELETE FROM labels WHERE id = $1 AND board_id = $2`,
+      [label_id, board_id]
+    );
+
+    if (result.rowCount === 0) {
+      res.status(404).send({ error: 'label not found' });
+    }
+
+    res.status(204);
+
+  } catch(err) {
+    console.error(err);
+    res.status(400).send('Unable to delete label lol');
+  }
+});
+
+// Probably wont work
+router.patch('/labels/:id', requireAuth, async (req, res) => {
+  console.log('patch     /labels/id');
+  try {
+
+    const allowedFields = ['text', 'color'];
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    for (const [key, value] of Object.entries(req.body)) {
+      // prevents user from making malicious requests
+      if (!allowedFields.includes(key)) continue;
+
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+
+      index ++;
+    };
+
+    // prevents empty requests which will crash the server
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    const board_id = req.body.board_id;
+    const label_id = req.params.id;
+
+    values.push(label_id, board_id);
+
+    const query = `
+      UPDATE labels
+      SET ${updates.join(', ')}
+      WHERE id = $${index} AND board_id = $${index + 1}
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'label not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Updating label failed lol');
+  }
+});
 
 export default router;
