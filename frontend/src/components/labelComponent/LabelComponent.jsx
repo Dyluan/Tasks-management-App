@@ -2,7 +2,6 @@ import styles from './LabelComponent.module.css';
 import Popover from '@mui/material/Popover';
 import DisplayLabelsComponent from '../displayLabels/DisplayLabelsComponent';
 import EditLabelComponent from '../editLabel/EditLabelComponent';
-import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
 import axios from 'axios';
 
@@ -33,7 +32,7 @@ function LabelComponent({
 
   const handleCreateButtonClick = () => {
     const defaultColorForCreateDisplay = {
-      id: uuidv4(),
+      id: null,  // Will be assigned by server when created
       color: '#bdbdbd',
       text: ''
     }

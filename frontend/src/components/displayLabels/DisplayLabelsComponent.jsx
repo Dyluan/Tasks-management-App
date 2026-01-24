@@ -29,13 +29,13 @@ function DisplayLabelsComponent({
                 type="checkbox" 
                 name="elem" 
                 id="elemInput" 
-                checked={selectedLabels.includes(elem.color)}
-                onChange={() => toggleLabel(elem.color)}
+                checked={selectedLabels.some(l => l.id === elem.id)}
+                onChange={() => toggleLabel(elem)}
               />
               <button 
                 style={{backgroundColor: elem.color}} 
                 className={styles.colorButton} 
-                onClick={() => toggleLabel(elem.color)}
+                onClick={() => toggleLabel(elem)}
               >
                 {elem.text}
               </button>

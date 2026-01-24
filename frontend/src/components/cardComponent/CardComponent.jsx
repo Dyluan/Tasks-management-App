@@ -14,7 +14,6 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import LabelComponent from '../labelComponent/LabelComponent';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
 function CardComponent({
@@ -67,6 +66,23 @@ function CardComponent({
     const updatedCard = response.data;
   };
 
+  // loads card labels on page load
+  // TODO: weird bug where labels are loaded 1/2 times
+  useEffect(() => {
+    const getCardLabelsFromServer = async () => {
+      const response = await axios.get(`http://localhost:5500/cards/${card.id}/labels`, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const labelsLoadedFromServer = response.data;
+
+      setSelectedLabels(labelsLoadedFromServer);
+      // Also update parent to keep in sync and prevent the card.labels useEffect from overwriting
+      updateCard(card.id, { ...card, labels: labelsLoadedFromServer });
+    };
+
+    getCardLabelsFromServer();
+  }, []);
+
   const openLabelPopOver = (color) => {
     setOpenEditLabel(true);
     setSelectedLabelColor(color);
@@ -87,22 +103,28 @@ function CardComponent({
     setOpenEditLabel(false);
   }
 
-  function toggleLabel(color) {
-    setSelectedLabels(prev => {
-      const updated =
-        prev.includes(color)
-          ? prev.filter(c => c !== color)
-          : [...prev, color];
+  const toggleLabel = async (label) => {
+    const exists = selectedLabels.some(l => l.id === label.id);
+    const updated = exists
+      ? selectedLabels.filter(l => l.id !== label.id)
+      : [...selectedLabels, label];
 
-      updateCard(card.id, {
-        ...card,
-        labels: updated
-      });
+    setSelectedLabels(updated);
 
-      return updated;
+    updateCard(card.id, {
+      ...card,
+      labels: updated
     });
-    console.log('selectedLabels :: ', selectedLabels);
-  }
+
+    const label_ids = updated.map(l => l.id);
+    console.log('ToggleLabel CALLED. My current labels::', label_ids);
+    const response = await axios.post(`http://localhost:5500/cards/${card.id}/labels`,
+      { label_ids: label_ids},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log('response::', response.data);
+  };
 
   const deleteComment = async (commentId) => {
     // since the set function from usestate is async, I have to create a temp var at the moment
@@ -223,6 +245,16 @@ function CardComponent({
     setSelectedLabels(card.labels ?? []);
   }, [card.labels]);
 
+  // sync selectedLabels when colorList changes (e.g., label color/text edited)
+  useEffect(() => {
+    setSelectedLabels(prev => 
+      prev.map(selectedLabel => {
+        const updatedLabel = colorList.find(c => c.id === selectedLabel.id);
+        return updatedLabel ? { ...selectedLabel, ...updatedLabel } : selectedLabel;
+      })
+    );
+  }, [colorList]);
+
   function cancelEdit() {
     setCardTitle(prevTitleRef.current);
     setEditingTitle(false);
@@ -338,21 +370,17 @@ function CardComponent({
                       </div>
                     )}
                     <ul>
-                      {selectedLabels.map((elem, index) => {
-                        // TODO: modify selectedLabels to reflect the true form of the labels, ie: include text and color
-                        const colorObj = colorList.find(c => c.color === elem);
-                        return (
-                          <li key={index}>
-                            <button 
-                              className={styles.labelButtons} 
-                              style={{backgroundColor: elem}}
-                              onClick={() => openLabelPopOver(colorObj)}
-                            >
-                              {colorObj?.text}
-                            </button>
-                          </li>
-                        );
-                      })}
+                      {selectedLabels.map((label) => (
+                        <li key={label.id}>
+                          <button 
+                            className={styles.labelButtons} 
+                            style={{backgroundColor: label.color}}
+                            onClick={() => openLabelPopOver(label)}
+                          >
+                            {label.text}
+                          </button>
+                        </li>
+                      ))}
                       {selectedLabels.length > 0 && (
                         <li>
                           <button
@@ -541,9 +569,9 @@ function CardComponent({
           <div className={styles.titleContainer} onClick={startEdit}>
             <div className={styles.showingLabels}>
               <ul className={styles.labelList}>
-                {selectedLabels.map((elem, index) => (
-                  <li className={styles.labelElement} key={index}>
-                    <span className={styles.showingColor} style={{backgroundColor: elem}}></span>
+                {selectedLabels.map((label) => (
+                  <li className={styles.labelElement} key={label.id}>
+                    <span className={styles.showingColor} style={{backgroundColor: label.color}}></span>
                   </li>
                 ))}
               </ul>

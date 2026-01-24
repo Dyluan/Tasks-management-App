@@ -323,12 +323,14 @@ function BoardComponent() {
 
   // add color to labels
   const addColorToList = async (newColor) => {
-    setColorList(prev => [...prev, newColor]);
-    // adding label to color as well
-    await axios.post(`http://localhost:5500/boards/${board.id}/labels`, 
+    // create label on server first and get the real ID
+    const response = await axios.post(`http://localhost:5500/boards/${board.id}/labels`, 
       { text: newColor.text, color: newColor.color },
       { headers: { Authorization: `Bearer ${token}` } }
     );
+    // use the server-generated label (with real ID) to update state
+    const serverLabel = response.data;
+    setColorList(prev => [...prev, serverLabel]);
   };
   
   // Ref to track columns for collision detection
