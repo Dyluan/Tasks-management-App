@@ -396,7 +396,7 @@ router.post('/:id/labels', requireAuth, async (req, res) => {
     } else {
       res.status(400).json({ success: false, message: "Insertion failed" });
     }
-    
+
   } catch(err) {
     console.error(err);
     res.status(500).send('Creating label failed lol');
@@ -450,7 +450,6 @@ router.delete('/labels/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Probably wont work
 router.patch('/labels/:id', requireAuth, async (req, res) => {
   console.log('patch     /labels/id');
   try {
@@ -464,6 +463,9 @@ router.patch('/labels/:id', requireAuth, async (req, res) => {
     for (const [key, value] of Object.entries(req.body)) {
       // prevents user from making malicious requests
       if (!allowedFields.includes(key)) continue;
+      
+      // skip board_id as it's used in WHERE clause, not SET
+      if (key === 'board_id') continue;
 
       updates.push(`${key} = $${index}`);
       values.push(value);
@@ -471,7 +473,7 @@ router.patch('/labels/:id', requireAuth, async (req, res) => {
       index ++;
     };
 
-    // prevents empty requests which will crash the server
+    // prevents empty requests which would crash the server
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }

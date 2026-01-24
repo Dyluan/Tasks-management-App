@@ -255,6 +255,6 @@ router.get('/:id/labels', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).send('Getting card label failed lol');
   }
-})
+});
 
 export default router;
