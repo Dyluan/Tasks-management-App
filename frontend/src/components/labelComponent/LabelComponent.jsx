@@ -4,6 +4,7 @@ import DisplayLabelsComponent from '../displayLabels/DisplayLabelsComponent';
 import EditLabelComponent from '../editLabel/EditLabelComponent';
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from 'react';
+import axios from 'axios';
 
 function LabelComponent({ 
   open, 
@@ -22,6 +23,7 @@ function LabelComponent({
   }) {
 
   const [shouldEditComponentRenderCreateButton, setShouldEditComponentRenderCreateButton] = useState(false);
+  const token = localStorage.getItem('jwt');
 
   const handleEditClick = (color) => {
     setShouldEditComponentRenderCreateButton(false);
@@ -46,10 +48,21 @@ function LabelComponent({
     updateColorList(selectedLabelColor, updatedColor);
   }
 
-  const handleSaveLabel = (newText) => {
+  const handleSaveLabel = async (newText) => {
     const updatedColor = { ...selectedLabelColor, text: newText };
     updateSelectedLabelColor(updatedColor);
     updateColorList(selectedLabelColor, updatedColor);
+
+    // editing label server side as well
+    await axios.patch(`http://localhost:5500/boards/labels/${updatedColor.id}`,
+      { 
+        text: updatedColor.text, 
+        color: updatedColor.color, 
+        board_id: updatedColor.board_id 
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
     toggleEditButton();
   }
 

@@ -101,6 +101,7 @@ function CardComponent({
 
       return updated;
     });
+    console.log('selectedLabels :: ', selectedLabels);
   }
 
   const deleteComment = async (commentId) => {
