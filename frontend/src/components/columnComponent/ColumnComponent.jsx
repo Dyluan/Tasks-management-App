@@ -55,16 +55,6 @@ function ColumnComponent({
     return response.data;
   };
 
-  // TODO: make use of that function
-  const patchCard = async (id, updates) => {
-    const response = await axios.patch(`http://localhost:5500/cards/${id}`, 
-      { updates },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const data = response.data;
-    console.log('updated card:', data);
-  };
-
   const addCard = async () => {
     // First, get data from server
     const newCardData = await newCard();

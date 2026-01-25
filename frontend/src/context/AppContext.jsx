@@ -77,7 +77,6 @@ export function AppProvider({ children }) {
         Authorization: `Bearer ${token}`
       }
     });
-    // console.log(response.data);
     setBoards(response.data);
   }
 
@@ -97,7 +96,6 @@ export function AppProvider({ children }) {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('/id: response:', response.data);
     return response.data;
   }
 

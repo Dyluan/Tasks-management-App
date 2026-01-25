@@ -116,7 +116,6 @@ function BoardComponent() {
       {
         headers: { Authorization: `Bearer ${token}` }
       });
-    console.log(response.data);
     
     // Update the boards state in AppContext
     updateBoard(board.id, { name, colors });
@@ -298,7 +297,7 @@ function BoardComponent() {
   // delete color from labels
   const deleteColorFromList = async (id) => {
     const colorToDelete = colorList.find(color => color.id === id);
-    
+
     if (colorToDelete) {
       // Remove the color from colorList
       setColorList(prev => prev.filter(color => color.id !== id));
@@ -309,7 +308,7 @@ function BoardComponent() {
           ...col,
           items: col.items.map(card => ({
             ...card,
-            labels: (card.labels ?? []).filter(label => label !== colorToDelete.color)
+            labels: (card.labels ?? []).filter(label => label.id !== colorToDelete.id)
           }))
         }))
       );

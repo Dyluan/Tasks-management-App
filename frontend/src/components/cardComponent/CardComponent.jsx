@@ -117,13 +117,11 @@ function CardComponent({
     });
 
     const label_ids = updated.map(l => l.id);
-    console.log('ToggleLabel CALLED. My current labels::', label_ids);
     const response = await axios.post(`http://localhost:5500/cards/${card.id}/labels`,
       { label_ids: label_ids},
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    console.log('response::', response.data);
   };
 
   const deleteComment = async (commentId) => {
@@ -145,7 +143,6 @@ function CardComponent({
     );
 
     const responseData = response.data;
-    console.log('Deleted comment!', responseData);
 
   }
 
@@ -223,7 +220,6 @@ function CardComponent({
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const responseData = response.data;
-    console.log('Added a new comment:', responseData);
 
     const updatedComments = [responseData, ...commentList];
     updateCard(card.id, {
@@ -245,13 +241,15 @@ function CardComponent({
     setSelectedLabels(card.labels ?? []);
   }, [card.labels]);
 
-  // sync selectedLabels when colorList changes (e.g., label color/text edited)
+  // sync selectedLabels when colorList changes (e.g., label color/text edited or deleted)
   useEffect(() => {
     setSelectedLabels(prev => 
-      prev.map(selectedLabel => {
-        const updatedLabel = colorList.find(c => c.id === selectedLabel.id);
-        return updatedLabel ? { ...selectedLabel, ...updatedLabel } : selectedLabel;
-      })
+      prev
+        .filter(selectedLabel => colorList.some(c => c.id === selectedLabel.id)) // remove deleted labels
+        .map(selectedLabel => {
+          const updatedLabel = colorList.find(c => c.id === selectedLabel.id);
+          return updatedLabel ? { ...selectedLabel, ...updatedLabel } : selectedLabel;
+        })
     );
   }, [colorList]);
 
@@ -279,7 +277,6 @@ function CardComponent({
       { title: tempEditComment },
       { headers: {Authorization: `Bearer ${token}`} }
     );
-    console.log('edited comment: ', response.data);
 
     setTempEditComment('');
   }

@@ -116,9 +116,7 @@ function LoginComponent({ userHasAnAccount=true }) {
         username: userName,
         email: email,
         password: password
-      });
-      console.log('Response from server : ', response.data);
-      
+      });      
       // Store JWT token in localStorage and navigate to home
       // localStorage.setItem('jwt', response.data.token);
 

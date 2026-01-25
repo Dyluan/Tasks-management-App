@@ -36,9 +36,6 @@ function CreateBoardPopoverComponent({
         headers: { Authorization: `Bearer ${token}` }
       }
     )
-    
-    // DO SOMETHING WITH RESPONSE HERE
-    console.log('/boards/new ::', response.data);
     // TODO: SHOULD HANDLE BAD RESPONSES HERE
     
     // Refetch boards to ensure state is in sync with server
