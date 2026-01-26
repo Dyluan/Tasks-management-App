@@ -417,8 +417,7 @@ router.get('/:id/labels', requireAuth, async (req, res) => {
       const labels = result.rows;
       res.status(200).send(labels);
     } else {
-      console.log('No label found.');
-      res.status(404).send([]);
+      res.status(200).json([]);
     }
 
   } catch(err) {
