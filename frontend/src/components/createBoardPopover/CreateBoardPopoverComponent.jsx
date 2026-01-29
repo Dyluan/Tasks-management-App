@@ -14,7 +14,7 @@ function CreateBoardPopoverComponent({
   workspace_id
   }) {
 
-  const { updateBoards, fetchWorkspaceBoards } = useApp();
+  const { fetchWorkspaceBoards } = useApp();
 
   const [title, setTitle] = useState('');
   const [titleTouched, setTitleTouched] = useState(false);
@@ -199,7 +199,7 @@ function CreateBoardPopoverComponent({
               width: '100%',
               textTransform: 'none'
             }}
-            disabled={title.trim().length === 0}
+            disabled={title.trim().length === 0 || !colorSelected}
             onClick={handleSaveClick}
           >
             Create

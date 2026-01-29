@@ -58,6 +58,9 @@ function CardComponent({
     setSelectedLabelColor(color);
   };
 
+  // Track whether labels have been loaded from server to prevent race conditions
+  const labelsLoadedRef = useRef(false);
+
   const patchCard = async (id, updates) => {
     const response = await axios.patch(`http://localhost:5500/cards/${id}`, 
       updates,
@@ -67,7 +70,6 @@ function CardComponent({
   };
 
   // loads card labels on page load
-  // TODO: weird bug where labels are loaded 1/2 times
   useEffect(() => {
     const getCardLabelsFromServer = async () => {
       const response = await axios.get(`http://localhost:5500/cards/${card.id}/labels`, 
@@ -76,7 +78,8 @@ function CardComponent({
       const labelsLoadedFromServer = response.data;
 
       setSelectedLabels(labelsLoadedFromServer);
-      // Also update parent to keep in sync and prevent the card.labels useEffect from overwriting
+      labelsLoadedRef.current = true; // Mark labels as loaded from server
+      // Also update parent to keep in sync
       updateCard(card.id, { ...card, labels: labelsLoadedFromServer });
     };
 
@@ -236,9 +239,12 @@ function CardComponent({
     setCommentList(card.comments ?? []);
   }, [card.comments]);
   
-  // updates the labels if the parent updates
+  // updates the labels if the parent updates, but only if labels haven't been loaded from server yet
+  // This prevents a race condition where parent re-renders with stale empty labels overwrite fetched labels
   useEffect(() => {
-    setSelectedLabels(card.labels ?? []);
+    if (!labelsLoadedRef.current) {
+      setSelectedLabels(card.labels ?? []);
+    }
   }, [card.labels]);
 
   // sync selectedLabels when colorList changes (e.g., label color/text edited or deleted)
