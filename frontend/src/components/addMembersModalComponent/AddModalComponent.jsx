@@ -3,9 +3,9 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import closeIcon from '../../assets/close_icon.png';
 import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import Popover from '@mui/material/Popover';
 import CheckIcon from '@mui/icons-material/Check';
+import axios from 'axios';
 
 function AddModalComponent({
   open,
@@ -16,6 +16,7 @@ function AddModalComponent({
   const [searchValue, setSearchValue] = useState('');
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const token = localStorage.getItem('jwt');
 
   const handleLinkClick = (event) => {
     setPopoverAnchorEl(event.currentTarget);
@@ -30,6 +31,17 @@ function AddModalComponent({
   const copyToClipboard = async() => {
     const text = 'blablabla';
     await navigator.clipboard.writeText(text);
+  };
+
+  const searchForUser = async (search) => {
+    const response = await axios.get(`http://localhost:5500/users/search`, 
+      { 
+        params: { query: search },
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    console.log('users:', response.data);
   }
 
   useEffect(() => {
@@ -78,8 +90,8 @@ function AddModalComponent({
           <div className={styles.searchSpace}>
             <input 
               type="text" 
-              placeholder='Email address or username' 
-              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder='Email address' 
+              onChange={(e) => searchForUser(e.target.value)}
             />
           </div>
           <div className={styles.bottom}>

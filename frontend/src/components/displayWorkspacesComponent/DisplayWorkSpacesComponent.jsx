@@ -1,11 +1,13 @@
 import styles from './DisplayWorkspaces.module.css';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Divider, Collapse } from '@mui/material';
-import WorkIcon from '@mui/icons-material/Work';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import { useNavigate } from 'react-router-dom';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
+import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
 
 function DisplayWorkspacesComponent({
   workspaces,
@@ -14,14 +16,28 @@ function DisplayWorkspacesComponent({
 }) {
 
   const navigate = useNavigate();
-  const [openSubMenu, setOpenSubMenu] = useState(true);
+  const [openSubMenu, setOpenSubMenu] = useState(null);
+  const [openMembersModal, setOpenMembersModal] = useState(false);
+  const handleMembersModalOpen = () => setOpenMembersModal(true);
+  const handleMembersModalClose = () => setOpenMembersModal(false);
 
-  const handleOpenClick = () => {
-    setOpenSubMenu(!openSubMenu);
+  const handleOpenClick = (workspaceId) => {
+    setOpenSubMenu(openSubMenu === workspaceId ? null : workspaceId);
+  }
+
+  const handleDeleteClick = (workspace) => {
+    console.log('delete ::', workspace);
   }
 
   return (
     <div className={styles.main}>
+
+      {/* our add members popup */}
+      <AddModalComponent
+        open={openMembersModal}
+        onClose={handleMembersModalClose}
+      />
+
       <List
         subheader = {
           <ListSubheader
@@ -38,34 +54,54 @@ function DisplayWorkspacesComponent({
       >
         {workspaces.map(workspace => (
           <>
-            <ListItemButton
-              sx={{
-                borderRadius: '6px'
-              }}  
-              onClick={() => {
-                navigate(`/workspace/${workspace.id}`)
-                setCurrentWorkspace(workspace.id)
-              }}
-            >
-              <ListItemIcon>
-                <WorkIcon 
-                  sx={{color: theme.textColor}}
-                />
-              </ListItemIcon>
+            <ListItemButton>
               <ListItemText 
                 primary={workspace.title} 
               />
-              <ListItemIcon onClick={() => handleOpenClick()}>
-                {openSubMenu ? <ExpandLess /> : <ExpandMore />}
+              <ListItemIcon onClick={() => handleOpenClick(workspace.id)}>
+                {openSubMenu === workspace.id ? <ExpandLess sx={{color: theme.textColor}} /> : <ExpandMore sx={{color: theme.textColor}} />}
               </ListItemIcon>
             </ListItemButton>
-            <Collapse in={openSubMenu} timeout="auto" unmountOnExit>
+            <Collapse in={openSubMenu === workspace.id} timeout="auto" unmountOnExit>
               <List component="div" disablePadding dense="true">
-                <ListItemButton>
+                <ListItemButton 
+                  sx={{ 
+                    pl: 4,
+                    borderRadius: '6px'
+                  }}
+                  onClick={() => {
+                    navigate(`/workspace/${workspace.id}`)
+                    setCurrentWorkspace(workspace.id)
+                  }}  
+                >
                   <ListItemIcon>
-                    <DeleteIcon />
+                    <DashboardIcon 
+                      sx={{color: theme.textColor}}
+                    />
                   </ListItemIcon>
-                  <ListItemText primary="delete workspace" />
+                  <ListItemText primary="Boards" />
+                </ListItemButton>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  onClick={() => handleMembersModalOpen()}
+                >
+                  <ListItemIcon>
+                    <GroupAddIcon 
+                      sx={{color: theme.textColor}}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary="Add members" />
+                </ListItemButton>
+                <ListItemButton 
+                  sx={{ pl: 4 }}
+                  onClick={() => handleDeleteClick(workspace)}  
+                >
+                  <ListItemIcon>
+                    <DeleteIcon 
+                      sx={{color: theme.textColor}}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary="Delete workspace" />
                 </ListItemButton>
               </List>
             </Collapse>
