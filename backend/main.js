@@ -5,6 +5,7 @@ import authRouter from './routes/auth.js';
 import workspaceRouter from './routes/workspace.js';
 import boardsRouter from './routes/boards.js';
 import cardsRouter from './routes/cards.js';
+import usersRouter from './routes/users.js';
 import { requireAuth } from './middleware/requireAuth.js';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/auth', authRouter);
 app.use('/workspace', workspaceRouter);
 app.use('/boards', boardsRouter);
 app.use('/cards', cardsRouter);
+app.use('/users', usersRouter);
 
 app.get('/me', requireAuth, (req,res) => {
   console.log('/me called.');
