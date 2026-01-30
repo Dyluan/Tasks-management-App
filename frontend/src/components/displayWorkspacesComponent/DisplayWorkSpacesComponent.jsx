@@ -8,29 +8,37 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
 import AddModalComponent from '../addMembersModalComponent/AddModalComponent';
+import axios from 'axios';
 
 function DisplayWorkspacesComponent({
   workspaces,
   theme,
-  setCurrentWorkspace
+  setCurrentWorkspace,
+  updateWorkspaceList
 }) {
 
-  const [modalDefaultUser, setModalDefaultUser] = useState(null);
+  const token = localStorage.getItem('jwt');
   const navigate = useNavigate();
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const [openMembersModal, setOpenMembersModal] = useState(false);
   const handleMembersModalOpen = () => setOpenMembersModal(true);
   const handleMembersModalClose = () => {
     setOpenMembersModal(false);
-    setModalDefaultUser(null);
   };
 
   const handleOpenClick = (workspaceId) => {
     setOpenSubMenu(openSubMenu === workspaceId ? null : workspaceId);
   }
 
-  const handleDeleteClick = (workspace) => {
-    console.log('delete ::', workspace);
+  const handleDeleteClick = async (workspace) => {
+    // Close the submenu first to avoid UI state referencing deleted workspace
+    setOpenSubMenu(null);
+    
+    await axios.delete(`http://localhost:5500/workspace/${workspace.id}`, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // refreshes the list of workspaces by loading them from the server
+    await updateWorkspaceList();
   }
 
   return (
@@ -40,8 +48,6 @@ function DisplayWorkspacesComponent({
       <AddModalComponent
         open={openMembersModal}
         onClose={handleMembersModalClose}
-        defaultUser={modalDefaultUser}
-        updateDefaultUser={setModalDefaultUser}
       />
 
       <List
@@ -59,7 +65,7 @@ function DisplayWorkspacesComponent({
         dense='true'
       >
         {workspaces.map(workspace => (
-          <>
+          <div key={workspace.id}>
             <ListItemButton onClick={() => handleOpenClick(workspace.id)}>
               <ListItemText 
                 primary={workspace.title} 
@@ -111,7 +117,7 @@ function DisplayWorkspacesComponent({
                 </ListItemButton>
               </List>
             </Collapse>
-          </>
+          </div>
         ))}
       </List>
     </div>

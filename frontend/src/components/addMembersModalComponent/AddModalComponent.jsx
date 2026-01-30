@@ -11,13 +11,12 @@ import { List, ListItemButton, ListItemIcon, ListItemText, TextField, Button } f
 function AddModalComponent({
   open,
   onClose,
-  defaultUser,
-  updateDefaultUser
   }) {
 
   const [users, setUsers] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const [inviteText, setInviteText] = useState('');
+  const [defaultUser, setDefaultUser] = useState(null);
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const token = localStorage.getItem('jwt');
@@ -30,9 +29,23 @@ function AddModalComponent({
   };
   const openPopover = Boolean(popoverAnchorEl);
 
+  const handleCloseClick = () => {
+    onClose();
+    setUsers([]);
+    setSearchValue('');
+    setInviteText('');
+    setDefaultUser(null);
+  }
+
   const handleSendClick = () => {
     // TODO: create endpoint to send an invite link to someone
+    // request must include ::
+    // workspace_id - user email - optionnal message
     onClose();
+    setUsers([]);
+    setSearchValue('');
+    setInviteText('');
+    setDefaultUser(null);
   }
 
 
@@ -67,7 +80,7 @@ function AddModalComponent({
   return(
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleCloseClick}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       sx={{
@@ -93,7 +106,7 @@ function AddModalComponent({
               Invite to the workspace
             </div>
             <div className={styles.right}>
-              <button onClick={onClose}>
+              <button onClick={handleCloseClick}>
                 <img src={closeIcon} alt="close" />
               </button>
             </div>
@@ -121,7 +134,7 @@ function AddModalComponent({
                         width: '540px',
                       }}
                       // onClick={() => setSelectedUser(user)}
-                      onClick={() => updateDefaultUser(user)}
+                      onClick={() => setDefaultUser(user)}
                     >
                       <ListItemIcon>
                         <img src={user.image} className={styles.userPicture} alt="user picture" />

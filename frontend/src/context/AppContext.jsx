@@ -69,7 +69,15 @@ export function AppProvider({ children }) {
       { headers: { Authorization: `Bearer ${token}` },
     })
     setWorkspaceList(prev => [...prev, response.data]);
-  }
+  };
+
+  const updateWorkspaceList = async () => {
+    const currentToken = localStorage.getItem('jwt');
+    const response = await axios.get('http://localhost:5500/workspace/all', {
+      headers: { Authorization: `Bearer ${currentToken}` }
+    });
+    setWorkspaceList(response.data);
+  };
 
   const fetchWorkspaceBoards = async (workspace_id) => {
     const response = await axios.get(`http://localhost:5500/boards/all?workspace_id=${workspace_id}`, {
@@ -136,7 +144,8 @@ export function AppProvider({ children }) {
         getBoard,
         editWorkspace,
         getWorkspace,
-        setCurrentWorkspace
+        setCurrentWorkspace,
+        updateWorkspaceList
       }}  
     >
       { children }

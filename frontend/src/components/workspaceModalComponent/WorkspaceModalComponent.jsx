@@ -16,7 +16,7 @@ function WorkspaceModalComponent( {
   const [modalDescription, setModalDescription] = useState('');
 
   const handleSaveClick = () => {
-    createWorkspace(modalTitle, modalDescription);
+    createWorkspace(modalTitle, modalDescription); 
     onClose();
   }
 
