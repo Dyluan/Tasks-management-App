@@ -6,14 +6,18 @@ import { useState, useEffect } from 'react';
 import Popover from '@mui/material/Popover';
 import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
+import { List, ListItemButton, ListItemIcon, ListItemText, TextField, Button } from '@mui/material';
 
 function AddModalComponent({
   open,
-  onClose,}) {
+  onClose,
+  defaultUser,
+  updateDefaultUser
+  }) {
 
-  // TODO: add a search Function
-  // Will do when I be backend ready
+  const [users, setUsers] = useState([]);
   const [searchValue, setSearchValue] = useState('');
+  const [inviteText, setInviteText] = useState('');
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const token = localStorage.getItem('jwt');
@@ -25,6 +29,12 @@ function AddModalComponent({
     setPopoverAnchorEl(null);
   };
   const openPopover = Boolean(popoverAnchorEl);
+
+  const handleSendClick = () => {
+    // TODO: create endpoint to send an invite link to someone
+    onClose();
+  }
+
 
   // TODO: Write/use a correct invitation link
   // http://websiteName.com/xxxxxx/xxxxxxx
@@ -42,6 +52,7 @@ function AddModalComponent({
     );
 
     console.log('users:', response.data);
+    setUsers(response.data);
   }
 
   useEffect(() => {
@@ -87,13 +98,70 @@ function AddModalComponent({
               </button>
             </div>
           </div>
-          <div className={styles.searchSpace}>
-            <input 
-              type="text" 
-              placeholder='Email address' 
-              onChange={(e) => searchForUser(e.target.value)}
-            />
-          </div>
+          {/* {!selectedUser ? ( */}
+          { !defaultUser ? (
+            <>
+              <div className={styles.searchSpace}>
+                <input 
+                  type="text" 
+                  placeholder='Email address'
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
+                    searchForUser(e.target.value);
+                  }}
+                />
+              </div>
+              {searchValue.length > 0 && (
+                <List>
+                  {users.map(user => (
+                    <ListItemButton
+                      sx={{
+                        height: '52px',
+                        width: '540px',
+                      }}
+                      // onClick={() => setSelectedUser(user)}
+                      onClick={() => updateDefaultUser(user)}
+                    >
+                      <ListItemIcon>
+                        <img src={user.image} className={styles.userPicture} alt="user picture" />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={user.email}
+                        secondary={user.name}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              )}
+            </>
+          ) : (
+            <div className={styles.main}>
+              <div className={styles.mainHeader}>
+                <div className={styles.selectedLeft}>
+                  <button className={styles.userContainer}>
+                    {defaultUser.email}
+                  </button>
+                </div>
+                <div className={styles.selectedRight}>
+                  <Button 
+                    variant='contained' 
+                    onClick={() => handleSendClick()}
+                  >Send invitation</Button>
+                </div>
+              </div>
+              <div className={styles.mainMessage}>
+                <TextField 
+                  multiline
+                  rows={3}
+                  placeholder='Join this workspace so we can collaborate together'
+                  fullWidth
+                  onChange={(e) => setInviteText(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          
           <div className={styles.bottom}>
             <div className={styles.bottomLeft}>
               Invite to the workspace using a link :
@@ -108,6 +176,7 @@ function AddModalComponent({
                 Create a link
               </button>
             </div>
+            {/* copy to clipboard popover */}
             <Popover
               open={openPopover}
               anchorEl={popoverAnchorEl}

@@ -15,11 +15,15 @@ function DisplayWorkspacesComponent({
   setCurrentWorkspace
 }) {
 
+  const [modalDefaultUser, setModalDefaultUser] = useState(null);
   const navigate = useNavigate();
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const [openMembersModal, setOpenMembersModal] = useState(false);
   const handleMembersModalOpen = () => setOpenMembersModal(true);
-  const handleMembersModalClose = () => setOpenMembersModal(false);
+  const handleMembersModalClose = () => {
+    setOpenMembersModal(false);
+    setModalDefaultUser(null);
+  };
 
   const handleOpenClick = (workspaceId) => {
     setOpenSubMenu(openSubMenu === workspaceId ? null : workspaceId);
@@ -36,6 +40,8 @@ function DisplayWorkspacesComponent({
       <AddModalComponent
         open={openMembersModal}
         onClose={handleMembersModalClose}
+        defaultUser={modalDefaultUser}
+        updateDefaultUser={setModalDefaultUser}
       />
 
       <List
@@ -54,11 +60,11 @@ function DisplayWorkspacesComponent({
       >
         {workspaces.map(workspace => (
           <>
-            <ListItemButton>
+            <ListItemButton onClick={() => handleOpenClick(workspace.id)}>
               <ListItemText 
                 primary={workspace.title} 
               />
-              <ListItemIcon onClick={() => handleOpenClick(workspace.id)}>
+              <ListItemIcon>
                 {openSubMenu === workspace.id ? <ExpandLess sx={{color: theme.textColor}} /> : <ExpandMore sx={{color: theme.textColor}} />}
               </ListItemIcon>
             </ListItemButton>

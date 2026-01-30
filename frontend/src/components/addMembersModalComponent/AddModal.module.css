@@ -74,3 +74,17 @@
   flex-direction: row;
   align-items: center;
 }
+.userPicture {
+  border-radius: 50%;
+  height: 32px;
+}
+.mainHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.userContainer {
+  padding: 4px;
+}
