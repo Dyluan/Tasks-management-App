@@ -1,4 +1,5 @@
 import ColumnListComponent from "../columnListComponent/ColumnListComponent";
+import DeleteModalComponent from "../deleteModalComponent/DeleteModalComponent";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Board.module.css";
@@ -21,6 +22,7 @@ import { List } from "@mui/material";
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import DeleteIcon from '@mui/icons-material/Delete';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { useApp } from "../../context/AppContext";
 import axios from "axios";
@@ -137,6 +139,11 @@ function BoardComponent() {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handlePopoverClose = () => setAnchorEl(null);
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const handleDeleteModalOpen = () => setOpenDeleteModal(true);
+  const handleDeleteModalClose = () => setOpenDeleteModal(false);
+
   const boardThemes = [
     {
       type: 'gradient',
@@ -267,6 +274,12 @@ function BoardComponent() {
           <LoginIcon sx={{ color: 'white' }} />
         </ListItemIcon>
         <ListItemText primary="Login" />
+      </ListItemButton>
+      <ListItemButton onClick={handleDeleteModalOpen}>
+        <ListItemIcon>
+          <DeleteIcon sx={{ color: 'white' }} />
+        </ListItemIcon>
+        <ListItemText primary="Delete Board" />
       </ListItemButton>
     </List>
   )
@@ -626,6 +639,12 @@ function BoardComponent() {
 
   return (
     <div className={styles.container}>
+      {/* cool modal to delete board */}
+      <DeleteModalComponent 
+        open={openDeleteModal}
+        onClose={handleDeleteModalClose}
+        board={board}
+      />
       {boardTheme.type === 'component' && boardTheme.board === 'threads' && (
         <div className={styles.backgroundComponent}>
           <Threads 

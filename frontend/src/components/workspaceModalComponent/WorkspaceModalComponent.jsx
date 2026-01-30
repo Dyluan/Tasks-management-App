@@ -17,16 +17,22 @@ function WorkspaceModalComponent( {
 
   const handleSaveClick = () => {
     createWorkspace(modalTitle, modalDescription); 
+    handleCloseClick();
+  };
+
+  const handleCloseClick = () => {
     onClose();
-  }
+    setModalTitle('');
+    setModalDescription('');
+  };
 
   // TODO: redirect user to newly created workspace
   return (
     <Modal
       open={open}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      onClose={handleCloseClick}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
       sx={{
         display: 'flex',
         justifyContent: 'center',
@@ -50,7 +56,7 @@ function WorkspaceModalComponent( {
               Create a new workspace
             </div>
             <div className={styles.right}>
-              <button onClick={onClose}>
+              <button onClick={handleCloseClick}>
                 <img src={closeIcon} alt="close" />
               </button>
             </div>

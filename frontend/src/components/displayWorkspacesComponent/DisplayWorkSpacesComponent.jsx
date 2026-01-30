@@ -66,11 +66,14 @@ function DisplayWorkspacesComponent({
       >
         {workspaces.map(workspace => (
           <div key={workspace.id}>
-            <ListItemButton onClick={() => handleOpenClick(workspace.id)}>
+            <ListItemButton 
+              onClick={() => handleOpenClick(workspace.id)}
+              sx={{ pr: 1 }}
+            >
               <ListItemText 
                 primary={workspace.title} 
               />
-              <ListItemIcon>
+              <ListItemIcon sx={{ minWidth: 'auto', justifyContent: 'flex-end' }}>
                 {openSubMenu === workspace.id ? <ExpandLess sx={{color: theme.textColor}} /> : <ExpandMore sx={{color: theme.textColor}} />}
               </ListItemIcon>
             </ListItemButton>
