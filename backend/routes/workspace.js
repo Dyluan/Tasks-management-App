@@ -101,6 +101,42 @@ router.post('/current', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).send('Setting default workspace failed lol');
   }
+});
+
+// TODO: assign new current_workspace if user deletes current one
+router.delete('/:id', requireAuth, async (req, res) => {
+  console.log('delete     workspace/id');
+  try {
+
+    const workspace_id = req.params.id;
+    const user_id = req.user.sub;
+
+    // check if workspace to be deleted is not the only one user has
+    const nb_of_workspaces = await pool.query(
+      `SELECT * FROM workspaces WHERE owner_id = $1`,
+      [user_id]
+    );
+    // if user has multiple workspaces, then we can delete
+    if (nb_of_workspaces.rows.length > 1) {
+      const result = await pool.query(
+        `DELETE FROM workspaces WHERE id = $1 AND owner_id = $2`,
+        [workspace_id, user_id]
+      );
+
+      if (result.rowCount === 0) {
+        res.status(404).send({ error: 'Workspace not found' });
+      }
+
+      res.status(204).json({ message: 'workspace successfully deleted' });
+
+    } else {
+      res.json({ message: `Cannot delete user's only workspace` });
+    }
+
+  } catch(err) {
+    console.log(err);
+    res.status(400).send('Unable to delete workspace lol');
+  }
 })
 
 router.get('/:id', requireAuth, async (req, res) => {

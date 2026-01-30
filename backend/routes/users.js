@@ -11,7 +11,6 @@ router.get('/search', requireAuth, async (req, res) => {
   console.log('get     /users/search');
   try {
     const search = req.query.query;
-    console.log("search:", search);
 
     const result = await pool.query(
       `SELECT email, name, image FROM users WHERE email LIKE $1

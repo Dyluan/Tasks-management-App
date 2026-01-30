@@ -165,6 +165,30 @@ router.delete('/column/:id', requireAuth, async (req, res) => {
   }
 });
 
+router.delete('/:id', requireAuth, async (req, res) => {
+  console.log('delete     /boards/id');
+  try {
+
+    const board_id = req.params.id;
+    const user_id = req.user.sub;
+
+    const result = await pool.query(
+      `DELETE FROM boards WHERE id = $1 AND owner_id = $2`,
+      [board_id, user_id]
+    );
+
+    if (result.rowCount === 0) {
+      res.status(404).send({ error: 'Board not found' });
+    }
+
+    res.status(204).json({ message: 'Board successfully deleted' });
+
+  } catch(err) {
+    console.log(err);
+    res.status(400).send('Unable to delete board lol');
+  }
+});
+
 router.get('/:id/all', requireAuth, async (req, res) => {
   console.log('/id/all');
   try {

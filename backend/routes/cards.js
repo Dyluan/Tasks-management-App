@@ -204,7 +204,6 @@ router.post('/:id/comment', requireAuth, async (req, res) => {
   }
 });
 
-// TODO: Does not work when label_ids is empty
 router.post('/:id/labels', requireAuth, async (req, res) => {
   console.log('post     /id/labels');
 
