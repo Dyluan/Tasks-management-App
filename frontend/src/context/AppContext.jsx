@@ -1,13 +1,11 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import axios from "axios";
-import { useUser } from "./UserContext";
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
   
   // We will store our data here: board, workspace,..
-  const { user } = useUser();
 
   const [workspace, setWorkspace] = useState({});
   const [workspaceList, setWorkspaceList] = useState([]);
@@ -64,7 +62,6 @@ export function AppProvider({ children }) {
       {
         title: title,
         description: description,
-        owner_id: user.sub
       },
       { headers: { Authorization: `Bearer ${token}` },
     })
@@ -87,6 +84,10 @@ export function AppProvider({ children }) {
     });
     setBoards(response.data);
   }
+
+  const deleteBoard = (board_id) => {
+    setBoards(boards => boards.filter(board => board.id !== board_id));
+  };
 
   const updateBoards = (newBoard) => {
     setBoards(prev => [...prev, newBoard]);
@@ -145,7 +146,8 @@ export function AppProvider({ children }) {
         editWorkspace,
         getWorkspace,
         setCurrentWorkspace,
-        updateWorkspaceList
+        updateWorkspaceList,
+        deleteBoard
       }}  
     >
       { children }

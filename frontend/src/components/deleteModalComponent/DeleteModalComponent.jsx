@@ -6,6 +6,7 @@ import closeIcon from '../../assets/close_icon.png';
 import WarningIcon from '@mui/icons-material/Warning';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { useApp } from '../../context/AppContext';
 
 function DeleteModalComponent({
   open,
@@ -13,6 +14,7 @@ function DeleteModalComponent({
   board
 }) {
 
+  const { deleteBoard } = useApp();
   const navigate = useNavigate();
   const handleCloseClick = () => {
     onClose();
@@ -25,7 +27,8 @@ function DeleteModalComponent({
     const response = await axios.delete(`http://localhost:5500/boards/${board.id}`, 
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    console.log('response: ', response.data);
+
+    deleteBoard(board.id);
     onClose();
     navigate('/home');
   }
