@@ -21,6 +21,8 @@ function LabelComponent({
   addColorToList
   }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const [shouldEditComponentRenderCreateButton, setShouldEditComponentRenderCreateButton] = useState(false);
   const token = localStorage.getItem('jwt');
 
@@ -53,7 +55,7 @@ function LabelComponent({
     updateColorList(selectedLabelColor, updatedColor);
 
     // editing label server side as well
-    await axios.patch(`http://localhost:5500/boards/labels/${updatedColor.id}`,
+    await axios.patch(`${server_url}/boards/labels/${updatedColor.id}`,
       { 
         text: updatedColor.text, 
         color: updatedColor.color, 

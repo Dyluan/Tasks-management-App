@@ -28,6 +28,8 @@ function CardComponent({
   addColorToList
   }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const [cardTitle, setCardTitle] = useState(card.cardName);
   const [editingTitle, setEditingTitle] = useState(false);
   const titleInputRef = useRef(null);
@@ -62,7 +64,7 @@ function CardComponent({
   const labelsLoadedRef = useRef(false);
 
   const patchCard = async (id, updates) => {
-    const response = await axios.patch(`http://localhost:5500/cards/${id}`, 
+    const response = await axios.patch(`${server_url}/cards/${id}`, 
       updates,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -72,7 +74,7 @@ function CardComponent({
   // loads card labels on page load
   useEffect(() => {
     const getCardLabelsFromServer = async () => {
-      const response = await axios.get(`http://localhost:5500/cards/${card.id}/labels`, 
+      const response = await axios.get(`${server_url}/cards/${card.id}/labels`, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const labelsLoadedFromServer = response.data;
@@ -120,7 +122,7 @@ function CardComponent({
     });
 
     const label_ids = updated.map(l => l.id);
-    const response = await axios.post(`http://localhost:5500/cards/${card.id}/labels`,
+    const response = await axios.post(`${server_url}/cards/${card.id}/labels`,
       { label_ids: label_ids},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -141,7 +143,7 @@ function CardComponent({
       comments: updatedCommentList
     });
 
-    const response = await axios.delete(`http://localhost:5500/cards/comment/${commentId}`,
+    const response = await axios.delete(`${server_url}/cards/comment/${commentId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -218,7 +220,7 @@ function CardComponent({
   }
 
   const updateComments = async (newComment) => {
-    const response = await axios.post(`http://localhost:5500/cards/${card.id}/comment`,
+    const response = await axios.post(`${server_url}/cards/${card.id}/comment`,
       { title: newComment },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -279,7 +281,7 @@ function CardComponent({
 
     setEditingCommentId(null);
 
-    const response = await axios.patch(`http://localhost:5500/cards/comment/${commentId}`,
+    const response = await axios.patch(`${server_url}/cards/comment/${commentId}`,
       { title: tempEditComment },
       { headers: {Authorization: `Bearer ${token}`} }
     );

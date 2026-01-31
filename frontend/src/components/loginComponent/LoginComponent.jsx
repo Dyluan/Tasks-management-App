@@ -8,11 +8,10 @@ import siteLogo from '../../assets/site_logo.svg';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useUser } from '../../context/UserContext';
 
 function LoginComponent({ userHasAnAccount=true }) {
 
-  const { updateUser } = useUser();
+  const server_url = process.env.REACT_APP_SERVER_URL;
 
   const [displayLogin, setDisplayLogin] = useState(userHasAnAccount);
   const [email, setEmail] = useState('');
@@ -99,7 +98,7 @@ function LoginComponent({ userHasAnAccount=true }) {
 
   const handleLoginClick = async () => {
     try {
-      const response = await axios.post('http://localhost:5500/auth/login', {
+      const response = await axios.post(`${server_url}/auth/login`, {
         email: email,
         password: password
       });
@@ -112,7 +111,7 @@ function LoginComponent({ userHasAnAccount=true }) {
 
   const handleRegisterClick = async () => {
     try {
-      const response = await axios.post('http://localhost:5500/auth/register', {
+      const response = await axios.post(`${server_url}/auth/register`, {
         username: userName,
         email: email,
         password: password
@@ -180,13 +179,13 @@ function LoginComponent({ userHasAnAccount=true }) {
             </div>
             <div className={styles.socials}>
               <button><GoogleIcon onClick={() => {
-                window.location.href = 'http://localhost:5500/auth/google/login'
+                window.location.href = `${server_url}/auth/google/login`
               }} /></button>
               <button><FacebookIcon onClick={() => {
-                window.location.href = 'http://localhost:5500/auth/facebook/login'
+                window.location.href = `${server_url}/auth/facebook/login`
               }}/></button>
               <button><GitHubIcon onClick={() => {
-                window.location.href = 'http://localhost:5500/auth/github/login'  
+                window.location.href = `${server_url}/auth/github/login`  
               }} />
               </button>
             </div>

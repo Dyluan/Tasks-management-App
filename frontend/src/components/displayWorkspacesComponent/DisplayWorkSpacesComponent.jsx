@@ -17,6 +17,8 @@ function DisplayWorkspacesComponent({
   updateWorkspaceList
 }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const token = localStorage.getItem('jwt');
   const navigate = useNavigate();
   const [openSubMenu, setOpenSubMenu] = useState(null);
@@ -34,7 +36,7 @@ function DisplayWorkspacesComponent({
     // Close the submenu first to avoid UI state referencing deleted workspace
     setOpenSubMenu(null);
     
-    await axios.delete(`http://localhost:5500/workspace/${workspace.id}`, 
+    await axios.delete(`${server_url}/workspace/${workspace.id}`, 
       { headers: { Authorization: `Bearer ${token}` } }
     );
     // refreshes the list of workspaces by loading them from the server

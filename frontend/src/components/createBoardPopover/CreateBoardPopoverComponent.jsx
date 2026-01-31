@@ -13,6 +13,8 @@ function CreateBoardPopoverComponent({
   onClose, 
   workspace_id
   }) {
+  
+  const server_url = process.env.REACT_APP_SERVER_URL;
 
   const { fetchWorkspaceBoards } = useApp();
 
@@ -26,7 +28,7 @@ function CreateBoardPopoverComponent({
   const handleSaveClick = async () => {
     const token = localStorage.getItem('jwt');
 
-    const response = await axios.post('http://localhost:5500/boards/new', 
+    const response = await axios.post(`${server_url}/boards/new`, 
       {
         name: title,
         workspace_id: workspace_id,

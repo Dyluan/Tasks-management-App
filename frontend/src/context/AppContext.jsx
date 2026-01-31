@@ -7,6 +7,8 @@ export function AppProvider({ children }) {
   
   // We will store our data here: board, workspace,..
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const [workspace, setWorkspace] = useState({});
   const [workspaceList, setWorkspaceList] = useState([]);
   const [boards, setBoards] = useState([]);
@@ -15,7 +17,7 @@ export function AppProvider({ children }) {
 
   // fetches the current user's workspace
   const getCurrentWorkspace = async () => {
-    const response = await axios.get(`http://localhost:5500/workspace/current`, {
+    const response = await axios.get(`${server_url}/workspace/current`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     const currentWorkspace = response.data;
@@ -23,7 +25,7 @@ export function AppProvider({ children }) {
     return currentWorkspace;
   }
   const setCurrentWorkspace = async (workspace_id) => {
-    const response = await axios.post(`http://localhost:5500/workspace/current`, {
+    const response = await axios.post(`${server_url}/workspace/current`, {
       workspace_id: workspace_id
     }, 
     {
@@ -33,7 +35,7 @@ export function AppProvider({ children }) {
 
   // gets the user's workspace by workspace id
   const getWorkspace = async (id) => {
-    const response = await axios.get(`http://localhost:5500/workspace/${id}`, {
+    const response = await axios.get(`${server_url}/workspace/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -41,7 +43,7 @@ export function AppProvider({ children }) {
   }
 
   const editWorkspace = async (id, updates) => {
-    const response = await axios.patch(`http://localhost:5500/workspace/${id}`, 
+    const response = await axios.patch(`${server_url}/workspace/${id}`, 
       updates,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -58,7 +60,7 @@ export function AppProvider({ children }) {
   }
 
   const createWorkspace = async (title, description) => {
-    const response = await axios.post('http://localhost:5500/workspace/new', 
+    const response = await axios.post(`${server_url}/workspace/new`, 
       {
         title: title,
         description: description,
@@ -70,14 +72,14 @@ export function AppProvider({ children }) {
 
   const updateWorkspaceList = async () => {
     const currentToken = localStorage.getItem('jwt');
-    const response = await axios.get('http://localhost:5500/workspace/all', {
+    const response = await axios.get(`${server_url}/workspace/all`, {
       headers: { Authorization: `Bearer ${currentToken}` }
     });
     setWorkspaceList(response.data);
   };
 
   const fetchWorkspaceBoards = async (workspace_id) => {
-    const response = await axios.get(`http://localhost:5500/boards/all?workspace_id=${workspace_id}`, {
+    const response = await axios.get(`${server_url}/boards/all?workspace_id=${workspace_id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -100,7 +102,7 @@ export function AppProvider({ children }) {
   }
 
   const getBoard = async (id) => {
-    const response = await axios.get(`http://localhost:5500/boards/${id}`, {
+    const response = await axios.get(`${server_url}/boards/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -111,7 +113,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const fetchWorkspaces = async () => {
       if (token) {
-        const response = await axios.get('http://localhost:5500/workspace/all', {
+        const response = await axios.get(`${server_url}/workspace/all`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

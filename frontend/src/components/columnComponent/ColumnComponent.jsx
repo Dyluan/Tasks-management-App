@@ -24,6 +24,8 @@ function ColumnComponent({
   addColorToList
   }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const items = column.items;
   const [nbOfCards, setNbOfCards] = useState(items.length);
   const columnTitle = column.title;
@@ -47,7 +49,7 @@ function ColumnComponent({
   }, [editingTitle]);
 
   const newCard = async () => {
-    const response = await axios.post('http://localhost:5500/cards/new', 
+    const response = await axios.post(`${server_url}/cards/new`, 
       { title: 'New Card', column_id: column.id, position: nbOfCards },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -82,7 +84,7 @@ function ColumnComponent({
     );
 
     // THEN deleting from server
-    await axios.delete(`http://localhost:5500/cards/${idToRemove}`,
+    await axios.delete(`${server_url}/cards/${idToRemove}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
   };

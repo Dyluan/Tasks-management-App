@@ -13,6 +13,8 @@ function AddModalComponent({
   onClose,
   }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const [users, setUsers] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const [inviteText, setInviteText] = useState('');
@@ -57,7 +59,7 @@ function AddModalComponent({
   };
 
   const searchForUser = async (search) => {
-    const response = await axios.get(`http://localhost:5500/users/search`, 
+    const response = await axios.get(`${server_url}/users/search`, 
       { 
         params: { query: search },
         headers: { Authorization: `Bearer ${token}` }

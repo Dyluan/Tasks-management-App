@@ -29,6 +29,8 @@ import axios from "axios";
 
 function BoardComponent() {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const { getBoard, updateBoard } = useApp();
   const { id } = useParams();
   const [board, setBoard] = useState({});
@@ -43,7 +45,7 @@ function BoardComponent() {
   const [colorList, setColorList] = useState([]);
 
   const newColumn = async() => {
-    const response = await axios.post(`http://localhost:5500/boards/${id}/columns/new`, 
+    const response = await axios.post(`${server_url}/boards/${id}/columns/new`, 
       { position: nbOfColumns+1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -54,7 +56,7 @@ function BoardComponent() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`http://localhost:5500/boards/${id}/all`, {
+      const response = await axios.get(`${server_url}/boards/${id}/all`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -96,7 +98,7 @@ function BoardComponent() {
 
   useEffect(() => {
     const getLabels = async() => {
-      const response = await axios.get(`http://localhost:5500/boards/${id}/labels`, {
+      const response = await axios.get(`${server_url}/boards/${id}/labels`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -110,7 +112,7 @@ function BoardComponent() {
   // takes 2 args: name and colors, and sends the request with appropriate data
   // allows me to either change the name or the color or both
   const saveChanges = async({name=boardName, colors=boardTheme}) => {
-    const response = await axios.patch(`http://localhost:5500/boards/${board.id}`, 
+    const response = await axios.patch(`${server_url}/boards/${board.id}`, 
       {
         name: name,
         colors: colors
@@ -124,7 +126,7 @@ function BoardComponent() {
   };
 
   const updateColumn = async(column_id, updates) => {
-    const response = await axios.patch(`http://localhost:5500/boards/column/${column_id}`, 
+    const response = await axios.patch(`${server_url}/boards/column/${column_id}`, 
       updates,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -132,7 +134,7 @@ function BoardComponent() {
   };
 
   const deleteColumnFromServer = async(column_id) => {
-    await axios.delete(`http://localhost:5500/boards/column/${column_id}`, 
+    await axios.delete(`${server_url}/boards/column/${column_id}`, 
       { headers: { Authorization: `Bearer ${token}` } }
     );
   };
@@ -326,7 +328,7 @@ function BoardComponent() {
         }))
       );
       // removes the color from the server as well
-      await axios.delete(`http://localhost:5500/boards/labels/${id}`, {
+      await axios.delete(`${server_url}/boards/labels/${id}`, {
         data: { board_id: board.id },
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -336,7 +338,7 @@ function BoardComponent() {
   // add color to labels
   const addColorToList = async (newColor) => {
     // create label on server first and get the real ID
-    const response = await axios.post(`http://localhost:5500/boards/${board.id}/labels`, 
+    const response = await axios.post(`${server_url}/boards/${board.id}/labels`, 
       { text: newColor.text, color: newColor.color },
       { headers: { Authorization: `Bearer ${token}` } }
     );

@@ -14,6 +14,8 @@ function DeleteModalComponent({
   board
 }) {
 
+  const server_url = process.env.REACT_APP_SERVER_URL;
+
   const { deleteBoard } = useApp();
   const navigate = useNavigate();
   const handleCloseClick = () => {
@@ -24,7 +26,7 @@ function DeleteModalComponent({
   // TODO: refresh the boards in the workspaces since front still holds old value
   const handleDeleteClick = async () => {
     const token = localStorage.getItem('jwt');
-    const response = await axios.delete(`http://localhost:5500/boards/${board.id}`, 
+    const response = await axios.delete(`${server_url}/boards/${board.id}`, 
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
