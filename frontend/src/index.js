@@ -4,6 +4,7 @@ import './index.css';
 import BoardComponent from './components/boardComponent/BoardComponent';
 import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
+import TestPage from './pages/testPage/TestPage';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from './context/UserContext';
@@ -21,6 +22,7 @@ root.render(
             <Route path='/home' element={<HomePage />} />
             <Route path='/workspace/:id' element={<HomePage />} />
             <Route path='/login' element={<LoginPage />} />
+            <Route path='/test' element={<TestPage />} />
           </Routes>
         </BrowserRouter>
       </AppProvider>
