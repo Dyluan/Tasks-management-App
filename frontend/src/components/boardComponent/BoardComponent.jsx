@@ -599,7 +599,21 @@ function BoardComponent() {
       const overIndex = columns.findIndex(col => col.id === overColumnId);
       
       if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
-        setColumns(arrayMove(columns, activeIndex, overIndex));
+        const reorderedColumns = arrayMove(columns, activeIndex, overIndex);
+        
+        // Update local state with new positions
+        const updatedColumns = reorderedColumns.map((col, index) => ({
+          ...col,
+          position: index + 1  // positions are 1-based
+        }));
+        setColumns(updatedColumns);
+        
+        // Send updated positions to server for all affected columns
+        const minIndex = Math.min(activeIndex, overIndex);
+        const maxIndex = Math.max(activeIndex, overIndex);
+        for (let i = minIndex; i <= maxIndex; i++) {
+          updateColumn(updatedColumns[i].id, { position: updatedColumns[i].position });
+        }
       }
       return;
     }
