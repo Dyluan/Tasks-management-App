@@ -139,6 +139,13 @@ function BoardComponent() {
     );
   };
 
+  const updateCardPosition = async(card_id, updates) => {
+    await axios.patch(`${server_url}/cards/${card_id}`, 
+      updates,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  };
+
   const [anchorEl, setAnchorEl] = useState(null);
   const handlePopoverClose = () => setAnchorEl(null);
 
@@ -564,12 +571,41 @@ function BoardComponent() {
       const [movedCard] = activeItems.splice(activeIndex, 1);
       overItems.splice(newIndex, 0, movedCard);
 
+      // Update positions for cards in the source column
+      const updatedActiveItems = activeItems.map((item, index) => ({
+        ...item,
+        position: index + 1
+      }));
+
+      // Update positions for cards in the destination column
+      const updatedOverItems = overItems.map((item, index) => ({
+        ...item,
+        position: index + 1
+      }));
+
+      // Save card positions to server
+      // Update moved card with new column_id and position
+      updateCardPosition(movedCard.id, { 
+        column_id: overContainer, 
+        position: newIndex + 1 
+      });
+
+      // Update positions of affected cards in source column
+      for (let i = activeIndex; i < updatedActiveItems.length; i++) {
+        updateCardPosition(updatedActiveItems[i].id, { position: updatedActiveItems[i].position });
+      }
+
+      // Update positions of affected cards in destination column (after the inserted card)
+      for (let i = newIndex + 1; i < updatedOverItems.length; i++) {
+        updateCardPosition(updatedOverItems[i].id, { position: updatedOverItems[i].position });
+      }
+
       return prev.map(col => {
         if (col.id === activeContainer) {
-          return { ...col, items: activeItems };
+          return { ...col, items: updatedActiveItems };
         }
         if (col.id === overContainer) {
-          return { ...col, items: overItems };
+          return { ...col, items: updatedOverItems };
         }
         return col;
       });
@@ -630,9 +666,24 @@ function BoardComponent() {
             const overIndex = col.items.findIndex(item => item.id === overId);
             
             if (activeIndex !== -1 && overIndex !== -1) {
+              const reorderedItems = arrayMove(col.items, activeIndex, overIndex);
+              
+              // Update positions for all cards
+              const updatedItems = reorderedItems.map((item, index) => ({
+                ...item,
+                position: index + 1
+              }));
+
+              // Save updated positions to server for affected cards
+              const minIndex = Math.min(activeIndex, overIndex);
+              const maxIndex = Math.max(activeIndex, overIndex);
+              for (let i = minIndex; i <= maxIndex; i++) {
+                updateCardPosition(updatedItems[i].id, { position: updatedItems[i].position });
+              }
+
               return {
                 ...col,
-                items: arrayMove(col.items, activeIndex, overIndex)
+                items: updatedItems
               };
             }
           }
