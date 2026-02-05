@@ -103,41 +103,82 @@ router.post('/current', requireAuth, async (req, res) => {
   }
 });
 
-// TODO: assign new current_workspace if user deletes current one
 router.delete('/:id', requireAuth, async (req, res) => {
-  console.log('delete     workspace/id');
+  console.log('delete workspace/id');
+
+  const workspaceIdToDelete = req.params.id;
+  const userId = req.user.sub;
+
+  const client = await pool.connect();
+
   try {
+    await client.query('BEGIN');
 
-    const workspace_id = req.params.id;
-    const user_id = req.user.sub;
-
-    // check if workspace to be deleted is not the only one user has
-    const nb_of_workspaces = await pool.query(
-      `SELECT * FROM workspaces WHERE owner_id = $1`,
-      [user_id]
+    // Get all user workspaces
+    const { rows: workspaces } = await client.query(
+      `SELECT id FROM workspaces WHERE owner_id = $1`,
+      [userId]
     );
-    // if user has multiple workspaces, then we can delete
-    if (nb_of_workspaces.rows.length > 1) {
-      const result = await pool.query(
-        `DELETE FROM workspaces WHERE id = $1 AND owner_id = $2`,
-        [workspace_id, user_id]
-      );
 
-      if (result.rowCount === 0) {
-        res.status(404).send({ error: 'Workspace not found' });
-      }
-
-      res.status(204).json({ message: 'workspace successfully deleted' });
-
-    } else {
-      res.json({ message: `Cannot delete user's only workspace` });
+    if (workspaces.length <= 1) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ message: "Cannot delete user's only workspace" });
     }
 
-  } catch(err) {
-    console.log(err);
-    res.status(400).send('Unable to delete workspace lol');
+    // Check current workspace
+    const { rows: userRows } = await client.query(
+      `SELECT current_workspace FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    const currentWorkspaceId = userRows[0].current_workspace;
+
+    let newCurrentWorkspaceId = currentWorkspaceId;
+
+    // If deleting the current workspace, pick another one
+    if (currentWorkspaceId === workspaceIdToDelete) {
+      const alternative = workspaces.find(w => w.id !== workspaceIdToDelete);
+
+      if (!alternative) {
+        await client.query('ROLLBACK');
+        return res.status(500).json({ message: 'No alternative workspace found' });
+      }
+
+      newCurrentWorkspaceId = alternative.id;
+
+      await client.query(
+        `UPDATE users SET current_workspace = $1 WHERE id = $2`,
+        [newCurrentWorkspaceId, userId]
+      );
+    }
+
+    // Delete workspace
+    const deleteResult = await client.query(
+      `DELETE FROM workspaces WHERE id = $1 AND owner_id = $2`,
+      [workspaceIdToDelete, userId]
+    );
+
+    if (deleteResult.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+
+    await client.query('COMMIT');
+
+    res.status(200).json({
+      message: 'Workspace deleted',
+      currentWorkspace: newCurrentWorkspaceId, // url to redirect to
+    });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error(err);
+    res.status(500).send('Unable to delete workspace');
+
+  } finally {
+    client.release();
   }
-})
+});
 
 router.get('/:id', requireAuth, async (req, res) => {
   console.log('/workspace/id');
