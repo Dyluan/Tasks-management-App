@@ -27,7 +27,7 @@ router.get('/all', requireAuth, async (req, res) => {
     }
   } catch(err) {
     console.error(err);
-    res.status(500).send('Fetching workspaces failed lol');
+    res.status(500).send('Fetching boards failed lol');
   }
 })
 
