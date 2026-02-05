@@ -27,7 +27,6 @@ app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
 
 app.get('/me', requireAuth, (req,res) => {
-  console.log('/me called.');
   res.json(req.user);
 })
 

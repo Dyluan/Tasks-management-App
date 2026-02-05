@@ -187,9 +187,9 @@ router.put('/:id', requireAuth, async (req, res) => {
 })
 
 router.patch('/:id', requireAuth, async (req, res) => {
-  console.log('patch   /workspapces/id');
+  console.log('patch   /workspaces/id');
   try {
-    const allowedFields = ['title', 'theme', 'members'];
+    const allowedFields = ['title', 'theme', 'members', 'darkMode'];
 
     const updates = [];
     const values = [];
@@ -198,7 +198,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
     for (const [key, value] of Object.entries(req.body)) {
       if (!allowedFields.includes(key)) continue;
 
-      updates.push(`${key} = $${index}`);
+      updates.push(`"${key}" = $${index}`);
       values.push(value);
 
       index ++;
