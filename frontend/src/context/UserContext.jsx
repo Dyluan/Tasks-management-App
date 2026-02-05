@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState, useContext, createContext } from "react";
 
 const UserContext = createContext();
@@ -17,14 +18,31 @@ export function UserProvider({ children }) {
   }
 
   const setUserInfo = async () => {
-    const response = await fetch(`${server_url}/me`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('jwt')}`
-      }
-    });
-    const data = await response.json();
-    setUser(data);
-    return data;
+    try {
+      const response = await fetch(`${server_url}/me`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('jwt')}`
+        }
+      });
+      const data = await response.json();
+
+      // Get detailed user info using data.sub
+      const userInfo = await getUserInfo(data.sub);
+      
+      setUser(userInfo);
+      return data;
+
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      return null;
+    }
+  };
+
+  const getUserInfo = async (id) => {
+    const response = await axios.get(`${server_url}/users/${id}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('jwt')}` }}
+    );
+    return response.data;
   }
 
   return (

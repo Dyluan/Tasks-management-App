@@ -1,18 +1,277 @@
-import styles from './Test.module.css';
-import { useState } from 'react';
+import styles from './NewHome.module.css';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { useApp } from '../../context/AppContext';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Divider, Collapse } from '@mui/material';
+import Popover from '@mui/material/Popover';
+import AddIcon from '@mui/icons-material/Add';
+import LogoutIcon from '@mui/icons-material/Logout';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import ContrastIcon from '@mui/icons-material/Contrast';
+import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
+import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
+import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 
-function TestPage() {
+function NewHomePage() {
+
+  const { user, setUserInfo } = useUser();
+  const {
+    workspace,
+    workspaceList,
+    createWorkspace,
+    boards,
+    editWorkspace,
+    getWorkspace,
+    fetchWorkspaceBoards,
+    setCurrentWorkspace,
+    updateWorkspaceList
+  } = useApp();
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  // parses the workspace's id from the url and calls a function to update workspace infos
+  // to match with workspace url
+  const {id} = useParams();
+  useEffect(() => {
+    if (id) {
+      getWorkspace(id);
+      fetchWorkspaceBoards(id);
+    }
+  }, [id]);
+
+  // useEffect called because login with socials redirects to homePage
+  useEffect(() => {
+    if(token) {
+      localStorage.setItem('jwt', token);
+      window.history.replaceState({}, '', '/home');
+      // calling /me
+      setUserInfo();
+    }
+  }, [token]);
+
+  // auto-connects the user
+  useEffect(() => {
+    localStorage.getItem('jwt');
+    setUserInfo();
+  }, []);
+
   const [darkMode, setDarkMode] = useState(false);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  useEffect(() => {
+    setDarkMode(workspace.darkMode);
+  }, [workspace.darkMode]);
+
+  const navigate = useNavigate();
+
+  const toggleDarkMode = async () => {
+    editWorkspace(workspace.id, { darkMode: !workspace.darkMode });
   };
 
+  const [titleEdit, setTitleEdit] = useState(false);
+  const [workspaceTitle, setWorkspaceTitle] = useState(workspace.title);
+  const prevWorkspaceTitleRef = useRef(workspaceTitle);
+  const titleInputRef = useRef(null);
+
+  useEffect(() => {
+    if (workspace.title) {
+      setWorkspaceTitle(workspace.title);
+    }
+  }, [workspace.title]);
+
+  useEffect(() => {
+    if (titleEdit && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [titleEdit]);
+
+  const startEditTitle = () => {
+    prevWorkspaceTitleRef.current = workspaceTitle;
+    setTitleEdit(true);
+  };
+  const cancelEdit = () => {
+    setWorkspaceTitle(prevWorkspaceTitleRef.current);
+    setTitleEdit(false);
+  };
+  const onTitleKeyDown = (e) => {
+    if (e.key === 'Enter') saveTitle(e.target.value);
+    if (e.key === 'Escape') cancelEdit();
+  };
+  const saveTitle = (newTitle) => {
+    const trimmed = String(newTitle).trim();
+    if (trimmed.length === 0) {
+      setWorkspaceTitle(prevWorkspaceTitleRef.current);
+    } else {
+      // editWorkspaceTitle(trimmed, workspace.id);
+      editWorkspace(workspace.id, { title: trimmed })
+      setWorkspaceTitle(trimmed);
+    }
+    setTitleEdit(false);
+  };
+
+  const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
+  const handlePopoverClick = (e) => {
+    setPopoverAnchorEl(e.currentTarget);
+  };
+  const handlePopoverClose = () => {
+    setPopoverAnchorEl(null);
+  };
+  const popoverOpen = Boolean(popoverAnchorEl);
+
+  const [openModal, setOpenModal] = useState(false);
+  const handleModalOpen = () => setOpenModal(true);
+  const handleModalClose = () => setOpenModal(false);
+
+  const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
+  const handleWorkspaceModalOpen = () => setOpenWorkspaceModal(true);
+  const handleWorkspaceModalClose = () => setOpenWorkspaceModal(false);
+
+  const [secondListOpen, setSecondListOpen] = useState(false);
+  const handleSecondListOpening = () => {
+    setSecondListOpen(!secondListOpen);
+  };
+
+  const [boardPopoverAnchorEl, setBoardPopoverAnchorEl] = useState(null);
+  const boardPopoverOpen = Boolean(boardPopoverAnchorEl);
+  const handleBoardPopoverClick = (e) => {
+    setBoardPopoverAnchorEl(e.currentTarget);
+  };
+  const handleBoardPopoverClose = () => setBoardPopoverAnchorEl(null);
+
+  const popoverContent = (
+    <List
+      subheader={
+        <ListSubheader component='div'>
+          Account
+        </ListSubheader>
+      }
+      dense={true}
+    >
+      <ListItem>
+        <ListItemIcon>
+          <img
+            src={user?.picture || user?.avatar || ''}
+            alt="user"
+            style={{
+              height: '38px',
+              width: '38px',
+              borderRadius: '50%'
+            }}
+          />
+        </ListItemIcon>
+        <ListItemText
+          primary={user?.name || ''}
+          secondary={user?.email || ''}
+        />
+      </ListItem>
+      <ListItemButton onClick={() => navigate('/login')}>
+        <ListItemText primary="Change account" />
+      </ListItemButton>
+      <ListItemButton onClick={() => navigate('/user')}>
+        <ListItemText primary="Manage account" />
+      </ListItemButton>
+      <Divider />
+      <ListItem>
+        <ListItemText secondary="Task Management App" />
+      </ListItem>
+      <ListItemButton onClick={handleModalOpen}>
+        <ListItemIcon>
+          <GroupAddIcon />
+        </ListItemIcon>
+        <ListItemText primary="Add members" />
+      </ListItemButton>
+      <ListItemButton onClick={handleSecondListOpening}>
+        <ListItemIcon>
+          <ContrastIcon />
+        </ListItemIcon>
+        <ListItemText primary="Theme" />
+        {secondListOpen ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse in={secondListOpen} timeout="auto" unmountOnExit>
+        <List dense="true">
+          <ListItemButton
+            sx={{ pl: 4 }}
+            onClick={async () => {
+              editWorkspace(workspace.id, { darkMode: true })
+            }}
+          >
+            <ListItemIcon>
+              <DarkModeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Dark mode" />
+          </ListItemButton>
+          <ListItemButton
+            sx={{ pl: 4 }}
+            onClick={async () => {
+              editWorkspace(workspace.id, { darkMode: false })
+            }}
+          >
+            <ListItemIcon>
+              <LightModeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Light mode" />
+          </ListItemButton>
+        </List>
+      </Collapse>
+      <Divider />
+      <ListItemButton onClick={handleWorkspaceModalOpen}>
+        <ListItemIcon>
+          <AddIcon />
+        </ListItemIcon>
+        <ListItemText primary="Create a new workspace" />
+      </ListItemButton>
+      <Divider />
+      <ListItemButton>
+        <ListItemIcon>
+          <LogoutIcon />
+        </ListItemIcon>
+        <ListItemText primary="Log out" />
+      </ListItemButton>
+    </List>
+  );
+
   return (
-    <div className={`${styles.app} ${darkMode ? styles.dark : styles.light}`}>
+    <div className={`${styles.app} ${workspace.darkMode ? styles.dark : styles.light}`}>
+      {/* User settings Popover */}
+      <Popover
+        open={popoverOpen}
+        onClose={handlePopoverClose}
+        anchorEl={popoverAnchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        {popoverContent}
+      </Popover>
+      {/* Create new workspace modal */}
+      <WorkspaceModalComponent
+        open={openWorkspaceModal}
+        onClose={handleWorkspaceModalClose}
+        createWorkspace={createWorkspace}
+      />
+      {/* Add members to workspace modal */}
+      <AddModalComponent
+        open={openModal}
+        onClose={handleModalClose}
+      />
+      {/* create new Board Popover */}
+      <CreateBoardPopoverComponent
+        open={boardPopoverOpen}
+        anchorEl={boardPopoverAnchorEl}
+        onClose={handleBoardPopoverClose}
+        workspace_id={workspace.id}
+      />
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
@@ -20,7 +279,7 @@ function TestPage() {
             <div className={styles.logoIcon}>
               <span className="material-icons-round">dashboard</span>
             </div>
-            <span className={styles.logoText}>FlowState</span>
+            <span className={styles.logoText}>Plannr</span>
           </div>
           <nav className={styles.nav}>
             <button className={styles.navButton}>
@@ -35,7 +294,10 @@ function TestPage() {
             <button className={styles.navButton}>
               Templates <span className="material-icons-round">expand_more</span>
             </button>
-            <button className={styles.createButton}>Create</button>
+            <button
+              className={styles.createButton}
+              onClick={handleWorkspaceModalOpen}
+            >Create</button>
           </nav>
         </div>
         <div className={styles.headerRight}>
@@ -59,6 +321,7 @@ function TestPage() {
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuACS_hY1i_mHb6rAUvTjRzMoidepVDPNas8ZFV0O5BVhgtZsL_vTWqW39YIbwvsG6hl80mpn08d__RwqCQM7zBlCycmt0OP3dA-9d1XVaGICwTMEUswTOd0KMGaKV9QQlP2KYysqbfh1arlUJBusJn1b8zKz8GOEVc2UdniG-mwzM8V-Ec53uACCC3Vk0rASsxdkq27eU2sy3K4nwguC2OmnmpI8VxWhmJ882_SZ5FG3SKFQAXBEtsjQZ8F7Cr-V7MceX_zYXWOM7A4"
               alt="User Profile"
+              onClick={(e) => handlePopoverClick(e)}
             />
           </div>
         </div>
@@ -72,19 +335,22 @@ function TestPage() {
             <div className={styles.sidebarSection}>
               <h3 className={styles.sectionTitle}>Your Workspaces</h3>
               <div className={styles.sectionItems}>
-                <a href="#" className={`${styles.workspaceItem} ${styles.active}`}>
-                  <div className={styles.workspaceItemLeft}>
-                    <div className={`${styles.workspaceIcon} ${styles.indigo}`}>E</div>
-                    <span>EUHEUEHUEHUE</span>
-                  </div>
-                  <span className="material-icons-round">settings</span>
-                </a>
-                <a href="#" className={styles.workspaceItem}>
-                  <div className={styles.workspaceItemLeft}>
-                    <div className={`${styles.workspaceIcon} ${styles.emerald}`}>P</div>
-                    <span>Pioupiu Labs</span>
-                  </div>
-                </a>
+                {workspaceList.map(ws => (
+                  <a className={
+                    workspace.id === ws.id ? `${styles.workspaceItem} ${styles.active}` : `${styles.workspaceItem}`}
+                    onClick={() => {
+                      setCurrentWorkspace(ws.id)
+                      navigate(`/workspace/${ws.id}`);
+                    }}
+                  >
+                    <div className={styles.workspaceItemLeft}>
+                      <div className={`${styles.workspaceIcon} ${workspace.id === ws.id ? styles.indigo : styles.emerald
+                        }`}>E</div>
+                      <span>{ws.title}</span>
+                    </div>
+                    <span className="material-icons-round">settings</span>
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -133,8 +399,19 @@ function TestPage() {
                 <div className={styles.workspaceLogo}>E</div>
                 <div className={styles.workspaceDetails}>
                   <div className={styles.workspaceTitleRow}>
-                    <h1 className={styles.workspaceTitle}>EUHEUEHUEHUE</h1>
-                    <button className={styles.editButton}>
+                    {titleEdit ? (
+                      <input 
+                        ref={titleInputRef}
+                        className={styles.titleInput}
+                        defaultValue={workspaceTitle}
+                        onKeyDown={onTitleKeyDown}
+                        onBlur={(e) => saveTitle(e.target.value)}
+                        aria-label='Edit workspace title'
+                      />
+                    ) : (
+                      <h1 className={styles.workspaceTitle}>{workspaceTitle}</h1>
+                    )}
+                    <button className={styles.editButton} onClick={() => startEditTitle()}>
                       <span className="material-icons-round">edit</span>
                     </button>
                   </div>
@@ -143,12 +420,15 @@ function TestPage() {
                       <span className="material-icons-round">lock</span> Private Workspace
                     </span>
                     <span className={styles.metaDivider}>•</span>
-                    <span>12 Boards</span>
+                    <span>{boards.length} Boards</span>
                   </div>
                 </div>
               </div>
               <div className={styles.workspaceActions}>
-                <button className={styles.actionButton}>
+                <button
+                  className={styles.actionButton}
+                  onClick={handleModalOpen}
+                >
                   <span className="material-icons-round">person_add</span> Invite
                 </button>
                 <button className={styles.actionButton}>
@@ -178,7 +458,7 @@ function TestPage() {
                     </button>
                   </div>
                   <p className={styles.recentCardTitle}>Brand Identity 2024</p>
-                  <p className={styles.recentCardSubtitle}>EUHEUEHUEHUE</p>
+                  <p className={styles.recentCardSubtitle}>{workspace.title}</p>
                 </div>
                 <div className={styles.recentCard}>
                   <div className={styles.recentCardImage}>
@@ -207,25 +487,23 @@ function TestPage() {
                 <button className={styles.viewAllButton}>View All</button>
               </div>
               <div className={styles.boardGrid}>
-                <div className={`${styles.boardCard} ${styles.gradientLime}`}>
-                  <div className={styles.boardCardContent}>
-                    <h3 className={styles.boardCardTitle}>design</h3>
-                    <div className={styles.boardCardFooter}>
-                      <span className={styles.taskBadge}>4 tasks active</span>
-                      <span className={`material-icons-round ${styles.boardStar}`}>star_outline</span>
+                {/* dynamic */}
+                {boards.map(board => (
+                  <div
+                    className={`${styles.boardCard}`}
+                    style={{ background: board.colors.board }}
+                    onClick={() => navigate(`/board/${board.id}`)}
+                    key={board.id}
+                  >
+                    <div className={styles.boardCardContent}>
+                      <h3 className={styles.boardCardTitle}>{board.name}</h3>
                     </div>
                   </div>
-                </div>
-                <div className={`${styles.boardCard} ${styles.gradientAmber}`}>
-                  <div className={`${styles.boardCardContent} ${styles.darkText}`}>
-                    <h3 className={styles.boardCardTitle}>oyg</h3>
-                    <div className={styles.boardCardFooter}>
-                      <span className={`${styles.taskBadge} ${styles.darkBadge}`}>Empty</span>
-                      <span className={`material-icons-round ${styles.boardStar}`}>star_outline</span>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.createBoardCard}>
+                ))}
+                <div
+                  className={styles.createBoardCard}
+                  onClick={handleBoardPopoverClick}
+                >
                   <div className={styles.createBoardIcon}>
                     <span className="material-icons-round">add</span>
                   </div>
@@ -280,4 +558,4 @@ function TestPage() {
   );
 }
 
-export default TestPage;
+export default NewHomePage;
