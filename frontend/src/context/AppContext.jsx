@@ -96,7 +96,7 @@ export function AppProvider({ children }) {
       }
     });
     setBoards(response.data);
-  }
+  };
 
   const deleteBoard = (board_id) => {
     setBoards(boards => boards.filter(board => board.id !== board_id));
@@ -170,7 +170,7 @@ export function AppProvider({ children }) {
         updateWorkspaceList,
         deleteBoard,
         clearApp,
-        initializeApp
+        initializeApp,
       }}  
     >
       { children }

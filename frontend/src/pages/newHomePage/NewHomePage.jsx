@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
 import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
+import axios from "axios";
 
 function NewHomePage() {
 
@@ -32,11 +33,13 @@ function NewHomePage() {
     setCurrentWorkspace,
     updateWorkspaceList,
     clearApp,
-    initializeApp
+    initializeApp,
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
+  const server_url = process.env.REACT_APP_SERVER_URL;
+  const navigate = useNavigate();
 
   // parses the workspace's id from the url and calls a function to update workspace infos
   // to match with workspace url
@@ -80,13 +83,22 @@ function NewHomePage() {
     navigate('/login');
   };
 
+  const handleDeleteClick = async () => {
+    const currentToken = localStorage.getItem('jwt');
+    const response = await axios.delete(`${server_url}/workspace/${workspace.id}`, 
+      { headers: { Authorization: `Bearer ${currentToken}` } }
+    );
+    const data = response.data;
+    handleSettingsPopoverClose();
+    await updateWorkspaceList();
+    navigate(`/workspace/${data.currentWorkspace}`);
+  };
+
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     setDarkMode(workspace.darkMode);
   }, [workspace.darkMode]);
-
-  const navigate = useNavigate();
 
   const toggleDarkMode = async () => {
     editWorkspace(workspace.id, { darkMode: !workspace.darkMode });
@@ -187,7 +199,7 @@ function NewHomePage() {
         </ListItemIcon>
         <ListItemText primary="Create new workspace" />
       </ListItemButton>
-      <ListItemButton>
+      <ListItemButton onClick={() => handleDeleteClick()} >
         <ListItemIcon>
           <DeleteIcon />
         </ListItemIcon>

@@ -5,10 +5,48 @@ import BoardComponent from './components/boardComponent/BoardComponent';
 import LoginPage from './pages/LoginPage/LoginPage';
 import NewHomePage from './pages/newHomePage/NewHomePage';
 import UserPage from './pages/UserPage/UserPage';
+import PageTransition from './components/PageTransition/PageTransition';
+import { AnimatePresence } from 'motion/react';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { UserProvider } from './context/UserContext';
 import { AppProvider } from './context/AppContext';
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode='wait'>
+      <Routes location={location} key={location.pathname}>
+        <Route path='/board/:id' element={
+          <PageTransition>
+            <BoardComponent />
+          </PageTransition>} 
+        />
+        <Route path='/home' element={
+          <PageTransition>
+            <NewHomePage />
+          </PageTransition>} 
+        />
+        <Route path='/workspace/:id' element={
+          <PageTransition>
+            <NewHomePage />
+          </PageTransition>} 
+        />
+        <Route path='/login' element={
+          <PageTransition>
+            <LoginPage />
+          </PageTransition>} 
+        />
+        <Route path='/user' element={
+          <PageTransition>
+            <UserPage />
+          </PageTransition>} 
+        />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,13 +54,7 @@ root.render(
     <UserProvider>
       <AppProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path='/board/:id' element={<BoardComponent />} />
-            <Route path='/home' element={<NewHomePage />} />
-            <Route path='/workspace/:id' element={<NewHomePage />} />
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='/user' element={<UserPage />} />
-          </Routes>
+          <AnimatedRoutes />
         </BrowserRouter>
       </AppProvider>
     </UserProvider>
