@@ -6,12 +6,19 @@ import { useApp } from '../../context/AppContext';
 import axios from 'axios';
 
 function UserPage() {
-  const { user, setUserInfo } = useUser();
-  const { workspace } = useApp();
+  const { user, setUserInfo, clearUser } = useUser();
+  const { workspace, clearApp } = useApp();
   const navigate = useNavigate();
 
   const server_url = process.env.REACT_APP_SERVER_URL;
   const token = localStorage.getItem('jwt');
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    clearUser();
+    clearApp();
+    navigate('/login');
+  };
 
   // auto-connects the user
   useEffect(() => {
@@ -54,6 +61,7 @@ function UserPage() {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     console.log('profile update:', response.data);
+    navigate(-1);
   };
 
   const handleInputChange = (e) => {
@@ -103,14 +111,14 @@ function UserPage() {
               <div
                 className={styles.userAvatarSmall}
                 style={{
-                  backgroundImage: `url('${user?.picture || user?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpVZJ3Bi3AtLQcCJ8ZKVV3S_zhK7KPZT7EEXKpWxPUSs1X0n1r11Ybg84VLoZJgzCPJvjF6M1gRsg9T3RH2l0vz4w0W_nljrGOhw8d3G0WVgzbZZ3SqAriL11pMF_2CHGSujzJsjW2ZKC6Q_RKYnQdVTvLzTPJS086PDLdGJYHjhTwjDVeEfu7QiLm5M-pC3LkMW2E2fmcNRiO0_4FOHGeuRdkEgFtnroMLeNQLDb8olshaWbR2DX66sfgJwd_0WJbauGWkOxTc6yF'}')`
+                  backgroundImage: `url('${user?.picture || user?.image || user?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpVZJ3Bi3AtLQcCJ8ZKVV3S_zhK7KPZT7EEXKpWxPUSs1X0n1r11Ybg84VLoZJgzCPJvjF6M1gRsg9T3RH2l0vz4w0W_nljrGOhw8d3G0WVgzbZZ3SqAriL11pMF_2CHGSujzJsjW2ZKC6Q_RKYnQdVTvLzTPJS086PDLdGJYHjhTwjDVeEfu7QiLm5M-pC3LkMW2E2fmcNRiO0_4FOHGeuRdkEgFtnroMLeNQLDb8olshaWbR2DX66sfgJwd_0WJbauGWkOxTc6yF'}')`
                 }}
               ></div>
               <div className={styles.userDetails}>
                 <p className={styles.userName}>{user?.name || ''}</p>
                 <p className={styles.userPlan}>Pro Plan</p>
               </div>
-              <button className={styles.logoutBtn} onClick={() => navigate('/login')}>
+              <button className={styles.logoutBtn} onClick={handleLogout}>
                 <span className="material-symbols-outlined">logout</span>
               </button>
             </div>

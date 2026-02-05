@@ -13,13 +13,14 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import DeleteIcon from '@mui/icons-material/Delete';
 import WorkspaceModalComponent from '../../components/workspaceModalComponent/WorkspaceModalComponent';
 import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 
 function NewHomePage() {
 
-  const { user, setUserInfo } = useUser();
+  const { user, setUserInfo, clearUser } = useUser();
   const {
     workspace,
     workspaceList,
@@ -29,7 +30,9 @@ function NewHomePage() {
     getWorkspace,
     fetchWorkspaceBoards,
     setCurrentWorkspace,
-    updateWorkspaceList
+    updateWorkspaceList,
+    clearApp,
+    initializeApp
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
@@ -37,7 +40,7 @@ function NewHomePage() {
 
   // parses the workspace's id from the url and calls a function to update workspace infos
   // to match with workspace url
-  const {id} = useParams();
+  const { id } = useParams();
   useEffect(() => {
     if (id) {
       getWorkspace(id);
@@ -47,19 +50,35 @@ function NewHomePage() {
 
   // useEffect called because login with socials redirects to homePage
   useEffect(() => {
-    if(token) {
+    if (token) {
+      // Clear old user/workspace data before setting up new session
+      clearUser();
+      clearApp();
+
       localStorage.setItem('jwt', token);
       window.history.replaceState({}, '', '/home');
       // calling /me
       setUserInfo();
+      // Reinitialize app data for the new user
+      initializeApp();
     }
   }, [token]);
 
   // auto-connects the user
   useEffect(() => {
-    localStorage.getItem('jwt');
-    setUserInfo();
+    const storedToken = localStorage.getItem('jwt');
+    if (storedToken) {
+      setUserInfo();
+    }
   }, []);
+
+  // logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    clearUser();
+    clearApp();
+    navigate('/login');
+  };
 
   const [darkMode, setDarkMode] = useState(false);
 
@@ -94,6 +113,7 @@ function NewHomePage() {
   const startEditTitle = () => {
     prevWorkspaceTitleRef.current = workspaceTitle;
     setTitleEdit(true);
+    handleSettingsPopoverClose();
   };
   const cancelEdit = () => {
     setWorkspaceTitle(prevWorkspaceTitleRef.current);
@@ -124,6 +144,15 @@ function NewHomePage() {
   };
   const popoverOpen = Boolean(popoverAnchorEl);
 
+  const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
+  const handleSettingsPopoverClick = (e) => {
+    setSettingsAnchorEl(e.currentTarget);
+  };
+  const handleSettingsPopoverClose = () => {
+    setSettingsAnchorEl(null);
+  };
+  const settingsPopoverOpen = Boolean(settingsAnchorEl);
+
   const [openModal, setOpenModal] = useState(false);
   const handleModalOpen = () => setOpenModal(true);
   const handleModalClose = () => setOpenModal(false);
@@ -144,6 +173,29 @@ function NewHomePage() {
   };
   const handleBoardPopoverClose = () => setBoardPopoverAnchorEl(null);
 
+  const settingsPopoverContent = (
+    <List dense={true}>
+      <ListItemButton onClick={() => startEditTitle()}>
+        <ListItemIcon sx={{ padding: '0', margin: '0' }}>
+          <span className="material-icons-round">edit</span>
+        </ListItemIcon>
+        <ListItemText primary="Rename workspace" />
+      </ListItemButton>
+      <ListItemButton onClick={() => handleWorkspaceModalOpen()}>
+        <ListItemIcon>
+          <AddIcon />
+        </ListItemIcon>
+        <ListItemText primary="Create new workspace" />
+      </ListItemButton>
+      <ListItemButton>
+        <ListItemIcon>
+          <DeleteIcon />
+        </ListItemIcon>
+        <ListItemText primary="Delete workspace" />
+      </ListItemButton>
+    </List>
+  )
+
   const popoverContent = (
     <List
       subheader={
@@ -156,7 +208,7 @@ function NewHomePage() {
       <ListItem>
         <ListItemIcon>
           <img
-            src={user?.picture || user?.avatar || ''}
+            src={user?.picture || user?.avatar || user?.image || ''}
             alt="user"
             style={{
               height: '38px',
@@ -170,7 +222,7 @@ function NewHomePage() {
           secondary={user?.email || ''}
         />
       </ListItem>
-      <ListItemButton onClick={() => navigate('/login')}>
+      <ListItemButton onClick={handleLogout}>
         <ListItemText primary="Change account" />
       </ListItemButton>
       <ListItemButton onClick={() => navigate('/user')}>
@@ -227,7 +279,7 @@ function NewHomePage() {
         <ListItemText primary="Create a new workspace" />
       </ListItemButton>
       <Divider />
-      <ListItemButton>
+      <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <LogoutIcon />
         </ListItemIcon>
@@ -238,6 +290,23 @@ function NewHomePage() {
 
   return (
     <div className={`${styles.app} ${workspace.darkMode ? styles.dark : styles.light}`}>
+      {/* Workspace settings Popover */}
+      <Popover
+        open={settingsPopoverOpen}
+        onClose={handleSettingsPopoverClose}
+        anchorEl={settingsAnchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        {settingsPopoverContent}
+      </Popover>
+
       {/* User settings Popover */}
       <Popover
         open={popoverOpen}
@@ -400,7 +469,7 @@ function NewHomePage() {
                 <div className={styles.workspaceDetails}>
                   <div className={styles.workspaceTitleRow}>
                     {titleEdit ? (
-                      <input 
+                      <input
                         ref={titleInputRef}
                         className={styles.titleInput}
                         defaultValue={workspaceTitle}
@@ -431,7 +500,10 @@ function NewHomePage() {
                 >
                   <span className="material-icons-round">person_add</span> Invite
                 </button>
-                <button className={styles.actionButton}>
+                <button
+                  className={styles.actionButton}
+                  onClick={(e) => handleSettingsPopoverClick(e)}
+                >
                   <span className="material-icons-round">settings</span> Settings
                 </button>
               </div>

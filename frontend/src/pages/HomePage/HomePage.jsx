@@ -23,7 +23,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function HomePage () {
 
-  const { user, setUserInfo } = useUser();
+  const { user, setUserInfo, clearUser } = useUser();
   const { 
     workspace,
     workspaceList,
@@ -33,7 +33,9 @@ function HomePage () {
     getWorkspace,
     fetchWorkspaceBoards,
     setCurrentWorkspace,
-    updateWorkspaceList
+    updateWorkspaceList,
+    clearApp,
+    initializeApp
     } = useApp();
   
   const params = new URLSearchParams(window.location.search);
@@ -52,18 +54,34 @@ function HomePage () {
   // useEffect called because login with socials redirects to homePage
   useEffect(() => {
     if(token) {
+      // Clear old user/workspace data before setting up new session
+      clearUser();
+      clearApp();
+      
       localStorage.setItem('jwt', token);
       window.history.replaceState({}, '', '/home');
       // calling /me
       setUserInfo();
+      // Reinitialize app data for the new user
+      initializeApp();
     }
   }, [token]);
 
   // auto-connects the user
   useEffect(() => {
-    localStorage.getItem('jwt');
-    setUserInfo();
+    const storedToken = localStorage.getItem('jwt');
+    if (storedToken) {
+      setUserInfo();
+    }
   }, [])
+
+  // logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    clearUser();
+    clearApp();
+    navigate('/login');
+  };
 
   // const [boards, setBoards] = useState(workspace.boards);
 
@@ -196,7 +214,7 @@ function HomePage () {
           secondary={user?.email || ''} 
         />
       </ListItem>
-      <ListItemButton onClick={() => navigate('/login')}>
+      <ListItemButton onClick={handleLogout}>
         <ListItemText primary="Change account" />
       </ListItemButton>
       <ListItemButton>
@@ -255,7 +273,7 @@ function HomePage () {
         <ListItemText primary="Create a new workspace" />
       </ListItemButton>
       <Divider />
-      <ListItemButton>
+      <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <LogoutIcon />
         </ListItemIcon>

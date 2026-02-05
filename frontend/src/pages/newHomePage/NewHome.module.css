@@ -263,6 +263,7 @@
 
 .workspaceItem:hover {
   background-color: var(--hover-bg);
+  cursor: pointer;
 }
 
 .workspaceItem.active {

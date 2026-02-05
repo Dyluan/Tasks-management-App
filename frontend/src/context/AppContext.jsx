@@ -13,39 +13,48 @@ export function AppProvider({ children }) {
   const [workspaceList, setWorkspaceList] = useState([]);
   const [boards, setBoards] = useState([]);
 
-  const token = localStorage.getItem('jwt');
+  // Clear all app state (used on logout or user change)
+  const clearApp = () => {
+    setWorkspace({});
+    setWorkspaceList([]);
+    setBoards([]);
+  };
 
   // fetches the current user's workspace
   const getCurrentWorkspace = async () => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.get(`${server_url}/workspace/current`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${currentToken}` }
     });
     const currentWorkspace = response.data;
     setWorkspace(currentWorkspace);
     return currentWorkspace;
   }
   const setCurrentWorkspace = async (workspace_id) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.post(`${server_url}/workspace/current`, {
       workspace_id: workspace_id
     }, 
     {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${currentToken}` }
     });
   }
 
   // gets the user's workspace by workspace id
   const getWorkspace = async (id) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.get(`${server_url}/workspace/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${currentToken}` }
     });
 
     setWorkspace(response.data);
   }
 
   const editWorkspace = async (id, updates) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.patch(`${server_url}/workspace/${id}`, 
       updates,
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${currentToken}` } }
     );
 
     const updatedWorkspace = response.data;
@@ -60,12 +69,13 @@ export function AppProvider({ children }) {
   }
 
   const createWorkspace = async (title, description) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.post(`${server_url}/workspace/new`, 
       {
         title: title,
         description: description,
       },
-      { headers: { Authorization: `Bearer ${token}` },
+      { headers: { Authorization: `Bearer ${currentToken}` },
     })
     setWorkspaceList(prev => [...prev, response.data]);
   };
@@ -79,9 +89,10 @@ export function AppProvider({ children }) {
   };
 
   const fetchWorkspaceBoards = async (workspace_id) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.get(`${server_url}/boards/all?workspace_id=${workspace_id}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${currentToken}`
       }
     });
     setBoards(response.data);
@@ -102,37 +113,45 @@ export function AppProvider({ children }) {
   }
 
   const getBoard = async (id) => {
+    const currentToken = localStorage.getItem('jwt');
     const response = await axios.get(`${server_url}/boards/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${currentToken}`
       }
     });
     return response.data;
   }
 
-  useEffect(() => {
-    const fetchWorkspaces = async () => {
-      if (token) {
+  // Initialize app data - called when component mounts or when explicitly refreshed
+  const initializeApp = async () => {
+    const currentToken = localStorage.getItem('jwt');
+    if (currentToken) {
+      try {
         const response = await axios.get(`${server_url}/workspace/all`, {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${currentToken}`
           }
         });
         
         const workspaces = response.data;
-        
         setWorkspaceList(workspaces);
 
-        // get current workspace ::
+        // get current workspace
         const currentWorkspace = await getCurrentWorkspace();
 
         // fetch all the boards linked to that workspace id
-        fetchWorkspaceBoards(currentWorkspace.id);
+        if (currentWorkspace?.id) {
+          fetchWorkspaceBoards(currentWorkspace.id);
+        }
+      } catch (error) {
+        console.error('Error initializing app:', error);
       }
-    };
-    
-    fetchWorkspaces();
-  }, [token])
+    }
+  };
+
+  useEffect(() => {
+    initializeApp();
+  }, [])
 
   return (
     <AppContext.Provider 
@@ -149,7 +168,9 @@ export function AppProvider({ children }) {
         getWorkspace,
         setCurrentWorkspace,
         updateWorkspaceList,
-        deleteBoard
+        deleteBoard,
+        clearApp,
+        initializeApp
       }}  
     >
       { children }
