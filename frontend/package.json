@@ -19,6 +19,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
+    "facehash": "^0.0.6",
     "jwt-decode": "^4.0.0",
     "motion": "^12.33.0",
     "ogl": "^1.0.11",

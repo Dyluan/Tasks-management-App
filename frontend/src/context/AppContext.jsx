@@ -1,4 +1,4 @@
-import { useState, useContext, createContext, useEffect } from "react";
+import { useState, useContext, createContext, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const AppContext = createContext();
@@ -12,6 +12,7 @@ export function AppProvider({ children }) {
   const [workspace, setWorkspace] = useState({});
   const [workspaceList, setWorkspaceList] = useState([]);
   const [boards, setBoards] = useState([]);
+  const [recentBoards, setRecentBoards] = useState([]);
 
   // Clear all app state (used on logout or user change)
   const clearApp = () => {
@@ -112,14 +113,29 @@ export function AppProvider({ children }) {
     ));
   }
 
-  const getBoard = async (id) => {
-    const currentToken = localStorage.getItem('jwt');
-    const response = await axios.get(`${server_url}/boards/${id}`, {
-      headers: {
-        Authorization: `Bearer ${currentToken}`
-      }
+  const updateRecentBoards = useCallback((board) => {
+    setRecentBoards(prev => {
+      const boardSnapshot = {
+        id: board.id,
+        name: board.name,
+        colors: board.colors,
+        workspace_title: board.workspace_title
+      };
+
+      return [
+        boardSnapshot,
+        ...prev.filter(b => b.id !== board.id)
+      ].slice(0, 4);
     });
-    return response.data;
+  }, []);
+
+  const getRecentBoards = async () => {
+    const currentToken = localStorage.getItem('jwt');
+    const response = await axios.get(`${server_url}/users/recent_boards`, 
+      { headers: { Authorization: `Bearer ${currentToken}` } }
+    );
+    console.log('rrr:', response.data.recent_boards);
+    return response.data.recent_boards;
   }
 
   // Initialize app data - called when component mounts or when explicitly refreshed
@@ -163,7 +179,8 @@ export function AppProvider({ children }) {
         boards,
         updateBoards,
         updateBoard,
-        getBoard,
+        updateRecentBoards,
+        recentBoards,
         editWorkspace,
         getWorkspace,
         setCurrentWorkspace,
@@ -171,6 +188,7 @@ export function AppProvider({ children }) {
         deleteBoard,
         clearApp,
         initializeApp,
+        getRecentBoards
       }}  
     >
       { children }

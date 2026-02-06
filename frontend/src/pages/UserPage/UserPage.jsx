@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { useApp } from '../../context/AppContext';
 import axios from 'axios';
+import { Facehash } from "facehash";
 
 function UserPage() {
-  const { user, setUserInfo, clearUser } = useUser();
+  const { user, loading, setUserInfo, clearUser } = useUser();
   const { workspace, clearApp } = useApp();
   const navigate = useNavigate();
 
@@ -22,8 +23,13 @@ function UserPage() {
 
   // auto-connects the user
   useEffect(() => {
-    localStorage.getItem('jwt');
-    setUserInfo();
+    const storedToken = localStorage.getItem('jwt');
+    if (storedToken) {
+      setUserInfo();
+    } else {
+      // No token, redirect to login
+      navigate('/login');
+    }
   }, []);
 
   const [darkMode, setDarkMode] = useState(workspace?.darkMode ?? false);
@@ -69,6 +75,23 @@ function UserPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Show loading screen while user data is being fetched
+  if (loading || !user) {
+    return (
+      <div className={`${styles.app} ${darkMode ? styles.dark : styles.light}`}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingContent}>
+            <div className={styles.loadingLogo}>
+              <span className="material-icons-round">dashboard</span>
+            </div>
+            <div className={styles.loadingSpinner}></div>
+            <p className={styles.loadingText}>Loading your profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${styles.app} ${darkMode ? styles.dark : styles.light}`}>
       <div className={styles.container}>
@@ -88,7 +111,7 @@ function UserPage() {
               <span className="material-symbols-outlined">person</span>
               <span>Profile</span>
             </a>
-            <a href="#" className={styles.navLink}>
+            <a href="#" className={styles.navLink} onClick={() => console.log(user)}>
               <span className="material-symbols-outlined">settings</span>
               <span>Account Settings</span>
             </a>
@@ -108,12 +131,18 @@ function UserPage() {
 
           <div className={styles.sidebarFooter}>
             <div className={styles.userInfo}>
-              <div
-                className={styles.userAvatarSmall}
-                style={{
-                  backgroundImage: `url('${user?.picture || user?.image || user?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpVZJ3Bi3AtLQcCJ8ZKVV3S_zhK7KPZT7EEXKpWxPUSs1X0n1r11Ybg84VLoZJgzCPJvjF6M1gRsg9T3RH2l0vz4w0W_nljrGOhw8d3G0WVgzbZZ3SqAriL11pMF_2CHGSujzJsjW2ZKC6Q_RKYnQdVTvLzTPJS086PDLdGJYHjhTwjDVeEfu7QiLm5M-pC3LkMW2E2fmcNRiO0_4FOHGeuRdkEgFtnroMLeNQLDb8olshaWbR2DX66sfgJwd_0WJbauGWkOxTc6yF'}')`
-                }}
-              ></div>
+              {/* TODO: not sure this fits with smaller screen values */}
+              {user ? (
+                  <Facehash name={user?.name} size={32} />
+                ) : (
+                  <div
+                    className={styles.userAvatarSmall}
+                    style={{
+                      backgroundImage: `url('${user?.image || ''}')`
+                    }}
+                  >
+                  </div>
+                )}
               <div className={styles.userDetails}>
                 <p className={styles.userName}>{user?.name || ''}</p>
                 <p className={styles.userPlan}>Pro Plan</p>

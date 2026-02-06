@@ -31,7 +31,7 @@ function BoardComponent() {
 
   const server_url = process.env.REACT_APP_SERVER_URL;
 
-  const { getBoard, updateBoard } = useApp();
+  const { updateRecentBoards, updateBoard } = useApp();
   const { id } = useParams();
   const [board, setBoard] = useState({});
   const token = localStorage.getItem('jwt');
@@ -91,6 +91,15 @@ function BoardComponent() {
 
       setColumns(mappedColumns);
       setNbOfColumns(mappedColumns.length);
+
+      // update recent boards
+      // TODO: fetch workspace name here
+      updateRecentBoards({
+        id: boardData.id,
+        name: boardData.name,
+        colors: boardData.colors,
+        workspace_title: boardData.workspace_name
+      });
     };
 
     fetchData();

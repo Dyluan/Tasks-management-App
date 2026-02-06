@@ -18,10 +18,12 @@ import WorkspaceModalComponent from '../../components/workspaceModalComponent/Wo
 import AddModalComponent from '../../components/addMembersModalComponent/AddModalComponent';
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 import axios from "axios";
+import { Facehash } from "facehash";
+import { brown } from '@mui/material/colors';
 
 function NewHomePage() {
 
-  const { user, setUserInfo, clearUser } = useUser();
+  const { user, loading, setUserInfo, clearUser } = useUser();
   const {
     workspace,
     workspaceList,
@@ -34,12 +36,15 @@ function NewHomePage() {
     updateWorkspaceList,
     clearApp,
     initializeApp,
+    recentBoards
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
   const server_url = process.env.REACT_APP_SERVER_URL;
   const navigate = useNavigate();
+
+  const FaceHashColor = '#10A5F5';
 
   // parses the workspace's id from the url and calls a function to update workspace infos
   // to match with workspace url
@@ -72,6 +77,9 @@ function NewHomePage() {
     const storedToken = localStorage.getItem('jwt');
     if (storedToken) {
       setUserInfo();
+    } else {
+      // No token, redirect to login
+      navigate('/login');
     }
   }, []);
 
@@ -188,22 +196,28 @@ function NewHomePage() {
   const settingsPopoverContent = (
     <List dense={true}>
       <ListItemButton onClick={() => startEditTitle()}>
-        <ListItemIcon sx={{ padding: '0', margin: '0' }}>
+        <ListItemIcon className={styles.settingsPopoverIcon}>
           <span className="material-icons-round">edit</span>
         </ListItemIcon>
-        <ListItemText primary="Rename workspace" />
+        <ListItemText 
+          primary="Rename workspace" 
+        />
       </ListItemButton>
       <ListItemButton onClick={() => handleWorkspaceModalOpen()}>
-        <ListItemIcon>
+        <ListItemIcon className={styles.settingsPopoverIcon}>
           <AddIcon />
         </ListItemIcon>
-        <ListItemText primary="Create new workspace" />
+        <ListItemText 
+          primary="Create new workspace" 
+        />
       </ListItemButton>
-      <ListItemButton onClick={() => handleDeleteClick()} >
-        <ListItemIcon>
+      <ListItemButton onClick={() => handleDeleteClick()} className={styles.settingsPopoverDeleteItem}>
+        <ListItemIcon className={styles.settingsPopoverIcon}>
           <DeleteIcon />
         </ListItemIcon>
-        <ListItemText primary="Delete workspace" />
+        <ListItemText 
+          primary="Delete workspace" 
+        />
       </ListItemButton>
     </List>
   )
@@ -219,15 +233,25 @@ function NewHomePage() {
     >
       <ListItem>
         <ListItemIcon>
-          <img
-            src={user?.picture || user?.avatar || user?.image || ''}
-            alt="user"
-            style={{
-              height: '38px',
-              width: '38px',
-              borderRadius: '50%'
-            }}
-          />
+          {user?.image ? (
+            <img
+              src={user?.picture || user?.avatar || user?.image || ''}
+              alt="user"
+              style={{
+                height: '38px',
+                width: '38px',
+                borderRadius: '50%'
+              }}
+            />
+          ) : (
+            <span style={{ 
+              backgroundColor: `${FaceHashColor}`,
+              borderRadius: '50%'}}
+            >
+              <Facehash name={user?.name} size={38} enableBlink />
+            </span>
+          )}
+          
         </ListItemIcon>
         <ListItemText
           primary={user?.name || ''}
@@ -299,6 +323,23 @@ function NewHomePage() {
       </ListItemButton>
     </List>
   );
+
+  // Show loading screen while user data is being fetched
+  if (loading || !user) {
+    return (
+      <div className={`${styles.app} ${workspace?.darkMode ? styles.dark : styles.light}`}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingContent}>
+            <div className={styles.loadingLogo}>
+              <span className="material-icons-round">dashboard</span>
+            </div>
+            <div className={styles.loadingSpinner}></div>
+            <p className={styles.loadingText}>Loading your workspace...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.app} ${workspace.darkMode ? styles.dark : styles.light}`}>
@@ -399,11 +440,17 @@ function NewHomePage() {
             </span>
           </button>
           <div className={styles.avatar}>
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuACS_hY1i_mHb6rAUvTjRzMoidepVDPNas8ZFV0O5BVhgtZsL_vTWqW39YIbwvsG6hl80mpn08d__RwqCQM7zBlCycmt0OP3dA-9d1XVaGICwTMEUswTOd0KMGaKV9QQlP2KYysqbfh1arlUJBusJn1b8zKz8GOEVc2UdniG-mwzM8V-Ec53uACCC3Vk0rASsxdkq27eU2sy3K4nwguC2OmnmpI8VxWhmJ882_SZ5FG3SKFQAXBEtsjQZ8F7Cr-V7MceX_zYXWOM7A4"
-              alt="User Profile"
-              onClick={(e) => handlePopoverClick(e)}
-            />
+            {user?.image ? (
+              <img 
+                src={user.image} 
+                alt='User Profile'
+                onClick={(e) => handlePopoverClick(e)}
+              />
+            ) : (
+              <Facehash name={user.name} size={32} enableBlink className={`[--facehash-color:${FaceHashColor}]`} 
+                onClick={(e) => handlePopoverClick(e)}
+              />
+            )}
           </div>
         </div>
       </header>
@@ -530,38 +577,26 @@ function NewHomePage() {
                 <h2>Recently Viewed</h2>
               </div>
               <div className={styles.boardGrid}>
-                <div className={styles.recentCard}>
-                  <div className={styles.recentCardImage}>
-                    <img
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUZfJSjX_Bx_4x6CZaBeNhfdyTNrRAthlFTNs0QC3SC6BCDukSh7CxFxxMFdAOcw8BEM6ajjkSJxzfqWr0xzC6WiGLYs14ySQLAeSs4-TUei0-DaZ_bFWshigpxWmyPrPCTK0QpuG3ybh9iKmy5VZocW-rOwOz2uZpwP3k1u9YKZIg9BsDcFt-WjDG7JuIhF9BeRwhZLC6DJbdJDqcrgJ9dnMlzigseZ8GDYgD1Vliqlc5pVwM2ZgTwnZ6CMJTLdG1WVHEUn_gzG7N"
-                      alt="Abstract gradient"
-                    />
-                    <div className={styles.cardOverlay}></div>
-                    <button className={styles.starButton}>
-                      <span className="material-icons-round">star_outline</span>
-                    </button>
+                {recentBoards.map(recentBoard => (
+                  <div className={styles.recentCard} key={recentBoard.id}>
+                    <div
+                      className={styles.recentCardImage}
+                      style={{ background: recentBoard.colors?.board || '#eee' }}
+                      onClick={() => navigate(`/board/${recentBoard.id}`)}
+                    >
+                      <div className={styles.cardOverlay}></div>
+                      <button className={styles.starButton}>
+                        <span className="material-icons-round">star_outline</span>
+                      </button>
+                    </div>
+                    <p className={styles.recentCardTitle}>{recentBoard.name}</p>
+                    <p className={styles.recentCardSubtitle}>{recentBoard.workspace_title}</p>
                   </div>
-                  <p className={styles.recentCardTitle}>Brand Identity 2024</p>
-                  <p className={styles.recentCardSubtitle}>{workspace.title}</p>
-                </div>
-                <div className={styles.recentCard}>
-                  <div className={styles.recentCardImage}>
-                    <img
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkqJcBPHx3m3cTNhw3IuGdtiOnkQtr2hjbPmZZSsjBzQdXhBqSYwh8X_949U-Hk91xcuFf6e3SdxqUHMfd2S4JJdXcqhqF4c0JX13sk1OM8kTX_ilun2jPOsyDqmYcFY23LenQlof78iAk13qYTBeG5OofnEOk3PP9dGjy5rTIte_XAIyAprIcXDRcZnY0aNvQzccJcLl695T3284U3JjsuC5KqD8xncglO5DKLEEp6P7SVA3esiN1keJxxYl6aZrbKnPGmsCqLaJN"
-                      alt="Colorful abstract"
-                    />
-                    <div className={styles.cardOverlay}></div>
-                    <button className={styles.starButton}>
-                      <span className="material-icons-round">star_outline</span>
-                    </button>
-                  </div>
-                  <p className={styles.recentCardTitle}>Product Roadmap</p>
-                  <p className={styles.recentCardSubtitle}>Pioupiu Labs</p>
-                </div>
+                ))}
               </div>
             </section>
 
-            {/* Your Boards Section */}
+            {/* Boards Section */}
             <section className={styles.section}>
               <div className={styles.sectionHeaderWithAction}>
                 <div className={styles.sectionHeader}>

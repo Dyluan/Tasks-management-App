@@ -8,6 +8,7 @@ export function UserProvider({ children }) {
   const server_url = process.env.REACT_APP_SERVER_URL;
   
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const updateUser = (userInfo) => {
     setUser(userInfo);
@@ -15,9 +16,11 @@ export function UserProvider({ children }) {
 
   const clearUser = () => {
     setUser(null);
+    setLoading(false);
   }
 
   const setUserInfo = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${server_url}/me`, {
         headers: {
@@ -30,10 +33,12 @@ export function UserProvider({ children }) {
       const userInfo = await getUserInfo(data.sub);
       
       setUser(userInfo);
+      setLoading(false);
       return data;
 
     } catch (error) {
       console.error('Error fetching user info:', error);
+      setLoading(false);
       return null;
     }
   };
@@ -49,6 +54,7 @@ export function UserProvider({ children }) {
     <UserContext.Provider 
       value={{ 
         user, 
+        loading,
         updateUser, 
         clearUser, 
         setUserInfo
