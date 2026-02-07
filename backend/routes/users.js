@@ -24,9 +24,68 @@ router.get('/search', requireAuth, async (req, res) => {
       res.json([]);
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Getting user failed lol');
+  }
+});
+
+router.post('/recent_boards', requireAuth, async (req, res) => {
+  console.log('post     /recent_boards');
+
+  const userId = req.user.sub;
+  const boards = req.body.boards;
+
+  console.log(boards);
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const result = await client.query(
+      `UPDATE users SET recent_boards = $1
+      WHERE id = $2 RETURNING recent_boards`, [boards, userId]
+    );
+
+    await client.query('COMMIT');
+
+    if (result.rows.length > 0) {
+      const newBoards = result.rows[0].recent_boards;
+      res.status(201).json(newBoards);
+    } else {
+      res.status(400).json({ success: false, message: 'Recent boards creation failed' });
+    }
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error(err);
+    res.status(500).send('Unable to post recent boards');
+  } finally {
+    client.release();
+  }
+
+})
+
+router.get('/recent_boards', requireAuth, async (req, res) => {
+  console.log('get    /recent_boards');
+  try {
+    const user_id = req.user.sub;
+
+    const result = await pool.query(
+      `SELECT recent_boards FROM users WHERE id = $1`
+      , [user_id]
+    );
+
+    if (result.rows.length > 0) {
+      const recent_boards = result.rows[0].recent_boards;
+      res.status(200).json(recent_boards);
+    } else {
+      res.json([]);
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Getting recent_boards failed lol');
   }
 });
 
@@ -37,7 +96,7 @@ router.get('/:id', requireAuth, async (req, res) => {
 
     const result = await pool.query(
       `SELECT * FROM users WHERE id = $1`
-    , [user_id]);
+      , [user_id]);
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
@@ -47,11 +106,11 @@ router.get('/:id', requireAuth, async (req, res) => {
       res.send([]);
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Getting user data failed lol');
   }
-})
+});
 
 router.patch('/:id/edit', requireAuth, async (req, res) => {
   console.log('patch     /:id/edit');
@@ -68,7 +127,7 @@ router.patch('/:id/edit', requireAuth, async (req, res) => {
       updates.push(`"${key}" = $${index}`);
       values.push(value);
 
-      index ++;
+      index++;
     };
 
     // prevents empty requests which will crash the server
@@ -95,7 +154,7 @@ router.patch('/:id/edit', requireAuth, async (req, res) => {
 
     res.status(200).json(result.rows[0]);
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Updating user failed lol');
   }

@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import pool from '../db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import axios from 'axios';
 
 dotenv.config();
 
@@ -16,7 +15,7 @@ router.get('/all', requireAuth, async (req, res) => {
 
     const result = await pool.query(
       `SELECT * FROM boards WHERE owner_id = $1 AND workspace_id = $2`
-    , [userId, workspace_id]);
+      , [userId, workspace_id]);
 
     if (result.rows.length > 0) {
       const boards = result.rows;
@@ -25,16 +24,16 @@ router.get('/all', requireAuth, async (req, res) => {
       console.log('No board found for said workspace');
       res.send([]);
     }
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Fetching boards failed lol');
   }
 })
 
-router.post('/new', requireAuth, async(req, res) => {
-  
+router.post('/new', requireAuth, async (req, res) => {
+
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
 
@@ -58,13 +57,13 @@ router.post('/new', requireAuth, async(req, res) => {
       // Adding default labels for newly created board
       const board_id = newBoard.id;
       const colorList = [
-        '#d6f5e3', 
-        '#f0f4b1', 
-        '#fde8b8', 
-        '#ffd1c1', 
-        '#f0d5fa', 
-        '#d6e4ff', 
-        '#cdeff7', 
+        '#d6f5e3',
+        '#f0f4b1',
+        '#fde8b8',
+        '#ffd1c1',
+        '#f0d5fa',
+        '#d6e4ff',
+        '#cdeff7',
         '#e6e6e6'
       ];
 
@@ -83,7 +82,7 @@ router.post('/new', requireAuth, async(req, res) => {
       res.status(400).json({ success: false, message: 'board creation failed' });
     }
 
-  } catch(err) {
+  } catch (err) {
     await client.query('ROLLBACK');
     console.error(err);
     res.status(500).send('Error creating a new board lol');
@@ -109,7 +108,7 @@ router.patch('/column/:id', requireAuth, async (req, res) => {
       updates.push(`${key} = $${index}`);
       values.push(value);
 
-      index ++;
+      index++;
     };
 
     // prevents empty requests which will crash the server
@@ -136,7 +135,7 @@ router.patch('/column/:id', requireAuth, async (req, res) => {
 
     res.status(200).json(result.rows[0]);
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Updating column failed lol');
   }
@@ -159,7 +158,7 @@ router.delete('/column/:id', requireAuth, async (req, res) => {
 
     res.status(204);
 
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(400).send('Unable to delete column lol');
   }
@@ -183,7 +182,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
 
     res.status(204).json({ message: 'Board successfully deleted' });
 
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(400).send('Unable to delete board lol');
   }
@@ -201,6 +200,7 @@ router.get('/:id/all', requireAuth, async (req, res) => {
         b.name,
         b.colors,
         b.created_at,
+        w.title AS workspace_name,
 
         COALESCE(
           jsonb_agg(
@@ -217,6 +217,7 @@ router.get('/:id/all', requireAuth, async (req, res) => {
         ) AS columns
 
       FROM boards b
+      LEFT JOIN workspaces w ON b.workspace_id = w.id
 
       LEFT JOIN columns c
         ON c.board_id = b.id
@@ -254,49 +255,22 @@ router.get('/:id/all', requireAuth, async (req, res) => {
       ) cards ON TRUE
 
       WHERE b.id = $1
-      GROUP BY b.id;
-    `, 
-    [board_id]);
+      GROUP BY b.id, w.title;
+    `,
+      [board_id]);
 
     if (result.rows.length > 0) {
       const data = result.rows[0];
       res.status(200).send(data);
     }
 
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).send('Getting board data failed lol');
   }
 })
 
-router.get('/:id', requireAuth, async(req, res) => {
-  console.log('/boards/id');
-  try {
-    const userId = req.user.sub;
-    const board_id = req.params.id;
-
-    console.log('user: boardID');
-    console.log(userId, board_id);
-
-    // TODO: fetch columns, cards
-    const result = await pool.query(
-      `SELECT * FROM boards WHERE owner_id = $1 AND id = $2`
-    , [userId, board_id]);
-
-    if (result.rows.length > 0) {
-      const boards = result.rows[0];
-      res.send(boards);
-    } else {
-      console.log('No board found');
-      res.send([]);
-    }
-  } catch(err) {
-    console.error(err);
-    res.status(500).send('Getting board data failed lol');
-  }
-})
-
-router.patch('/:id', requireAuth, async(req, res) => {
+router.patch('/:id', requireAuth, async (req, res) => {
   console.log('patch  /boards/id');
   try {
 
@@ -313,7 +287,7 @@ router.patch('/:id', requireAuth, async(req, res) => {
       updates.push(`${key} = $${index}`);
       values.push(value);
 
-      index ++;
+      index++;
     };
 
     // prevents empty requests which will crash the server
@@ -340,8 +314,8 @@ router.patch('/:id', requireAuth, async(req, res) => {
     }
 
     res.status(200).json(result.rows[0]);
-    
-  } catch(err) {
+
+  } catch (err) {
     console.error(err);
     res.status(500).send('Updating board failed lol');
   }
@@ -364,7 +338,7 @@ router.get('/:id/columns', requireAuth, async (req, res) => {
       console.log('Columns not found');
       res.send([]);
     }
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Fetching columns failed lol');
   }
@@ -394,7 +368,7 @@ router.post('/:id/columns/new', requireAuth, async (req, res) => {
       res.status(400).json({ success: false, message: "Insert failed" });
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Creating new column failed lol');
   }
@@ -421,7 +395,7 @@ router.post('/:id/labels', requireAuth, async (req, res) => {
       res.status(400).json({ success: false, message: "Insertion failed" });
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Creating label failed lol');
   }
@@ -444,7 +418,7 @@ router.get('/:id/labels', requireAuth, async (req, res) => {
       res.status(200).json([]);
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Getting labels failed lol');
   }
@@ -467,7 +441,7 @@ router.delete('/labels/:id', requireAuth, async (req, res) => {
 
     res.status(204);
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(400).send('Unable to delete label lol');
   }
@@ -486,14 +460,14 @@ router.patch('/labels/:id', requireAuth, async (req, res) => {
     for (const [key, value] of Object.entries(req.body)) {
       // prevents user from making malicious requests
       if (!allowedFields.includes(key)) continue;
-      
+
       // skip board_id as it's used in WHERE clause, not SET
       if (key === 'board_id') continue;
 
       updates.push(`${key} = $${index}`);
       values.push(value);
 
-      index ++;
+      index++;
     };
 
     // prevents empty requests which would crash the server
@@ -521,7 +495,7 @@ router.patch('/labels/:id', requireAuth, async (req, res) => {
 
     res.status(200).json(result.rows[0]);
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send('Updating label failed lol');
   }
