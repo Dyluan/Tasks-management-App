@@ -36,7 +36,8 @@ function NewHomePage() {
     updateWorkspaceList,
     clearApp,
     initializeApp,
-    recentBoards
+    recentBoards,
+    getMinimalBoards
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
@@ -52,7 +53,7 @@ function NewHomePage() {
   useEffect(() => {
     if (id) {
       getWorkspace(id);
-      fetchWorkspaceBoards(id);
+      getMinimalBoards(id);
     }
   }, [id]);
 
@@ -101,6 +102,11 @@ function NewHomePage() {
     await updateWorkspaceList();
     navigate(`/workspace/${data.currentWorkspace}`);
   };
+
+  // loads all boards on "View All" button click
+  const handleViewAllClick = async () => {
+    fetchWorkspaceBoards(id);
+  }
 
   const [darkMode, setDarkMode] = useState(false);
 
@@ -603,7 +609,10 @@ function NewHomePage() {
                   <span className="material-icons-round">grid_view</span>
                   <h2>Your Boards</h2>
                 </div>
-                <button className={styles.viewAllButton}>View All</button>
+                <button 
+                  className={styles.viewAllButton}
+                  onClick={() => handleViewAllClick()}
+                >View All</button>
               </div>
               <div className={styles.boardGrid}>
                 {/* dynamic */}

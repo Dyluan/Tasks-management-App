@@ -152,6 +152,15 @@ export function AppProvider({ children }) {
     }
   }, [recentBoards]);
 
+  const getMinimalBoards = async (workspace_id) => {
+    const currentToken = localStorage.getItem('jwt');
+    const response = await axios.get(`${server_url}/boards/${workspace_id}/mini`,
+      { headers: { Authorization: `Bearer ${currentToken}` } }
+    );
+    console.log('mini:', response.data);
+    setBoards(response.data);
+  };
+
   // Initialize app data - called when component mounts or when explicitly refreshed
   const initializeApp = async () => {
     const currentToken = localStorage.getItem('jwt');
@@ -169,14 +178,12 @@ export function AppProvider({ children }) {
         // get current workspace
         const currentWorkspace = await getCurrentWorkspace();
 
-        // fetch all the boards linked to that workspace id
-        if (currentWorkspace?.id) {
-          fetchWorkspaceBoards(currentWorkspace.id);
-        }
-
         // fetch recent boards on app load
         const recent = await getRecentBoards();
         setRecentBoards(recent || []);
+
+        // fetch 4 boards from server on app load
+        getMinimalBoards(currentWorkspace.id);
 
       } catch (error) {
         console.error('Error initializing app:', error);
@@ -207,6 +214,7 @@ export function AppProvider({ children }) {
         deleteBoard,
         clearApp,
         initializeApp,
+        getMinimalBoards
       }}  
     >
       { children }
