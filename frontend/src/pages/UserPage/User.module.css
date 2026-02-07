@@ -149,6 +149,15 @@
   box-shadow: 0 0 0 2px var(--primary-light);
 }
 
+.faceSmall {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 9999px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
 .userDetails {
   flex: 1;
   min-width: 0;
@@ -309,6 +318,15 @@
   width: 8rem;
   height: 8rem;
   border-radius: 9999px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.faceLarge {
+  width: 8rem !important;
+  height: 8rem !important;
+  border-radius: 50%;
   background-size: cover;
   background-position: center;
   overflow: hidden;

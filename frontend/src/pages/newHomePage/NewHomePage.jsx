@@ -447,7 +447,7 @@ function NewHomePage() {
                 onClick={(e) => handlePopoverClick(e)}
               />
             ) : (
-              <Facehash name={user.name} size={32} enableBlink className={`[--facehash-color:${FaceHashColor}]`} 
+              <Facehash name={user.name} size={32} enableBlink style={{ backgroundColor: FaceHashColor }}
                 onClick={(e) => handlePopoverClick(e)}
               />
             )}

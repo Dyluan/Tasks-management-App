@@ -14,6 +14,8 @@ function UserPage() {
   const server_url = process.env.REACT_APP_SERVER_URL;
   const token = localStorage.getItem('jwt');
 
+  const FaceHashColor = '#10A5F5';
+
   const handleLogout = () => {
     localStorage.removeItem('jwt');
     clearUser();
@@ -123,17 +125,13 @@ function UserPage() {
               <span className="material-symbols-outlined">notifications</span>
               <span>Notifications</span>
             </a>
-            <a href="#" className={styles.navLink}>
-              <span className="material-symbols-outlined">palette</span>
-              <span>Appearance</span>
-            </a>
           </nav>
 
           <div className={styles.sidebarFooter}>
             <div className={styles.userInfo}>
               {/* TODO: not sure this fits with smaller screen values */}
               {user ? (
-                  <Facehash name={user?.name} size={32} />
+                  <Facehash name={user?.name}  enableBlink className={styles.faceSmall} style={{ backgroundColor: FaceHashColor }} />
                 ) : (
                   <div
                     className={styles.userAvatarSmall}
@@ -179,12 +177,16 @@ function UserPage() {
             {/* Avatar Section */}
             <section className={styles.avatarSection}>
               <div className={styles.avatarWrapper}>
-                <div
-                  className={styles.avatarLarge}
-                  style={{
-                    backgroundImage: `url('${user?.picture || user?.avatar || user?.image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAKiY9Br77NKum1vEYlmZZKGfnUnwK_K4m5Brrm_SUxWMZfRBB1ky-dndlja8W1Xi1qarN3zY2BkiVfru3upzzDpZx5q-CWCSU43EawiblwfKgZoCnpxBhLk2H5DMRmrN5NOd31tFc98jhz29ugzgGX7deM9l5RnC0F206h2NlftLqRHfJ37QNAx5RBielXNkfiq4k6p2fd53NJrUmEQcFQa2fQ7wj7t5CZPjsMUvmlfw70IfHPrDt3Dv-StiRcdrOWToNYIN-yz1nV'}')`
-                  }}
-                ></div>
+                {user.image ? (
+                  <div
+                    className={styles.avatarLarge}
+                    style={{
+                      backgroundImage: `url('${ user?.image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAKiY9Br77NKum1vEYlmZZKGfnUnwK_K4m5Brrm_SUxWMZfRBB1ky-dndlja8W1Xi1qarN3zY2BkiVfru3upzzDpZx5q-CWCSU43EawiblwfKgZoCnpxBhLk2H5DMRmrN5NOd31tFc98jhz29ugzgGX7deM9l5RnC0F206h2NlftLqRHfJ37QNAx5RBielXNkfiq4k6p2fd53NJrUmEQcFQa2fQ7wj7t5CZPjsMUvmlfw70IfHPrDt3Dv-StiRcdrOWToNYIN-yz1nV'}')`
+                    }}
+                  ></div>
+                ) : (
+                  <Facehash name={user.name} enableBlink className={styles.faceLarge} style={{ backgroundColor: FaceHashColor }}/>
+                )}
                 <button className={styles.avatarEditBtn}>
                   <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>camera_alt</span>
                 </button>
