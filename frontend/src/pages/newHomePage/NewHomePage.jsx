@@ -19,7 +19,6 @@ import AddModalComponent from '../../components/addMembersModalComponent/AddModa
 import CreateBoardPopoverComponent from '../../components/createBoardPopover/CreateBoardPopoverComponent';
 import axios from "axios";
 import { Facehash } from "facehash";
-import { brown } from '@mui/material/colors';
 
 function NewHomePage() {
 
@@ -37,7 +36,6 @@ function NewHomePage() {
     clearApp,
     initializeApp,
     recentBoards,
-    getMinimalBoards
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
@@ -53,7 +51,7 @@ function NewHomePage() {
   useEffect(() => {
     if (id) {
       getWorkspace(id);
-      getMinimalBoards(id);
+      fetchWorkspaceBoards(id);
     }
   }, [id]);
 
@@ -104,8 +102,9 @@ function NewHomePage() {
   };
 
   // loads all boards on "View All" button click
-  const handleViewAllClick = async () => {
-    fetchWorkspaceBoards(id);
+  const [showAllBoards, setShowAllBoards] = useState(false);
+  const handleViewAllClick = () => {
+    setShowAllBoards(!showAllBoards);
   }
 
   const [darkMode, setDarkMode] = useState(false);
@@ -609,14 +608,16 @@ function NewHomePage() {
                   <span className="material-icons-round">grid_view</span>
                   <h2>Your Boards</h2>
                 </div>
-                <button 
-                  className={styles.viewAllButton}
-                  onClick={() => handleViewAllClick()}
-                >View All</button>
+                {boards.length > 4 && (
+                  <button 
+                    className={styles.viewAllButton}
+                    onClick={() => handleViewAllClick()}
+                  >{showAllBoards ? 'View Less' : 'View All'}</button>
+                )}
               </div>
               <div className={styles.boardGrid}>
                 {/* dynamic */}
-                {boards.map(board => (
+                {(showAllBoards ? boards : boards.slice(0, 4)).map(board => (
                   <div
                     className={`${styles.boardCard}`}
                     style={{ background: board.colors.board }}
