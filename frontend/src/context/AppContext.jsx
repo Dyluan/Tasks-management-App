@@ -134,9 +134,23 @@ export function AppProvider({ children }) {
     const response = await axios.get(`${server_url}/users/recent_boards`, 
       { headers: { Authorization: `Bearer ${currentToken}` } }
     );
-    console.log('rrr:', response.data.recent_boards);
-    return response.data.recent_boards;
-  }
+    return response.data;
+  };
+
+  const postRecentBoards = async (boards) => {
+    const currentToken = localStorage.getItem('jwt');
+    await axios.post(`${server_url}/users/recent_boards`,
+      { boards },
+      { headers: { Authorization: `Bearer ${currentToken}` } }
+    );
+  };
+
+  // sends postRecentBoards request each time an element inside of recentBoards changes
+  useEffect(() => {
+    if (recentBoards.length > 0) {
+      postRecentBoards(recentBoards);
+    }
+  }, [recentBoards]);
 
   // Initialize app data - called when component mounts or when explicitly refreshed
   const initializeApp = async () => {
@@ -159,6 +173,11 @@ export function AppProvider({ children }) {
         if (currentWorkspace?.id) {
           fetchWorkspaceBoards(currentWorkspace.id);
         }
+
+        // fetch recent boards on app load
+        const recent = await getRecentBoards();
+        setRecentBoards(recent || []);
+
       } catch (error) {
         console.error('Error initializing app:', error);
       }
@@ -188,7 +207,6 @@ export function AppProvider({ children }) {
         deleteBoard,
         clearApp,
         initializeApp,
-        getRecentBoards
       }}  
     >
       { children }
