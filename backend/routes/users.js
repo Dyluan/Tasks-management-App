@@ -36,8 +36,6 @@ router.post('/recent_boards', requireAuth, async (req, res) => {
   const userId = req.user.sub;
   const boards = req.body.boards;
 
-  console.log(boards);
-
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

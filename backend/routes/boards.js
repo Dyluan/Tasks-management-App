@@ -28,7 +28,31 @@ router.get('/all', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).send('Fetching boards failed lol');
   }
-})
+});
+
+router.get('/:id/mini', requireAuth, async (req, res) => {
+  console.log('get     /mini');
+  try {
+    const userId = req.user.sub;
+    const workspace_id = req.params.id;
+
+    const result = await pool.query(
+      `SELECT * FROM boards WHERE owner_id = $1 AND workspace_id = $2
+      LIMIT 4`
+      , [userId, workspace_id]);
+
+    if (result.rows.length > 0) {
+      const boards = result.rows;
+      res.send(boards);
+    } else {
+      console.log('No board found for said workspace');
+      res.send([]);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fetching boards failed lol');
+  }
+});
 
 router.post('/new', requireAuth, async (req, res) => {
 
