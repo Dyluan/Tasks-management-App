@@ -88,3 +88,6 @@
 .userContainer {
   padding: 4px;
 }
+.face {
+  border-radius: 50%;
+}

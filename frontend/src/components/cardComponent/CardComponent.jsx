@@ -584,7 +584,7 @@ function CardComponent({
             <div className={styles.title}>
               {cardTitle}
             </div>
-            {/* TODO, the cardInformation holds a padding that displays 
+            {/* TODO: the cardInformation holds a padding that displays 
               even if there's no content inside */}
             <div className={styles.cardInformation}>
               {description.length > 0 && (

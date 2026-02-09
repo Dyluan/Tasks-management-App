@@ -7,6 +7,7 @@ import Popover from '@mui/material/Popover';
 import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
 import { List, ListItemButton, ListItemIcon, ListItemText, TextField, Button } from '@mui/material';
+import { Facehash } from "facehash";
 
 function AddModalComponent({
   open,
@@ -19,6 +20,8 @@ function AddModalComponent({
   const [searchValue, setSearchValue] = useState('');
   const [inviteText, setInviteText] = useState('');
   const [defaultUser, setDefaultUser] = useState(null);
+
+  const FaceHashColor = '#10A5F5';
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState(null);
   const token = localStorage.getItem('jwt');
@@ -139,7 +142,18 @@ function AddModalComponent({
                       onClick={() => setDefaultUser(user)}
                     >
                       <ListItemIcon>
-                        <img src={user.image} className={styles.userPicture} alt="user picture" />
+                        { user?.image ? (
+                          <img src={user.image} className={styles.userPicture} alt="user picture" />
+                        ) : (
+                          <Facehash 
+                            name={user.name} 
+                            size={32} 
+                            style={{ backgroundColor: FaceHashColor }} 
+                            className={styles.face} 
+                            enableBlink
+                          />
+                        )}
+                        
                       </ListItemIcon>
                       <ListItemText 
                         primary={user.email}

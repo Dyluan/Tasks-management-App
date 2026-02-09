@@ -59,17 +59,45 @@ function UserPage() {
     }
   }, [user]);
 
+  const validateUsername = async () => {
+    if (formData.name.trim().length < 4) {
+      return 'Username must be at least 4 characters long';
+    }
+    // returns a user with said username or returns empty json
+    const response = await axios.get(`${server_url}/users/search/${formData.name}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (response.data.id) {
+      if (response.data.id === user.id) {
+        return '';
+      } else {
+        return 'Username already taken';
+      }
+    } else {
+      return '';
+    }
+  }
+
+  const [usernameError, setUsernameError] = useState('');
+  const [usernameTouched, setUsernameTouched] = useState(false);
+  const handleUsernameBlur = async () => {
+    setUsernameTouched(true);
+    const usernameValidationError = await validateUsername();
+    setUsernameError(usernameValidationError);
+  }
+
   const saveProfile = async () => {
     if (!user?.id) {
       console.error('User not loaded yet');
       return;
     }
-    const response = await axios.patch(`${server_url}/users/${user.id}/edit`, 
-      formData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    console.log('profile update:', response.data);
-    navigate(-1);
+    if (!usernameError) {
+      const response = await axios.patch(`${server_url}/users/${user.id}/edit`, 
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      navigate(-1);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -232,8 +260,10 @@ function UserPage() {
                       placeholder="username"
                       value={formData.name}
                       onChange={handleInputChange}
+                      onBlur={handleUsernameBlur}
                     />
                   </div>
+                  {usernameError && <div className={styles.errorMessage}>{usernameError}</div>}
                 </div>
                 <div className={styles.formGroupFull}>
                   <label className={styles.label}>Bio</label>
