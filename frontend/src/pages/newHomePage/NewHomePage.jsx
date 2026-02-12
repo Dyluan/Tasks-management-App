@@ -36,6 +36,8 @@ function NewHomePage() {
     clearApp,
     initializeApp,
     recentBoards,
+    updateBoard,
+    updateRecentBoard,
   } = useApp();
 
   const params = new URLSearchParams(window.location.search);
@@ -329,6 +331,47 @@ function NewHomePage() {
     </List>
   );
 
+  // array of board ids that are set as favorites
+  const [favBoardsIds, setFavBoardsIds] = useState([]);
+  
+  // Initialize favBoardsIds with boards that have favorite === true
+  useEffect(() => {
+    const favoritesFromBoards = boards
+      .filter(board => board.favorite === true)
+      .map(board => board.id);
+    
+    const favoritesFromRecent = recentBoards
+      .filter(board => board.favorite === true)
+      .map(board => board.id);
+    
+    // Combine and deduplicate
+    const allFavorites = [...new Set([...favoritesFromBoards, ...favoritesFromRecent])];
+    setFavBoardsIds(allFavorites);
+  }, [boards, recentBoards]);
+
+  const handleFavClick = async (e, id) => {
+    e.stopPropagation();
+    const currentToken = localStorage.getItem('jwt');
+    const newFavoriteStatus = !favBoardsIds.includes(id);
+    
+    // Update local state
+    if (newFavoriteStatus) {
+      setFavBoardsIds(prev => [...prev, id]);
+    } else {
+      setFavBoardsIds(favBoardsIds.filter(fav => fav !== id));
+    }
+    
+    // Update context state (for both boards and recentBoards)
+    updateBoard(id, { favorite: newFavoriteStatus });
+    updateRecentBoard(id, { favorite: newFavoriteStatus });
+    
+    // Persist to server
+    await axios.patch(`${server_url}/boards/${id}`,
+      { favorite: newFavoriteStatus },
+      { headers: { Authorization: `Bearer ${currentToken}` } }
+    );
+  };
+
   // Show loading screen while user data is being fetched
   if (loading || !user) {
     return (
@@ -590,8 +633,12 @@ function NewHomePage() {
                       onClick={() => navigate(`/board/${recentBoard.id}`)}
                     >
                       <div className={styles.cardOverlay}></div>
-                      <button className={styles.starButton}>
-                        <span className="material-icons-round">star_outline</span>
+                      <button className={styles.starButton} onClick={(e) => handleFavClick(e, recentBoard.id)}>
+                        {favBoardsIds.includes(recentBoard.id) ? (
+                          <span className="material-icons-round" style={{color: '#FFFF55'}}>star</span>
+                        ) : (
+                          <span className="material-icons-round">star_outline</span>
+                        )}
                       </button>
                     </div>
                     <p className={styles.recentCardTitle}>{recentBoard.name}</p>

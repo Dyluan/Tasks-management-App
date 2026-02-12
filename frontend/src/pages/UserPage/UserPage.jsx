@@ -157,10 +157,7 @@ function UserPage() {
 
           <div className={styles.sidebarFooter}>
             <div className={styles.userInfo}>
-              {/* TODO: not sure this fits with smaller screen values */}
-              {user ? (
-                  <Facehash name={user?.name}  enableBlink className={styles.faceSmall} style={{ backgroundColor: FaceHashColor }} />
-                ) : (
+              {user.image ? (
                   <div
                     className={styles.userAvatarSmall}
                     style={{
@@ -168,6 +165,9 @@ function UserPage() {
                     }}
                   >
                   </div>
+                  
+                ) : (
+                  <Facehash name={user?.name} enableBlink className={styles.faceSmall} style={{ backgroundColor: FaceHashColor }} />
                 )}
               <div className={styles.userDetails}>
                 <p className={styles.userName}>{user?.name || ''}</p>

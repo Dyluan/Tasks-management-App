@@ -119,7 +119,8 @@ export function AppProvider({ children }) {
         id: board.id,
         name: board.name,
         colors: board.colors,
-        workspace_title: board.workspace_title
+        workspace_title: board.workspace_title,
+        favorite: board.favorite
       };
 
       return [
@@ -127,6 +128,12 @@ export function AppProvider({ children }) {
         ...prev.filter(b => b.id !== board.id)
       ].slice(0, 4);
     });
+  }, []);
+
+  const updateRecentBoard = useCallback((boardId, updatedData) => {
+    setRecentBoards(prev => prev.map(board =>
+      board.id === boardId ? { ...board, ...updatedData } : board
+    ));
   }, []);
 
   const getRecentBoards = async () => {
@@ -199,6 +206,7 @@ export function AppProvider({ children }) {
         updateBoards,
         updateBoard,
         updateRecentBoards,
+        updateRecentBoard,
         recentBoards,
         editWorkspace,
         getWorkspace,
