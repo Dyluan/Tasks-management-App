@@ -5,6 +5,7 @@ import BoardComponent from './components/boardComponent/BoardComponent';
 import LoginPage from './pages/LoginPage/LoginPage';
 import NewHomePage from './pages/newHomePage/NewHomePage';
 import UserPage from './pages/UserPage/UserPage';
+import AllBoardsPage from './pages/allBoardsPage/AllBoardsPage';
 import PageTransition from './components/PageTransition/PageTransition';
 import { AnimatePresence } from 'motion/react';
 import reportWebVitals from './reportWebVitals';
@@ -31,6 +32,11 @@ function AnimatedRoutes() {
         <Route path='/workspace/:id' element={
           <PageTransition>
             <NewHomePage />
+          </PageTransition>} 
+        />
+        <Route path='/boards/all' element={
+          <PageTransition>
+            <AllBoardsPage />
           </PageTransition>} 
         />
         <Route path='/login' element={

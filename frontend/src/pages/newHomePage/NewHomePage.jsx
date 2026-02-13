@@ -534,7 +534,7 @@ function NewHomePage() {
             <div className={styles.sidebarSection}>
               <h3 className={styles.sectionTitle}>Shortcuts</h3>
               <div className={styles.sectionItems}>
-                <a href="#" className={styles.shortcutItem}>
+                <a href="/boards/all" className={styles.shortcutItem}>
                   <span className="material-icons-round">dashboard</span>
                   <span>Boards</span>
                 </a>
