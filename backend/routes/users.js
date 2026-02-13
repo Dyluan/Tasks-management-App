@@ -7,6 +7,29 @@ dotenv.config();
 
 const router = express.Router();
 
+router.get('/search/:user', requireAuth, async (req, res) => {
+  console.log('get     /users/search/id');
+  try {
+    const searchedUser = req.params.user;
+
+    const result = await pool.query(
+      `SELECT * FROM users WHERE name = $1`
+      , [searchedUser]
+    );
+
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      res.status(200).json(user);
+    } else {
+      res.json({});
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Getting user failed lol');
+  }
+});
+
 router.get('/search', requireAuth, async (req, res) => {
   console.log('get     /users/search');
   try {

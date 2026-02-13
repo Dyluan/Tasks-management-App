@@ -298,7 +298,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   console.log('patch  /boards/id');
   try {
 
-    const allowedFields = ['name', 'colors'];
+    const allowedFields = ['name', 'colors', 'favorite'];
 
     const updates = [];
     const values = [];
